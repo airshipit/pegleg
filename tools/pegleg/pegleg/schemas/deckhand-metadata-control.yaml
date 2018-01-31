@@ -1,0 +1,19 @@
+$schema: http://json-schema.org/schema#
+
+definitions:
+  labels:
+    type: object
+
+type: object
+properties:
+  schema:
+    type: string
+    pattern: '^metadata/Control/v1$'
+  name:
+    type: string
+  labels:
+    $ref: '#/definitions/labels'
+additionalProperties: false
+required:
+  - schema
+  - name

@@ -1,0 +1,30 @@
+$schema: http://json-schema.org/schema#
+
+definitions:
+  labels:
+    type: object
+  schema:
+    type: string
+    pattern: '^.+/.+/v[0-9](\.[0-9])?$'
+
+type: object
+properties:
+  schema:
+    $ref: '#/definitions/schema'
+  metadata:
+    properties:
+      schema:
+        type: string
+        enum:
+          - metadata/Control/v1
+          - metadata/Document/v1
+    additionalProperties: true
+    required:
+      - schema
+  data: {}
+
+additionalProperties: false
+required:
+  - schema
+  - metadata
+  - data
