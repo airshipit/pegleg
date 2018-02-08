@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
-set -eu
+set -e
 
 SCRIPT_DIR=$(realpath "$(dirname "${0}")")
 SOURCE_DIR=${SCRIPT_DIR}/pegleg
-WORKSPACE=$(realpath "${SCRIPT_DIR}/..")
+if [ -d "$PWD/global" ]; then
+  WORKSPACE="$PWD"
+else
+  WORKSPACE=$(realpath "${SCRIPT_DIR}/..")
+fi
 
 IMAGE_PEGLEG=${IMAGE_PEGLEG:-quay.io/attcomdev/pegleg:latest}
 

@@ -26,18 +26,18 @@ def all():
     return search(DIR_DEPTHS.keys())
 
 
-def create_global_directories(aic_revision):
+def create_global_directories(revision):
     _create_tree(_global_common_path())
-    _create_tree(_global_revision_path(aic_revision))
+    _create_tree(_global_revision_path(revision))
 
 
-def create_site_directories(*, site_name, aic_revision, **_kwargs):
+def create_site_directories(*, site_name, revision, **_kwargs):
     _create_tree(_site_path(site_name))
 
 
-def create_site_type_directories(*, aic_revision, site_type):
+def create_site_type_directories(*, revision, site_type):
     _create_tree(_site_type_common_path(site_type))
-    _create_tree(_site_type_revision_path(site_type, aic_revision))
+    _create_tree(_site_type_revision_path(site_type, revision))
 
 
 FULL_STRUCTURE = {
@@ -82,12 +82,12 @@ def _create_tree(root_path, *, tree=FULL_STRUCTURE):
         _create_tree(path, tree=data)
 
 
-def directories_for(*, site_name, aic_revision, site_type):
+def directories_for(*, site_name, revision, site_type):
     return [
         _global_common_path(),
-        _global_revision_path(aic_revision),
+        _global_revision_path(revision),
         _site_type_common_path(site_type),
-        _site_type_revision_path(site_type, aic_revision),
+        _site_type_revision_path(site_type, revision),
         _site_path(site_name),
     ]
 
@@ -96,16 +96,16 @@ def _global_common_path():
     return 'global/common'
 
 
-def _global_revision_path(aic_revision):
-    return 'global/%s' % aic_revision
+def _global_revision_path(revision):
+    return 'global/%s' % revision
 
 
 def _site_type_common_path(site_type):
     return 'type/%s/common' % site_type
 
 
-def _site_type_revision_path(site_type, aic_revision):
-    return 'type/%s/%s' % (site_type, aic_revision)
+def _site_type_revision_path(site_type, revision):
+    return 'type/%s/%s' % (site_type, revision)
 
 
 def _site_path(site_name):
@@ -137,7 +137,7 @@ def slurp(path):
     if not os.path.exists(path):
         raise click.ClickException(
             '%s not found.  pegleg must be run from '
-            'the root of an AIC cLCP configuration repostiory.' % path)
+            'the root of a configuration repostiory.' % path)
 
     with open(path) as f:
         try:

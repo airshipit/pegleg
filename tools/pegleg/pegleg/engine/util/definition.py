@@ -11,7 +11,7 @@ __all__ = [
 ]
 
 
-def create(*, site_name, site_type, aic_revision):
+def create(*, site_name, site_type, revision):
     definition = {
         'schema': 'pegleg/SiteDefinition/v1',
         'metadata': {
@@ -24,7 +24,7 @@ def create(*, site_name, site_type, aic_revision):
             },
         },
         'data': {
-            'aic_revision': aic_revision,
+            'revision': revision,
             'site_type': site_type,
         }
     }

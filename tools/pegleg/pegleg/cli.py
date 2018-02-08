@@ -103,37 +103,37 @@ def stub():
 
 RELEASE_OPTION = click.option(
     '-r',
-    '--aic-revision',
+    '--revision',
     callback=_validate_revision_callback,
     required=True,
-    help='AIC revision to use (e.g. v4.0)')
+    help='Configuration revision to use (e.g. v1.0)')
 
 SITE_TYPE_OPTION = click.option(
     '-t',
     '--site-type',
     required=True,
-    help='Site type to use (e.g. "medium" or "large"')
+    help='Site type to use ("large", "medium", "cicd", "labs", etc.')
 
 
 @stub.command('global', help='Add global structure for a new revision')
 @RELEASE_OPTION
-def global_(*, aic_revision):
-    engine.stub.global_(aic_revision)
+def global_(*, revision):
+    engine.stub.global_(revision)
 
 
 @stub.command(help='Add a new site + revision')
 @click.argument('site_name')
 @RELEASE_OPTION
 @SITE_TYPE_OPTION
-def site(*, aic_revision, site_type, site_name):
-    engine.stub.site(aic_revision, site_type, site_name)
+def site(*, revision, site_type, site_name):
+    engine.stub.site(revision, site_type, site_name)
 
 
 @stub.command('site-type', help='Add a new site-type + revision')
 @RELEASE_OPTION
 @SITE_TYPE_OPTION
-def site_type(*, aic_revision, site_type):
-    engine.stub.site_type(aic_revision, site_type)
+def site_type(*, revision, site_type):
+    engine.stub.site_type(revision, site_type)
 
 
 @main.command(help='Sanity checks for repository content')

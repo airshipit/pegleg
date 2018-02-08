@@ -27,7 +27,7 @@ def impacted(input_stream, output_stream):
 
 
 def list_(output_stream):
-    fieldnames = ['site_name', 'site_type', 'aic_revision']
+    fieldnames = ['site_name', 'site_type', 'revision']
     writer = csv.DictWriter(
         output_stream, fieldnames=fieldnames, delimiter=' ')
     for site_name in util.files.list_sites():
