@@ -17,10 +17,11 @@ DECKHAND_SCHEMAS = {
 }
 
 
-def full():
+def full(fail_on_missing_sub_src=False):
     errors = []
     errors.extend(_verify_no_unexpected_files())
     errors.extend(_verify_file_contents())
+    errors.extend(_verify_deckhand_render(fail_on_missing_sub_src))
     if errors:
         raise click.ClickException('\n'.join(['Linting failed:'] + errors))
 
@@ -122,6 +123,20 @@ def _verify_document(document, schemas, filename):
                     % (filename, name))
     return errors
 
+def _verify_deckhand_render(fail_on_missing_sub_src=False):
+
+    documents = []
+
+    for filename in util.files.all():
+        with open(filename) as f:
+            documents.extend(list(yaml.safe_load_all(f)))
+
+    rendered_documents, errors = util.deckhand.deckhand_render(
+        documents=documents,
+        fail_on_missing_sub_src=fail_on_missing_sub_src,
+        validate=True,
+    )
+    return errors
 
 def _layer(data):
     if hasattr(data, 'get'):

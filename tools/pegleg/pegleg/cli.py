@@ -32,7 +32,6 @@ def main(ctx, *, verbose):
 def site():
     pass
 
-
 @site.command(help='Output complete config for one site')
 @click.option(
     '-o',
@@ -44,7 +43,6 @@ def site():
 @click.argument('site_name')
 def collect(*, output_stream, site_name):
     engine.site.collect(site_name, output_stream)
-
 
 @site.command(help='Find sites impacted by changed files')
 @click.option(
@@ -89,6 +87,18 @@ def show(*, output_stream, site_name):
     engine.site.show(site_name, output_stream)
 
 
+@site.command('render', help='Render a site through the deckhand engine')
+@click.option(
+    '-o',
+    '--output',
+    'output_stream',
+    type=click.File(mode='w'),
+    default=sys.stdout,
+    help='Where to output')
+@click.argument('site_name')
+def render(*, output_stream, site_name):
+    engine.site.render(site_name, output_stream)
+
 def _validate_revision_callback(_ctx, _param, value):
     if value is not None and value.startswith('v'):
         return value
@@ -114,6 +124,14 @@ SITE_TYPE_OPTION = click.option(
     required=True,
     help='Site type to use ("large", "medium", "cicd", "labs", etc.')
 
+LINT_OPTION = click.option(
+    '-f',
+    '--fail-on-missing-sub-src',
+    required=False,
+    type=click.BOOL,
+    default=True,
+    help="Raise deckhand exception on missing substition sources. Defaults to True.")
+
 
 @stub.command('global', help='Add global structure for a new revision')
 @RELEASE_OPTION
@@ -136,6 +154,7 @@ def site_type(*, revision, site_type):
     engine.stub.site_type(revision, site_type)
 
 
+@LINT_OPTION
 @main.command(help='Sanity checks for repository content')
-def lint():
-    engine.lint.full()
+def lint(*, fail_on_missing_sub_src):
+    engine.lint.full(fail_on_missing_sub_src)
