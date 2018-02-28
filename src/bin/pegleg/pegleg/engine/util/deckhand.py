@@ -1,6 +1,7 @@
 from deckhand.engine import layering
 from deckhand import errors as dh_errors
 
+
 def load_schemas_from_docs(documents):
     '''
     Fills the cache of known schemas from the document set
@@ -20,7 +21,10 @@ def load_schemas_from_docs(documents):
 
     return schema_set, errors
 
-def deckhand_render(documents=[], fail_on_missing_sub_src=False, validate=False):
+
+def deckhand_render(documents=[],
+                    fail_on_missing_sub_src=False,
+                    validate=False):
 
     errors = []
     rendered_documents = []

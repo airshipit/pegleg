@@ -26,6 +26,7 @@ def impacted(input_stream, output_stream):
     for site_name in sorted(impacted_sites):
         output_stream.write(site_name + '\n')
 
+
 def render(site_name, output_stream):
     documents = []
     for filename in util.definition.site_files(site_name):
@@ -33,10 +34,10 @@ def render(site_name, output_stream):
             documents.extend(list(yaml.safe_load_all(f)))
 
     rendered_documents, errors = util.deckhand.deckhand_render(
-        documents=documents
-    )
+        documents=documents)
     for d in documents:
         output_stream.writelines(yaml.dump(d))
+
 
 def list_(output_stream):
     fieldnames = ['site_name', 'site_type', 'revision']

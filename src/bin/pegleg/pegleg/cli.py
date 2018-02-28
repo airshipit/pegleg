@@ -32,6 +32,7 @@ def main(ctx, *, verbose):
 def site():
     pass
 
+
 @site.command(help='Output complete config for one site')
 @click.option(
     '-o',
@@ -43,6 +44,7 @@ def site():
 @click.argument('site_name')
 def collect(*, output_stream, site_name):
     engine.site.collect(site_name, output_stream)
+
 
 @site.command(help='Find sites impacted by changed files')
 @click.option(
@@ -99,6 +101,7 @@ def show(*, output_stream, site_name):
 def render(*, output_stream, site_name):
     engine.site.render(site_name, output_stream)
 
+
 def _validate_revision_callback(_ctx, _param, value):
     if value is not None and value.startswith('v'):
         return value
@@ -130,7 +133,9 @@ LINT_OPTION = click.option(
     required=False,
     type=click.BOOL,
     default=True,
-    help="Raise deckhand exception on missing substition sources. Defaults to True.")
+    help=
+    "Raise deckhand exception on missing substition sources. Defaults to True."
+)
 
 
 @stub.command('global', help='Add global structure for a new revision')

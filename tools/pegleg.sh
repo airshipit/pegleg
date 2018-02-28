@@ -14,16 +14,10 @@ else
   WORKSPACE=$(realpath "${SCRIPT_DIR}/..")
 fi
 
-IMAGE_PEGLEG=${IMAGE_PEGLEG:-quay.io/attcomdev/pegleg:latest}
+IMAGE=${IMAGE:-quay.io/attcomdev/pegleg:latest}
 
-if [[ -z ${http_proxy} && -z ${https_proxy} ]]
-then
-    docker build --network=host -q --rm -t "${IMAGE_PEGLEG}" "${SOURCE_DIR}" > /dev/null
-else
-    docker build --network=host -q --rm -t "${IMAGE_PEGLEG}" --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy}  "${SOURCE_DIR}" > /dev/null
-fi
-
-docker run --net=none --rm -t \
-    -v "${WORKSPACE}:/var/pegleg" \
-    "${IMAGE_PEGLEG}" \
+docker run --rm -t \
+    --net=none \
+    -v "${WORKSPACE}:/workspace" \
+    "${IMAGE}" \
     pegleg "${@}"

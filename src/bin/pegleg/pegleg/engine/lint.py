@@ -113,15 +113,16 @@ def _verify_document(document, schemas, filename):
     if document.get('schema') in MANDATORY_ENCRYPTED_TYPES:
         storage_policy = document.get('metadata', {}).get('storagePolicy')
         if storage_policy != 'encrypted':
-            errors.append(
-                    '%s (document %s) is a secret, but has unexpected storagePolicy: "%s"'
-                    % (filename, name, storage_policy))
+            errors.append('%s (document %s) is a secret, but has unexpected '
+                          'storagePolicy: "%s"' % (filename, name,
+                                                   storage_policy))
 
         if not _filename_in_section(filename, 'secrets/'):
             errors.append(
-                    '%s (document %s) is a secret, is not stored in a secrets path'
-                    % (filename, name))
+                '%s (document %s) is a secret, is not stored in a secrets path'
+                % (filename, name))
     return errors
+
 
 def _verify_deckhand_render(fail_on_missing_sub_src=False):
 
@@ -137,6 +138,7 @@ def _verify_deckhand_render(fail_on_missing_sub_src=False):
         validate=True,
     )
     return errors
+
 
 def _layer(data):
     if hasattr(data, 'get'):
