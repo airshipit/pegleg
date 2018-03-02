@@ -1,16 +1,36 @@
-from pegleg.engine import util
+import os
+import click
 import collections
 import csv
 import json
 import yaml
+import logging
 
+from pegleg.engine import util
 __all__ = ['collect', 'impacted', 'list_', 'show', 'render']
 
+LOG = logging.getLogger(__name__)
 
-def collect(site_name, output_stream):
-    for filename in util.definition.site_files(site_name):
-        with open(filename) as f:
-            output_stream.writelines(f.readlines())
+
+def collect(site_name, save_location):
+    try:
+        save_files = dict()
+        for (repo_base,
+             filename) in util.definition.site_files_by_repo(site_name):
+            repo_name = os.path.normpath(repo_base).split(os.sep)[-1]
+            if repo_name not in save_files:
+                save_files[repo_name] = open(
+                    os.path.join(save_location, repo_name + ".yaml"), "w")
+            LOG.debug("Collecting file %s to file %s" %
+                      (filename,
+                       os.path.join(save_location, repo_name + '.yaml')))
+            with open(filename) as f:
+                save_files[repo_name].writelines(f.readlines())
+    except Exception as ex:
+        raise click.ClickException("Error saving output: %s" % str(ex))
+    finally:
+        for f in save_files.values():
+            f.close()
 
 
 def impacted(input_stream, output_stream):
@@ -35,8 +55,7 @@ def render(site_name, output_stream):
 
     rendered_documents, errors = util.deckhand.deckhand_render(
         documents=documents)
-    for d in documents:
-        output_stream.writelines(yaml.dump(d))
+    yaml.dump_all(rendered_documents, output_stream, default_flow_style=False)
 
 
 def list_(output_stream):

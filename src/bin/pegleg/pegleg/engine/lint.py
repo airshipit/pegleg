@@ -1,10 +1,11 @@
-from pegleg.engine import util
 import click
-import jsonschema
 import logging
 import os
 import pkg_resources
 import yaml
+
+from pegleg.engine import util
+from pegleg import config
 
 __all__ = ['full']
 
@@ -19,11 +20,14 @@ DECKHAND_SCHEMAS = {
 
 def full(fail_on_missing_sub_src=False):
     errors = []
-    errors.extend(_verify_no_unexpected_files())
+    warns = []
+    warns.extend(_verify_no_unexpected_files())
     errors.extend(_verify_file_contents())
     errors.extend(_verify_deckhand_render(fail_on_missing_sub_src))
     if errors:
-        raise click.ClickException('\n'.join(['Linting failed:'] + errors))
+        raise click.ClickException('\n'.join(
+            ['Linting failed:'] + errors + ['Linting warnings:'] + warns))
+    return warns
 
 
 def _verify_no_unexpected_files():
@@ -36,16 +40,16 @@ def _verify_no_unexpected_files():
     found_directories = util.files.existing_directories()
     LOG.debug('found_directories: %s', found_directories)
 
-    errors = []
+    msgs = []
     for unused_dir in sorted(found_directories - expected_directories):
-        errors.append('%s exists, but is unused' % unused_dir)
+        msgs.append('%s exists, but is unused' % unused_dir)
 
     for missing_dir in sorted(expected_directories - found_directories):
         if not missing_dir.endswith('common'):
-            errors.append(
+            msgs.append(
                 '%s was not found, but expected by manifest' % missing_dir)
 
-    return errors
+    return msgs
 
 
 def _verify_file_contents():
@@ -89,18 +93,6 @@ def _verify_document(document, schemas, filename):
         document.get('metadata', {}).get('name', '')
     ])
     errors = []
-    try:
-        jsonschema.validate(document, schemas['root'])
-        try:
-            jsonschema.validate(document['metadata'],
-                                schemas[document['metadata']['schema']])
-        except Exception as e:
-            errors.append('%s (document %s) failed Deckhand metadata schema '
-                          'validation: %s' % (filename, name, e))
-    except Exception as e:
-        errors.append(
-            '%s (document %s) failed Deckhand root schema validation: %s' %
-            (filename, name, e))
 
     layer = _layer(document)
     if layer is not None and layer != _expected_layer(filename):
@@ -147,8 +139,11 @@ def _layer(data):
 
 
 def _expected_layer(filename):
-    parts = os.path.normpath(filename).split(os.sep)
-    return parts[0]
+    for r in config.all_repos():
+        if filename.startswith(r + "/"):
+            partial_name = filename[len(r) + 1:]
+            parts = os.path.normpath(partial_name).split(os.sep)
+            return parts[0]
 
 
 def _load_schemas():
