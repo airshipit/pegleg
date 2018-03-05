@@ -1,0 +1,11 @@
+---
+data:
+  revision: v1.0
+  site_type: cicd
+metadata:
+  layeringDefinition: {abstract: false, layer: site}
+  name: test-file
+  schema: metadata/Document/v1
+  storagePolicy: cleartext
+schema: pegleg/SiteDefinition/v1
+...

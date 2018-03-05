@@ -4,8 +4,12 @@ import os
 import pkg_resources
 import yaml
 
-from pegleg.engine import util
 from pegleg import config
+from pegleg.engine import util
+
+SCHEMA_STORAGE_POLICY_MISMATCH_FLAG = 'P001'
+DECKHAND_RENDERING_INCOMPLETE_FLAG = 'P002'
+REPOS_MISSING_DIRECTORIES_FLAG = 'P003'
 
 __all__ = ['full']
 
@@ -18,12 +22,39 @@ DECKHAND_SCHEMAS = {
 }
 
 
-def full(fail_on_missing_sub_src=False):
+def full(fail_on_missing_sub_src=False, exclude_lint=None, warn_lint=None):
     errors = []
     warns = []
-    warns.extend(_verify_no_unexpected_files())
-    errors.extend(_verify_file_contents())
-    errors.extend(_verify_deckhand_render(fail_on_missing_sub_src))
+
+    messages = _verify_file_contents()
+    # If policy is cleartext and error is added this will put
+    # that particular message into the warns list and all other will
+    # be added to the error list if SCHMEA_STORAGE_POLICY_MITCHMATCH_FLAG
+    for msg in messages:
+        if (SCHEMA_STORAGE_POLICY_MISMATCH_FLAG in warn_lint
+                and SCHEMA_STORAGE_POLICY_MISMATCH_FLAG == msg[0]):
+            warns.append(msg)
+        else:
+            errors.append(msg)
+
+    # Deckhand Rendering completes without error
+    if DECKHAND_RENDERING_INCOMPLETE_FLAG in warn_lint:
+        warns.extend(
+            [(DECKHAND_RENDERING_INCOMPLETE_FLAG, x)
+             for x in _verify_deckhand_render(fail_on_missing_sub_src)])
+    elif DECKHAND_RENDERING_INCOMPLETE_FLAG not in exclude_lint:
+        errors.extend(
+            [(DECKHAND_RENDERING_INCOMPLETE_FLAG, x)
+             for x in _verify_deckhand_render(fail_on_missing_sub_src)])
+
+    # All repos contain expected directories
+    if REPOS_MISSING_DIRECTORIES_FLAG in warn_lint:
+        warns.extend([(REPOS_MISSING_DIRECTORIES_FLAG, x)
+                      for x in _verify_no_unexpected_files()])
+    elif REPOS_MISSING_DIRECTORIES_FLAG not in exclude_lint:
+        errors.extend([(REPOS_MISSING_DIRECTORIES_FLAG, x)
+                       for x in _verify_no_unexpected_files()])
+
     if errors:
         raise click.ClickException('\n'.join(
             ['Linting failed:'] + errors + ['Linting warnings:'] + warns))
@@ -40,16 +71,18 @@ def _verify_no_unexpected_files():
     found_directories = util.files.existing_directories()
     LOG.debug('found_directories: %s', found_directories)
 
-    msgs = []
+    errors = []
     for unused_dir in sorted(found_directories - expected_directories):
-        msgs.append('%s exists, but is unused' % unused_dir)
+        errors.append((REPOS_MISSING_DIRECTORIES_FLAG,
+                       '%s exists, but is unused' % unused_dir))
 
     for missing_dir in sorted(expected_directories - found_directories):
         if not missing_dir.endswith('common'):
-            msgs.append(
-                '%s was not found, but expected by manifest' % missing_dir)
+            errors.append(
+                (REPOS_MISSING_DIRECTORIES_FLAG,
+                 '%s was not found, but expected by manifest' % missing_dir))
 
-    return msgs
+    return errors
 
 
 def _verify_file_contents():
@@ -97,22 +130,25 @@ def _verify_document(document, schemas, filename):
     layer = _layer(document)
     if layer is not None and layer != _expected_layer(filename):
         errors.append(
-            '%s (document %s) had unexpected layer "%s", expected "%s"' %
-            (filename, name, layer, _expected_layer(filename)))
+            ('N/A',
+             '%s (document %s) had unexpected layer "%s", expected "%s"' %
+             (filename, name, layer, _expected_layer(filename))))
 
     # secrets must live in the appropriate directory, and must be
     # "storagePolicy: encrypted".
     if document.get('schema') in MANDATORY_ENCRYPTED_TYPES:
         storage_policy = document.get('metadata', {}).get('storagePolicy')
-        if storage_policy != 'encrypted':
-            errors.append('%s (document %s) is a secret, but has unexpected '
-                          'storagePolicy: "%s"' % (filename, name,
-                                                   storage_policy))
+
+        if (storage_policy != 'encrypted'):
+            errors.append((SCHEMA_STORAGE_POLICY_MISMATCH_FLAG,
+                           '%s (document %s) is a secret, but has unexpected '
+                           'storagePolicy: "%s"' % (filename, name,
+                                                    storage_policy)))
 
         if not _filename_in_section(filename, 'secrets/'):
-            errors.append(
-                '%s (document %s) is a secret, is not stored in a secrets path'
-                % (filename, name))
+            errors.append(('N/A',
+                           '%s (document %s) is a secret, is not stored in a '
+                           'secrets path' % (filename, name)))
     return errors
 
 

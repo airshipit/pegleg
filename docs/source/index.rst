@@ -16,7 +16,7 @@
 
 .. tip::
 
-  The Undercloud Platform is part of the AIC CP (AT&T Integrated Cloud 
+  The Undercloud Platform is part of the AIC CP (AT&T Integrated Cloud
   Containerized Platform). More details may be found by using the `Treasuremap`_
 
 Building this Documentation

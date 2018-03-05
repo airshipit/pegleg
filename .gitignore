@@ -5,3 +5,6 @@ pegleg.egg-info
 /ChangeLog
 /AUTHORS
 *.swp
+build
+dist
+.cache

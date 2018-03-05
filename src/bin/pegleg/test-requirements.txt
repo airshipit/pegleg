@@ -1,0 +1,7 @@
+# Testing
+pytest==3.2.1
+pytest-cov==2.5.1
+mock==2.0.0
+
+# Linting
+flake8==3.3.0
