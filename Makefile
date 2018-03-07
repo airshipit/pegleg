@@ -14,14 +14,15 @@
 
 PEGLEG_BUILD_CTX           ?= src/bin/pegleg
 IMAGE_NAME                 ?= pegleg
-DOCKER_REGISTRY            ?= attcomdev
+IMAGE_PREFIX               ?= attcomdev
+DOCKER_REGISTRY            ?= quay.io
 IMAGE_TAG                  ?= latest
 HELM                       ?= helm
 PROXY                      ?= http://proxy_url
 USE_PROXY                  ?= false
 PUSH_IMAGE                 ?= false
 LABEL                      ?= commit-id
-IMAGE                      ?= $(IMAGE_PREFIX)/$(PEGLEG_IMAGE_NAME):$(IMAGE_TAG)
+IMAGE                      ?= $(DOCKER_REGISTRY)/$(IMAGE_PREFIX)/$(IMAGE_NAME):$(IMAGE_TAG)
 export
 
 # Build all docker images for this project
