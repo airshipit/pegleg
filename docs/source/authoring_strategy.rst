@@ -49,7 +49,7 @@ These must be utilized for all data considered sensitive.
 Global Catalogue Documents
 --------------------------
 
-Deckhand's layering functionality can be utilized in several ways, but AIC
+`Deckhand`_'s layering functionality can be utilized in several ways, but AIC
 site definitions will use a 'catalogue' approach. At the ``global`` layer
 there will be several documents providing different configurations for an
 object or service. Each of these will be abstract documents. They can be
@@ -84,9 +84,12 @@ to ensure you understand all the requirements for it.
 This catalogue pattern can also be utilized for the ``type`` layer
 if needed.
 
+.. _Deckhand: https://deckhand.readthedocs.io
+
 Global Layer
 ------------
-.. highlight:: yaml
+
+.. code-block:: yaml
 
     ---
     schema: armada/Chart/v1
@@ -263,7 +266,7 @@ Global Layer
 Site Layer
 ----------
 
-.. highlight:: yaml
+.. code-block:: yaml
 
     ---
     schema: armada/Chart/v1
@@ -350,4 +353,3 @@ Site Layer
       storagePolicy: cleartext
     data: myuser
     ...
-

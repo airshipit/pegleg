@@ -22,9 +22,8 @@
 Building this Documentation
 ---------------------------
 
-Use of ``sphinx-build -b html docs/source docs/build`` will build a html
-version of this documentation that can be viewed using a browser at
-docs/build/index.html on the local filesystem.
+Use of ``tox -e docs`` will build an HTML version of this documentation that
+can be viewed using a browser at docs/build/index.html on the local filesystem.
 
 Conventions and Standards
 -------------------------
@@ -34,11 +33,6 @@ Conventions and Standards
 
    authoring_strategy
    artifacts
+   cli
 
-
-.. _Helm: https://helm.sh/
-.. _Kubernetes: https://kubernetes.io/
-.. _Openstack: https://www.openstack.org/
-.. _Openstack Helm: https://github.com/openstack/openstack-helm
 .. _Treasuremap: https://github.com/att-comdev/treasuremap
-.. _yaml: http://yaml.org/
