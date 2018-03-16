@@ -12,7 +12,7 @@ if [ -z "${WORKSPACE}" ]; then
   WORKSPACE="/"
 fi
 
-IMAGE=${IMAGE:-quay.io/attcomdev/pegleg:latest}
+IMAGE=${IMAGE:-artifacts-aic.atlantafoundry.com/att-comdev/pegleg:latest}
 
 echo
 echo "== NOTE: Workspace $WORKSPACE  is available as /workspace in container context =="
