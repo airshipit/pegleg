@@ -31,6 +31,7 @@ Conventions and Standards
 .. toctree::
    :maxdepth: 2
 
+   getting_started
    authoring_strategy
    artifacts
    cli

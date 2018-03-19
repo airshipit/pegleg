@@ -24,7 +24,7 @@ called pegleg.sh.
 ::
 
     $WORKSPACE = Location of the folder that holds the repositories containing
-    the site definition libraries. Pegleg makes no assumption about the root
+    the site definition libraries. Pegleg makes no assumptions about the root
     directory. $WORKSPACE is /workspace in the container context.
 
     $IMAGE = Location of pegleg docker image.
@@ -37,7 +37,8 @@ To run:
 CLI Options
 ===========
 
-\ -v / --verbose
+**-v / --verbose**
+
 Enable debug logging.
 
 Site
@@ -63,11 +64,12 @@ Path to the root of an auxiliary repo.
 
 Collect
 -------
-Output complete config for one site
+Output complete config for one site. It is assumed that all lint errors have
+been corrected already.
 
 **site_name**
 
-Name of the site.
+Name of the site. (Required).
 
 **-s / --save-location**
 
@@ -87,9 +89,51 @@ Find sites impacted by changed files.
 
 **-i / --input**
 
-List of impacted files
+List of impacted files.
 
 **-o / --output**
+
+Where to output.
+
+::
+
+    ./pegleg impacted -i <input_stream> -o <output_stream>
+
+List
+----
+List known sites.
+
+**-o/--output**
+
+Where to output.
+
+::
+
+    ./pegleg <command> <options> list
+
+    Example:
+    ./pegleg site -p /workspace/repo_1 list -o /workspace
+
+Show
+----
+Show details for one site.
+
+**site_name**
+
+Name of site. (Required).
+
+**-o /--output**
+
+Where to output.
+
+::
+
+    ./pegleg <command> <options> show site_name
+
+    Example:
+    ./pegleg site -p /workspace/repo_1 show site_name -o /workspace
+
+
 
 Lint
 ----
