@@ -64,7 +64,6 @@ def site_files(site_name):
     params = load_as_params(site_name)
     for filename in files.search(files.directories_for(**params)):
         yield filename
-    yield path(site_name)
 
 
 def site_files_by_repo(site_name):
@@ -74,5 +73,3 @@ def site_files_by_repo(site_name):
     for repo, dl in dir_map.items():
         for filename in files.search(dl):
             yield (repo, filename)
-        if repo == config.get_primary_repo():
-            yield (repo, path(site_name))

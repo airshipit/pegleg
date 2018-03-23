@@ -42,6 +42,10 @@ run_pegleg: build_pegleg
 .PHONY: lint
 lint: py_lint
 
+# Perform auto formatting
+.PHONY: format
+format: py_format
+
 .PHONY: build_pegleg
 build_pegleg:
 ifeq ($(USE_PROXY), true)
@@ -60,3 +64,7 @@ clean:
 .PHONY: py_lint
 py_lint:
 	cd src/bin/pegleg;tox -e lint
+
+.PHONY: py_format
+py_format:
+	cd src/bin/pegleg;tox -e fmt
