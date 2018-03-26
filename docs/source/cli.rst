@@ -27,11 +27,19 @@ called pegleg.sh.
     the site definition libraries. Pegleg makes no assumptions about the root
     directory. $WORKSPACE is /workspace in the container context.
 
+        Example: $WORKSPACE=/home/ubuntu/all_repos
+
     $IMAGE = Location of pegleg docker image.
+
+        Example: $IMAGE=quay.io/attcomdev/pegleg:latest
 
 To run:
 
-./pegleg.sh <command> <options>
+.. code-block:: console
+
+    export WORKSPACE=<repo_location>
+    export IMAGE=<docker_image>
+    ./pegleg.sh <command> <options>
 
 
 CLI Options
@@ -43,7 +51,7 @@ Enable debug logging.
 
 Site
 ----
-Commands related to sites.
+This allows you to set the primary and auxiliary repositories.
 
 **-p / --primary**
 
@@ -64,8 +72,8 @@ Path to the root of an auxiliary repo.
 
 Collect
 -------
-Output complete config for one site. It is assumed that all lint errors have
-been corrected already.
+Output complete config for one site.
+It is assumed that all lint errors have been corrected already.
 
 **site_name**
 
@@ -137,7 +145,8 @@ Where to output.
 
 Lint
 ----
-Sanity checks for repository content.
+Sanity checks for repository content. Validations for linting are done
+utilizing `Deckhand Validations`_.
 
 ::
 
@@ -187,3 +196,6 @@ Will warn of lint failures from the specified lint options.
 
     P002 - Deckhand rendering is expected to complete without errors.
     P003 - All repos contain expected directories.
+
+
+.. _`Deckhand Validations`: http://deckhand.readthedocs.io/en/latest/validation.html

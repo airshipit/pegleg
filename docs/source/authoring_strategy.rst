@@ -18,18 +18,17 @@ Document Fundamentals
 =====================
 
 The definition of a site consists of a set of small YAML documents that
-are managed by _Deckhand http://deckhand.readthedocs.io/en/latest/. Each
-document is identified by a ``schema`` top-level key and the ``metadata.name``
-value that uniquely identifies a particular document of the type ``schema``.
-Deckhand provides functionality allowing documents to be authored such that
-data from multiple documents can be merged.
+are managed by Deckhand_. Each document is identified by a ``schema`` top-level
+key and the ``metadata.name`` value that uniquely identifies a particular
+document of the type ``schema``. Deckhand provides functionality allowing
+documents to be authored such that data from multiple documents can be merged.
 
     * Abstact vs Concrete - Documents define a value in ``metadata.layeringDefinition.abstract`` to
       determine if a document is abstract (a value of ``true``) or concrete (a value of ``false``).
       When calling the ``/revisions/{id}/rendered-documents`` API, only concrete documents are returned.
-    * Layering - Document _layering http://deckhand.readthedocs.io/en/latest/layering.html is used
+    * Layering - Document layering_ is used
       for whole documents that have known defaults but may need to be transformed in specific instances.
-    * Substitution - Data _substitution http://deckhand.readthedocs.io/en/latest/substitution.html is
+    * Substitution - Data substitution_ is
       used for extracting particular values from a document's data section (whole or in-part) and
       inserting that data into a destination document (at the root of the data section or deeper
       into a document).
@@ -40,9 +39,8 @@ Shared Documents
 Secrets
 -------
 
-Several generic document
-_types http://deckhand.readthedocs.io/en/latest/document_types.html#provided-utility-document-kinds
-exist to support storing sensitive data encrypted.
+Several generic document types_ exist to support storing sensitive data
+encrypted.
 
 These must be utilized for all data considered sensitive.
 
@@ -84,6 +82,10 @@ This catalogue pattern can also be utilized for the ``type`` layer
 if needed.
 
 .. _Deckhand: https://deckhand.readthedocs.io
+.. _layering: http://deckhand.readthedocs.io/en/latest/layering.html
+.. _substitution: http://deckhand.readthedocs.io/en/latest/substitution.html
+.. _types: http://deckhand.readthedocs.io/en/latest/document_types.html#provided-utility-document-kinds
+
 
 Global Layer
 ------------

@@ -21,23 +21,40 @@ Getting Started
 What is Pegleg?
 ---------------
 
-Pegleg is document aggregator that provides early linting and validations for
-documents that can be consumed by UCP.
+Pegleg is a document aggregator that will aggregate all the documents in a
+repository and pack them into a single YAML file. This allows for operators to
+structure their site definitions in a maintainable directory layout, while
+providing them with the automation and tooling needed to aggregate, lint, and
+render those documents for deployment.
 
 For more information on the documents that Pegleg works on see `Document Fundamentals`_.
 
 Basic Usage
 -----------
 
-Before using Pegleg, you must install the required packages in pegleg/src/bin/pegleg
+Before using Pegleg, you must:
+
+Clone the Pegleg repository
+
+.. code-block:: console
+
+    git clone https://github.com/att-comdev/pegleg
+
+and install the required packages in pegleg/src/bin/pegleg
 
 .. code-block:: console
 
      pip3 install -r pegleg/src/bin/pegleg/requirements.txt -r pegleg/src/bin/pegleg/test-requirements.txt
 
+Next, add your repos containing your `site definition libraries`_ into your
+local system where Pegleg is running, as Pegleg can only work on files available
+in the local directory.
 
 You will then be able to use all of Pegleg's features through the CLI. See CLI_ for more
 information.
 
 .. _Document Fundamentals: https://pegleg.readthedocs.io/en/latest/authoring_strategy.html
 .. _CLI: https://pegleg.readthedocs.io/en/latest/cli.html
+.. _Deckhand: http://deckhand.readthedocs.io/en/latest/
+.. _UCP: https://github.com/att-comdev/ucp-integration
+.. _site definition libraries: https://pegleg.readthedocs.io/en/latest/artifacts.html#definition-library-layout
