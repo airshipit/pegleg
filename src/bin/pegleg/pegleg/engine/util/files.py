@@ -158,8 +158,8 @@ def list_sites(primary_repo_base=None):
 
 def directory_for(*, path):
     for r in config.all_repos():
-        if path.startswith(r + "/"):
-            partial_path = path[len(r) + 1:]
+        if path.startswith(r):
+            partial_path = path[len(r):]
             parts = os.path.normpath(partial_path).split(os.sep)
             depth = DIR_DEPTHS.get(parts[0])
             if depth is not None:

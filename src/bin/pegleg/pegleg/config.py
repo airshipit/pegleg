@@ -1,5 +1,3 @@
-from copy import copy
-
 try:
     if GLOBAL_CONTEXT:
         pass
@@ -15,15 +13,15 @@ def get_primary_repo():
 
 
 def set_primary_repo(r):
-    GLOBAL_CONTEXT['primary_repo'] = r
+    GLOBAL_CONTEXT['primary_repo'] = r.rstrip('/') + '/'
 
 
 def set_auxiliary_repo_list(a):
-    GLOBAL_CONTEXT['aux_repos'] = copy(a)
+    GLOBAL_CONTEXT['aux_repos'] = [r.rstrip('/') + '/' for r in a]
 
 
 def add_auxiliary_repo(a):
-    GLOBAL_CONTEXT['aux_repos'].append(a)
+    GLOBAL_CONTEXT['aux_repos'].append(a.rstrip('/') + '/')
 
 
 def get_auxiliary_repo_list():

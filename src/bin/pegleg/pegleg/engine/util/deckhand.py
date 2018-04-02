@@ -1,3 +1,5 @@
+from pegleg.engine.errorcodes import DECKHAND_DUPLICATE_SCHEMA
+from pegleg.engine.errorcodes import DECKHAND_RENDER_EXCEPTION
 from deckhand.engine import layering
 from deckhand import errors as dh_errors
 
@@ -15,7 +17,8 @@ def load_schemas_from_docs(documents):
         if document.get('schema', '') == SCHEMA_SCHEMA:
             name = document['metadata']['name']
             if name in schema_set:
-                errors.append('Duplicate schema specified for: %s' % name)
+                errors.append((DECKHAND_DUPLICATE_SCHEMA,
+                               'Duplicate schema specified for: %s' % name))
 
             schema_set[name] = document['data']
 
@@ -40,7 +43,8 @@ def deckhand_render(documents=[],
             validate=validate)
         rendered_documents = [dict(d) for d in deckhand_eng.render()]
     except dh_errors.DeckhandException as e:
-        errors.append('An unknown Deckhand exception occurred while trying'
-                      ' to render documents: %s' % str(e))
+        errors.append((DECKHAND_RENDER_EXCEPTION,
+                       'An unknown Deckhand exception occurred while trying'
+                       ' to render documents: %s' % str(e)))
 
     return rendered_documents, errors
