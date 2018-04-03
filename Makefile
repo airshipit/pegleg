@@ -33,10 +33,15 @@ images: build_pegleg
 .PHONY: run_images
 run_images: run_pegleg
 
-# Run the drydock container and exercise simple tests
+# Run the Pegleg container and exercise simple tests
 .PHONY: run_pegleg
 run_pegleg: build_pegleg
 	tools/pegleg.sh --help
+
+# Run all unit tests under src/bin/pegleg
+.PHONY: run_tests
+run_tests:
+	tox -c src/bin/pegleg/tox.ini -e py35
 
 # Perform Linting
 .PHONY: lint
