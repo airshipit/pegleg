@@ -41,8 +41,8 @@ DECKHAND_SCHEMAS = {
 def full(fail_on_missing_sub_src=False, exclude_lint=None, warn_lint=None):
     messages = []
     # If policy is cleartext and error is added this will put
-    # that particular message into the warns list and all other will
-    # be added to the error list if SCHMEA_STORAGE_POLICY_MITCHMATCH_FLAG
+    # that particular message into the warns list and all others will
+    # be added to the error list if SCHEMA_STORAGE_POLICY_MISMATCH_FLAG
     messages.extend(_verify_file_contents())
 
     # Deckhand Rendering completes without error
@@ -160,14 +160,13 @@ def _verify_document(document, schemas, filename):
 
 
 def _verify_deckhand_render(fail_on_missing_sub_src=False):
-
     documents = []
 
     for filename in util.files.all():
         with open(filename) as f:
             documents.extend(list(yaml.safe_load_all(f)))
 
-    rendered_documents, errors = util.deckhand.deckhand_render(
+    _, errors = util.deckhand.deckhand_render(
         documents=documents,
         fail_on_missing_sub_src=fail_on_missing_sub_src,
         validate=True,

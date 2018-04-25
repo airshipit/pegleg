@@ -16,6 +16,7 @@ import tempfile
 from pegleg import config
 from pegleg.engine.util import files
 
+
 def test_no_non_yamls(tmpdir):
     p = tmpdir.mkdir("site_yamls").mkdir("global")
     for x in range(3):  # Create 3 YAML files
@@ -25,6 +26,6 @@ def test_no_non_yamls(tmpdir):
     results = list(files.all())
 
     assert 3 == len(results)
-    # make sure only YAML files are returned
+    # Make sure only YAML files are returned
     for i in results:
         assert i.endswith('.yaml')
