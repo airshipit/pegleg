@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 import click
 
 from pegleg import config
@@ -24,6 +26,7 @@ __all__ = [
     'path',
     'pluck',
     'site_files',
+    'site_files_by_repo',
 ]
 
 
@@ -61,7 +64,8 @@ def load_as_params(site_name, primary_repo_base=None):
 def path(site_name, primary_repo_base=None):
     if not primary_repo_base:
         primary_repo_base = config.get_primary_repo()
-    return '%s/site/%s/site-definition.yaml' % (primary_repo_base, site_name)
+    return os.path.join(primary_repo_base, 'site', site_name,
+                        'site-definition.yaml')
 
 
 def pluck(site_definition, key):

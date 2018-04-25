@@ -17,6 +17,7 @@ from setuptools import find_packages
 
 setup(
     name='pegleg',
+    python_requires='>=3.5.0',
     version='0.1.0',
     packages=find_packages(),
     entry_points={

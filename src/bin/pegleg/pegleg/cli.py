@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import engine
-from pegleg import config
-
-import click
 import logging
 import sys
+
+import click
+
+from pegleg import config
+from pegleg import engine
 
 LOG = logging.getLogger(__name__)
 
@@ -69,9 +70,44 @@ def site(primary_repo, aux_repo):
     'save_location',
     type=click.Path(
         file_okay=False, dir_okay=True, writable=True, resolve_path=True),
-    help='Where to output')
+    help='Where to output the complete site definition.')
+@click.option(
+    '--validate',
+    'validate',
+    is_flag=True,
+    # TODO(felipemonteiro): Potentially set this to True in the future. This
+    # is currently set to False to skip validation by default for backwards
+    # compatibility concerns.
+    default=False,
+    help='Perform validations on documents prior to collection.')
+@click.option(
+    '-x',
+    '--exclude',
+    'exclude_lint',
+    multiple=True,
+    help='Excludes specified linting checks. Warnings will still be issued. '
+    '-w takes priority over -x.')
+@click.option(
+    '-w',
+    '--warn',
+    'warn_lint',
+    multiple=True,
+    help='Warn if linting check fails. -w takes priority over -x.')
 @click.argument('site_name')
-def collect(*, save_location, site_name):
+def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
+    """Collects documents into a single site-definition.yaml file, which
+    defines the entire site definition and contains all documents required
+    for ingestion by Airship.
+
+    Collect can lint documents prior to collection if the ``--validate``
+    flag is optionally included.
+    """
+    if validate:
+        # Lint the primary repo prior to document collection.
+        _lint(
+            fail_on_missing_sub_src=True,
+            exclude_lint=exclude_lint,
+            warn_lint=warn_lint)
     engine.site.collect(site_name, save_location)
 
 
@@ -188,6 +224,14 @@ def site_type(*, revision, site_type):
     engine.stub.site_type(revision, site_type)
 
 
+def _lint(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
+    warns = engine.lint.full(fail_on_missing_sub_src, exclude_lint, warn_lint)
+    if warns:
+        click.echo("Linting passed, but produced some warnings.")
+        for w in warns:
+            click.echo(w)
+
+
 @LINT_OPTION
 @main.command(help='Sanity checks for repository content')
 @click.option(
@@ -220,8 +264,7 @@ def lint(*, fail_on_missing_sub_src, primary_repo, aux_repo, exclude_lint,
          warn_lint):
     config.set_primary_repo(primary_repo)
     config.set_auxiliary_repo_list(aux_repo or [])
-    warns = engine.lint.full(fail_on_missing_sub_src, exclude_lint, warn_lint)
-    if warns:
-        click.echo("Linting passed, but produced some warnings.")
-        for w in warns:
-            click.echo(w)
+    _lint(
+        fail_on_missing_sub_src=fail_on_missing_sub_src,
+        exclude_lint=exclude_lint,
+        warn_lint=warn_lint)

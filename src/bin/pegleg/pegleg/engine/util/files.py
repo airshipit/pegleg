@@ -163,15 +163,17 @@ def _site_type_revision_path(site_type, revision):
 
 
 def _site_path(site_name):
-    return 'site/%s' % site_name
+    return os.path.join(config.get_rel_site_path(), site_name)
 
 
 def list_sites(primary_repo_base=None):
     """Get a list of site definition directories in the primary repo."""
     if not primary_repo_base:
         primary_repo_base = config.get_primary_repo()
-    for path in os.listdir(os.path.join(primary_repo_base, 'site')):
-        joined_path = os.path.join(primary_repo_base, 'site', path)
+    full_site_path = os.path.join(primary_repo_base,
+                                  config.get_rel_site_path())
+    for path in os.listdir(full_site_path):
+        joined_path = os.path.join(full_site_path, path)
         if os.path.isdir(joined_path):
             yield path
 
@@ -198,8 +200,8 @@ def existing_directories():
 def slurp(path):
     if not os.path.exists(path):
         raise click.ClickException(
-            '%s not found.  pegleg must be run from '
-            'the root of a configuration repostiory.' % path)
+            '%s not found. Pegleg must be run from the root of a configuration'
+            ' repository.' % path)
 
     with open(path) as f:
         try:

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+import copy
 import os
 import tempfile
 
@@ -22,11 +23,29 @@ import yaml
 from pegleg import config
 from pegleg.engine.util import files
 
+TEST_DOCUMENT = """
+---
+schema: deckhand/Passphrase/v1
+metadata:
+  schema: metadata/Document/v1
+  name: %(name)s
+  storagePolicy: cleartext
+  layeringDefinition:
+    abstract: False
+    layer: %(layer)s
+data: %(name)s-password
+...
+"""
+
+
+def _gen_document(**kwargs):
+    test_document = TEST_DOCUMENT % kwargs
+    return yaml.load(test_document)
+
 
 @pytest.fixture()
 def create_tmp_deployment_files(tmpdir):
     """Fixture that creates a temporary directory structure."""
-    orig_primary_repo = config.get_primary_repo()
     sitenames = ['cicd', 'lab']
 
     SITE_TEST_STRUCTURE = {
@@ -59,12 +78,14 @@ def create_tmp_deployment_files(tmpdir):
             'directories': {
                 'common': {
                     'files': {
-                        'global-common.yaml': 'global-common'
+                        'global-common.yaml':
+                        _gen_document(name="global-common", layer='global')
                     }
                 },
                 'v1.0': {
                     'files': {
-                        'global-v1.0.yaml': 'global-v1.0'
+                        'global-v1.0.yaml':
+                        _gen_document(name="global-v1.0", layer='global')
                     }
                 }
             }
@@ -80,13 +101,15 @@ def create_tmp_deployment_files(tmpdir):
                         'common': {
                             'files': {
                                 '%s-type-common.yaml' % site:
-                                ('%s-type-common' % site)
+                                _gen_document(
+                                    name="%s-type-common" % site, layer='type')
                             }
                         },
                         'v1.0': {
                             'files': {
                                 '%s-type-v1.0.yaml' % site:
-                                ('%s-type-v1.0' % site)
+                                _gen_document(
+                                    name="%s-type-v1.0" % site, layer='type')
                             }
                         }
                     }
@@ -108,17 +131,18 @@ metadata:
   schema: metadata/Document/v1
   storagePolicy: cleartext
 schema: pegleg/SiteDefinition/v1
-...
 """ % (site, site)
 
         test_structure = SITE_TEST_STRUCTURE.copy()
         test_structure['directories']['secrets']['directories']['passphrases'][
             'files'] = {
-                '%s-passphrase.yaml' % site: '%s-passphrase' % site
+                '%s-passphrase.yaml' % site:
+                _gen_document(name="%s-passphrase" % site, layer='site')
             }
         test_structure['directories']['software']['directories']['charts'][
             'files'] = {
-                '%s-chart.yaml' % site: '%s-chart' % site
+                '%s-chart.yaml' % site:
+                _gen_document(name="%s-chart" % site, layer='site')
             }
         test_structure['files']['site-definition.yaml'] = yaml.safe_load(
             site_definition)
@@ -128,4 +152,8 @@ schema: pegleg/SiteDefinition/v1
 
     yield
 
-    config.set_primary_repo(orig_primary_repo)
+    config.GLOBAL_CONTEXT = {
+        'primary_repo': './',
+        'aux_repos': [],
+        'site_path': 'site'
+    }

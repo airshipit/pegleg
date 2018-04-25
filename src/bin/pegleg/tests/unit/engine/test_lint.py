@@ -40,29 +40,113 @@ def test_verify_deckhand_render_site_documents_separately(
         result = lint._verify_deckhand_render()
         assert result == []
 
+        expected_sitenames = ['cicd', 'lab']
         sites = files.list_sites()
 
         # Verify that both expected site types are listed.
-        assert sorted(sites) == ['cicd', 'lab']
+        assert sorted(sites) == expected_sitenames
         # Verify that Deckhand called render twice, once for each site.
         assert mock_render.call_count == 2
 
+        expected_documents = []
+        for sitename in expected_sitenames:
+            documents = [{
+                'data': 'global-common-password',
+                'metadata': {
+                    'layeringDefinition': {
+                        'abstract': False,
+                        'layer': 'global'
+                    },
+                    'name': 'global-common',
+                    'schema': 'metadata/Document/v1',
+                    'storagePolicy': 'cleartext'
+                },
+                'schema': 'deckhand/Passphrase/v1'
+            }, {
+                'data': 'global-v1.0-password',
+                'metadata': {
+                    'layeringDefinition': {
+                        'abstract': False,
+                        'layer': 'global'
+                    },
+                    'name': 'global-v1.0',
+                    'schema': 'metadata/Document/v1',
+                    'storagePolicy': 'cleartext'
+                },
+                'schema': 'deckhand/Passphrase/v1'
+            }, {
+                'data': '%s-type-common-password' % sitename,
+                'metadata': {
+                    'layeringDefinition': {
+                        'abstract': False,
+                        'layer': 'type'
+                    },
+                    'name': '%s-type-common' % sitename,
+                    'schema': 'metadata/Document/v1',
+                    'storagePolicy': 'cleartext'
+                },
+                'schema': 'deckhand/Passphrase/v1'
+            }, {
+                'data': '%s-type-v1.0-password' % sitename,
+                'metadata': {
+                    'layeringDefinition': {
+                        'abstract': False,
+                        'layer': 'type'
+                    },
+                    'name': '%s-type-v1.0' % sitename,
+                    'schema': 'metadata/Document/v1',
+                    'storagePolicy': 'cleartext'
+                },
+                'schema': 'deckhand/Passphrase/v1'
+            }, {
+                'data': '%s-chart-password' % sitename,
+                'metadata': {
+                    'layeringDefinition': {
+                        'abstract': False,
+                        'layer': 'site'
+                    },
+                    'name': '%s-chart' % sitename,
+                    'schema': 'metadata/Document/v1',
+                    'storagePolicy': 'cleartext'
+                },
+                'schema': 'deckhand/Passphrase/v1'
+            }, {
+                'data': '%s-passphrase-password' % sitename,
+                'metadata': {
+                    'layeringDefinition': {
+                        'abstract': False,
+                        'layer': 'site'
+                    },
+                    'name': '%s-passphrase' % sitename,
+                    'schema': 'metadata/Document/v1',
+                    'storagePolicy': 'cleartext'
+                },
+                'schema': 'deckhand/Passphrase/v1'
+            }, {
+                'data': {
+                    'revision': 'v1.0',
+                    'site_type': sitename
+                },
+                'metadata': {
+                    'layeringDefinition': {
+                        'abstract': False,
+                        'layer': 'site'
+                    },
+                    'name': sitename,
+                    'schema': 'metadata/Document/v1',
+                    'storagePolicy': 'cleartext'
+                },
+                'schema': 'pegleg/SiteDefinition/v1'
+            }]
+            expected_documents.extend(documents)
+
         mock_calls = list(mock_render.mock_calls)
+        actual_documents = []
         for mock_call in mock_calls:
             documents = mock_call[2]['documents']
-            assert len(documents) == 7
+            actual_documents.extend(documents)
 
-            # Verify one site_definition.yaml per site.
-            site_definitions = [x for x in documents if isinstance(x, dict)]
-            assert len(site_definitions) == 1
-
-            site_definition = site_definitions[0]
-            site_type = site_definition['data']['site_type']
-
-            assert site_definition['data']['revision'] == 'v1.0'
-            assert site_type in expected_documents
-
-            # Verify expected documents collected per site.
-            other_documents = expected_documents[site_type]
-            for other_document in other_documents:
-                assert other_document in documents
+        sort_func = lambda x: x['metadata']['name']
+        assert sorted(
+            expected_documents, key=sort_func) == sorted(
+                actual_documents, key=sort_func)

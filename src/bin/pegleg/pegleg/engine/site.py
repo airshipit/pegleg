@@ -21,6 +21,7 @@ import yaml
 import logging
 
 from pegleg.engine import util
+
 __all__ = ['collect', 'impacted', 'list_', 'show', 'render']
 
 LOG = logging.getLogger(__name__)
@@ -33,17 +34,22 @@ def collect(site_name, save_location):
             raise ValueError('Missing param: save-location')
         elif not os.path.exists(save_location):
             raise FileNotFoundError('Invalid save-location path')
-        for (repo_base,
-             filename) in util.definition.site_files_by_repo(site_name):
+
+        for repo_base, filename in util.definition.site_files_by_repo(
+                site_name):
             repo_name = os.path.normpath(repo_base).split(os.sep)[-1]
+            save_file = os.path.join(save_location, repo_name + '.yaml')
             if repo_name not in save_files:
-                save_files[repo_name] = open(
-                    os.path.join(save_location, repo_name + ".yaml"), "w")
-            LOG.debug("Collecting file %s to file %s" %
-                      (filename,
-                       os.path.join(save_location, repo_name + '.yaml')))
+                save_files[repo_name] = open(save_file, "w")
+            LOG.debug("Collecting file %s to file %s" % (filename, save_file))
+
             with open(filename) as f:
-                save_files[repo_name].writelines(f.readlines())
+                lines_to_write = f.readlines()
+                if lines_to_write[0] != '---\n':
+                    lines_to_write = ['---\n'] + lines_to_write
+                if lines_to_write[-1] != '...\n':
+                    lines_to_write.append('...\n')
+                save_files[repo_name].writelines(lines_to_write)
     except Exception as ex:
         raise click.ClickException("Error saving output: %s" % str(ex))
     finally:

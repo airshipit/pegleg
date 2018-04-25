@@ -39,17 +39,19 @@ DECKHAND_SCHEMAS = {
 
 
 def full(fail_on_missing_sub_src=False, exclude_lint=None, warn_lint=None):
+    exclude_lint = exclude_lint or []
+    warn_lint = warn_lint or []
     messages = []
     # If policy is cleartext and error is added this will put
     # that particular message into the warns list and all others will
     # be added to the error list if SCHEMA_STORAGE_POLICY_MISMATCH_FLAG
     messages.extend(_verify_file_contents())
 
-    # Deckhand Rendering completes without error
-    messages.extend(_verify_deckhand_render(fail_on_missing_sub_src))
-
     # All repos contain expected directories
     messages.extend(_verify_no_unexpected_files())
+
+    # Deckhand Rendering completes without error
+    messages.extend(_verify_deckhand_render(fail_on_missing_sub_src))
 
     errors = []
     warns = []
@@ -160,9 +162,15 @@ def _verify_document(document, schemas, filename):
     return errors
 
 
-def _verify_deckhand_render(fail_on_missing_sub_src=False):
+def _gather_relevant_documents_per_site():
+    """Gathers all relevant documents per site, which includes all type and
+    global documents that are needed to render each site document.
+
+    :returns: Dictionary of documents, keyed by each site name.
+    :rtype: dict
+    """
     sitenames = list(util.files.list_sites())
-    documents_by_site = {s: [] for s in sitenames}
+    documents_to_render = {s: [] for s in sitenames}
 
     for sitename in sitenames:
         params = util.definition.load_as_params(sitename)
@@ -170,11 +178,21 @@ def _verify_deckhand_render(fail_on_missing_sub_src=False):
         filenames = set(util.files.search(paths))
         for filename in filenames:
             with open(filename) as f:
-                documents_by_site[sitename].extend(list(yaml.safe_load_all(f)))
+                documents_to_render[sitename].extend(
+                    list(yaml.safe_load_all(f)))
 
+    return documents_to_render
+
+
+def _verify_deckhand_render(fail_on_missing_sub_src=False):
+    """Verify Deckhand render works by using all relevant deployment files.
+
+    :returns: List of errors generated during rendering.
+    """
     all_errors = []
+    documents_to_render = _gather_relevant_documents_per_site()
 
-    for sitename, documents in documents_by_site.items():
+    for sitename, documents in documents_to_render.items():
         LOG.debug('Rendering documents for site: %s.', sitename)
         _, errors = util.deckhand.deckhand_render(
             documents=documents,

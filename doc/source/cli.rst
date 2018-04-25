@@ -73,7 +73,6 @@ Path to the root of an auxiliary repo.
 Collect
 -------
 Output complete config for one site.
-It is assumed that all lint errors have been corrected already.
 
 **site_name**
 
@@ -81,15 +80,43 @@ Name of the site. (Required).
 
 **-s / --save-location**
 
-Where to output.
+Where to output collected documents.
+
+**-x <code>** (Optional, validation only).
+
+Will exclude the specified lint option. -w takes priority over -x.
+
+**-w <code>** (Optional, validation only).
+
+Will warn of lint failures from the specified lint options.
+
+**--validate** (Optional, validation only). False by default.
+
+Perform validation of documents prior to collection. See :ref:`linting` for
+additional information on document linting. It is recommended that document
+linting be executed prior to document collection. However, ``--validate``
+is False by default for backwards compatibility concerns.
+
+Usage:
 
 ::
 
     ./pegleg.sh <command> <options> collect site_name -s save_location
+    -x P001 -w P002 --validate
 
-    Example:
+Example without validation:
+
+::
+
     ./pegleg.sh site -p /workspace/repo_1 -a /workspace/repo_2
     collect site_name -s /workspace
+
+Example with validation:
+
+::
+
+    ./pegleg.sh site -p /workspace/repo_1 -a /workspace/repo_2
+    collect site_name -s /workspace -x P004 --validate
 
 Impacted
 --------
@@ -141,7 +168,7 @@ Where to output.
     Example:
     ./pegleg site -p /workspace/repo_1 show site_name -o /workspace
 
-
+.. _linting:
 
 Lint
 ----
@@ -173,7 +200,7 @@ Raise Deckhand exception on missing substitution sources. Defaults to True.
 
 **-x <code>**
 
-Will excluded the specified lint option. -w takes priority over -x.
+Will exclude the specified lint option. -w takes priority over -x.
 
 **-w <code>**
 

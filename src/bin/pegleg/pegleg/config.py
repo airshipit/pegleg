@@ -19,6 +19,7 @@ except NameError:
     GLOBAL_CONTEXT = {
         'primary_repo': './',
         'aux_repos': [],
+        'site_path': 'site'
     }
 
 
@@ -51,3 +52,12 @@ def all_repos():
     repos = [get_primary_repo()]
     repos.extend(get_auxiliary_repo_list())
     return repos
+
+
+def get_rel_site_path():
+    return GLOBAL_CONTEXT.get('site_path', 'site')
+
+
+def set_rel_site_path(p):
+    p = p or 'site'
+    GLOBAL_CONTEXT['site_path'] = p
