@@ -160,18 +160,31 @@ def _verify_document(document, schemas, filename):
 
 
 def _verify_deckhand_render(fail_on_missing_sub_src=False):
-    documents = []
+    sitenames = list(util.files.list_sites())
+    documents_by_site = {s: [] for s in sitenames}
 
-    for filename in util.files.all():
-        with open(filename) as f:
-            documents.extend(list(yaml.safe_load_all(f)))
+    for sitename in sitenames:
+        params = util.definition.load_as_params(sitename)
+        paths = util.files.directories_for(**params)
+        filenames = set(util.files.search(paths))
+        for filename in filenames:
+            with open(filename) as f:
+                documents_by_site[sitename].extend(list(yaml.safe_load_all(f)))
 
-    _, errors = util.deckhand.deckhand_render(
-        documents=documents,
-        fail_on_missing_sub_src=fail_on_missing_sub_src,
-        validate=True,
-    )
-    return errors
+    all_errors = []
+
+    for sitename, documents in documents_by_site.items():
+        LOG.debug('Rendering documents for site: %s.', sitename)
+        _, errors = util.deckhand.deckhand_render(
+            documents=documents,
+            fail_on_missing_sub_src=fail_on_missing_sub_src,
+            validate=True,
+        )
+        LOG.debug('Generated %d rendering errors for site: %s.', len(errors),
+                  sitename)
+        all_errors.extend(errors)
+
+    return list(set(all_errors))
 
 
 def _layer(data):

@@ -104,6 +104,11 @@ def _create_tree(root_path, *, tree=FULL_STRUCTURE):
         os.makedirs(path, mode=0o775, exist_ok=True)
         _create_tree(path, tree=data)
 
+    for filename, yaml_data in tree.get('files', {}).items():
+        path = os.path.join(root_path, filename)
+        with open(path, 'w') as f:
+            yaml.safe_dump(yaml_data, f)
+
 
 def directories_for(*, site_name, revision, site_type):
     library_list = [

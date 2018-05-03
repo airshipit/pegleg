@@ -17,7 +17,7 @@ from setuptools import setup
 setup(
     name='pegleg',
     version='0.1.0',
-    packages=['pegleg'],
+    packages=['pegleg', 'tests'],
     entry_points={
         'console_scripts': [
             'pegleg=pegleg.cli:main',
