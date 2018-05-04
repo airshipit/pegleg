@@ -38,6 +38,9 @@ run_images: run_pegleg
 run_pegleg: build_pegleg
 	tools/pegleg.sh --help
 
+.PHONY: tests
+tests: run_tests
+
 # Run all unit tests under src/bin/pegleg
 .PHONY: run_tests
 run_tests:
