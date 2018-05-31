@@ -14,13 +14,60 @@
     check:
       jobs:
         - airship-pegleg-linter
+        - airship-pegleg-doc-build
+        - airship-pegleg-lint-pep8
+        - airship-pegleg-unit-py35
+        - airship-pegleg-security-bandit
+
     gate:
       jobs:
         - airship-pegleg-linter
+        - airship-pegleg-doc-build
+        - airship-pegleg-lint-pep8
+        - airship-pegleg-unit-py35
+        - airship-pegleg-security-bandit
+
+- nodeset:
+    name: airship-pegleg-single-node
+    nodes:
+      - name: primary
+        label: ubuntu-xenial
 
 - job:
     name: airship-pegleg-linter
     description: |
       Lints all files by checking them for whitespace.
     run: tools/gate/playbooks/zuul-linter.yaml
-    nodeset: openstack-helm-single-node
+    nodeset: airship-pegleg-single-node
+
+- job:
+    name: airship-pegleg-lint-pep8
+    description: |
+      Lints Python files against the PEP8 standard
+    run: tools/gate/playbooks/pep8-linter.yaml
+    timeout: 300
+    nodeset: airship-pegleg-single-node
+
+- job:
+    name: airship-pegleg-unit-py35
+    description: |
+      Executes unit tests under Python 3.5
+    run: tools/gate/playbooks/unit-py35.yaml
+    timeout: 300
+    nodeset: airship-pegleg-single-node
+
+- job:
+    name: airship-pegleg-security-bandit
+    description: |
+      Executes the Bandit security scanner against Python files
+    run: tools/gate/playbooks/security-bandit.yaml
+    timeout: 300
+    nodeset: airship-pegleg-single-node
+
+- job:
+    name: airship-pegleg-doc-build
+    description: |
+      Locally build the documentation to check for errors
+    run: tools/gate/playbooks/doc-build.yaml
+    timeout: 300
+    nodeset: airship-pegleg-single-node

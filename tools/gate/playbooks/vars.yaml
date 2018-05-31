@@ -12,9 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- hosts: primary
-  tasks:
-    - name: Execute a Whitespace Linter check
-      command: find . -not -path "*/\.*" -not -path "*/docs/build/*" -not -name "*.tgz"  -type f -exec egrep -l " +$" {} \;
-      register: result
-      failed_when: result.stdout != ""
+null: null

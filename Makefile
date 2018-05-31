@@ -41,6 +41,10 @@ run_pegleg: build_pegleg
 .PHONY: tests
 tests: run_tests
 
+.PHONY: security
+security:
+	tox -c src/bin/pegleg/tox.ini -e bandit
+
 # Run all unit tests under src/bin/pegleg
 .PHONY: run_tests
 run_tests:
@@ -64,6 +68,10 @@ endif
 ifeq ($(PUSH_IMAGE), true)
 	docker push $(IMAGE)
 endif
+
+.PHONY: docs
+docs: clean
+	tox -edocs
 
 .PHONY: clean
 clean:
