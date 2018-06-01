@@ -79,7 +79,7 @@ clean:
 
 .PHONY: py_lint
 py_lint:
-	cd src/bin/pegleg;tox -e lint
+	cd src/bin/pegleg;tox -e pep8
 
 .PHONY: py_format
 py_format:
