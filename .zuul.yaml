@@ -47,6 +47,12 @@
     run: tools/gate/playbooks/pep8-linter.yaml
     timeout: 300
     nodeset: airship-pegleg-single-node
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/.*$
+      - ^etc/.*$
+      - ^releasenotes/.*$
+      - ^setup.cfg$
 
 - job:
     name: airship-pegleg-unit-py35
@@ -55,6 +61,12 @@
     run: tools/gate/playbooks/unit-py35.yaml
     timeout: 300
     nodeset: airship-pegleg-single-node
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/.*$
+      - ^etc/.*$
+      - ^releasenotes/.*$
+      - ^setup.cfg$
 
 - job:
     name: airship-pegleg-security-bandit
@@ -63,6 +75,12 @@
     run: tools/gate/playbooks/security-bandit.yaml
     timeout: 300
     nodeset: airship-pegleg-single-node
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/.*$
+      - ^etc/.*$
+      - ^releasenotes/.*$
+      - ^setup.cfg$
 
 - job:
     name: airship-pegleg-doc-build
@@ -71,3 +89,6 @@
     run: tools/gate/playbooks/doc-build.yaml
     timeout: 300
     nodeset: airship-pegleg-single-node
+    irrelevant-files:
+      - ^src/bin/pegleg/tests/.*$
+      - ^setup.cfg$
