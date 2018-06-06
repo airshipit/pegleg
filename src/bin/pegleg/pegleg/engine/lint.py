@@ -107,6 +107,7 @@ def _verify_single_file(filename, schemas):
                            '%s does not begin with YAML beginning of document '
                            'marker "---".' % filename))
         f.seek(0)
+        documents = []
         try:
             documents = list(yaml.safe_load_all(f))
         except Exception as e:
