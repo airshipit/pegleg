@@ -13,11 +13,12 @@
 # limitations under the License.
 
 from setuptools import setup
+from setuptools import find_packages
 
 setup(
     name='pegleg',
     version='0.1.0',
-    packages=['pegleg', 'tests'],
+    packages=find_packages(),
     entry_points={
         'console_scripts': [
             'pegleg=pegleg.cli:main',
