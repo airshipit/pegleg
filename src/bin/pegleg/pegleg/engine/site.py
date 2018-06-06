@@ -29,6 +29,10 @@ LOG = logging.getLogger(__name__)
 def collect(site_name, save_location):
     try:
         save_files = dict()
+        if save_location is None:
+            raise ValueError('Missing param: save-location')
+        elif not os.path.exists(save_location):
+            raise FileNotFoundError('Invalid save-location path')
         for (repo_base,
              filename) in util.definition.site_files_by_repo(site_name):
             repo_name = os.path.normpath(repo_base).split(os.sep)[-1]

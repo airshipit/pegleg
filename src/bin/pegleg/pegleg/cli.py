@@ -69,7 +69,6 @@ def site(primary_repo, aux_repo):
     'save_location',
     type=click.Path(
         file_okay=False, dir_okay=True, writable=True, resolve_path=True),
-    default=sys.stdout,
     help='Where to output')
 @click.argument('site_name')
 def collect(*, save_location, site_name):
