@@ -18,7 +18,7 @@
         - airship-pegleg-lint-pep8
         - airship-pegleg-unit-py35
         - airship-pegleg-security-bandit
-
+        - airship-pegleg-docker-build-gate
     gate:
       jobs:
         - airship-pegleg-linter
@@ -26,6 +26,10 @@
         - airship-pegleg-lint-pep8
         - airship-pegleg-unit-py35
         - airship-pegleg-security-bandit
+        - airship-pegleg-docker-build-gate
+    post:
+      jobs:
+        - airship-pegleg-docker-publish
 
 - nodeset:
     name: airship-pegleg-single-node
@@ -92,3 +96,60 @@
     irrelevant-files:
       - ^src/bin/pegleg/tests/.*$
       - ^setup.cfg$
+
+- job:
+    name: airship-pegleg-docker-build-gate
+    timeout: 1800
+    run: tools/gate/playbooks/docker-image-build.yaml
+    nodeset: airship-pegleg-single-node
+    irrelevant-files:
+      - '^docs/.*'
+    vars:
+      publish: false
+      tags:
+        dynamic:
+          patch_set: true
+
+- job:
+    name: airship-pegleg-docker-publish
+    timeout: 1800
+    run: tools/gate/playbooks/docker-image-build.yaml
+    nodeset: airship-pegleg-single-node
+    secrets:
+      - airship_pegleg_quay_creds
+    irrelevant-files:
+      - '^docs/.*'
+    vars:
+      publish: true
+      tags:
+        dynamic:
+          branch: true
+          commit: true
+        static:
+          - latest
+
+- secret:
+    name: airship_pegleg_quay_creds
+    data:
+      username: !encrypted/pkcs1-oaep
+        - BI1sCnCyps8RaXf/BQ2ZtobrXn4MfnimRr5wE5Rv3U95NCCK5EoUwBEvnz7yNmQ8m99D7
+          9Gx4qA0N1ry7QL+o2Ll0D/ahb/HsaVBNU3CeVfe+3shpEVEuSi2xrA8K9LQPfIK1237vr
+          wVvN/R+y/uYm7mpPr/aEPjQwJf3wgEK8xV/ZTvqYSVCpGylbfV0tWxm6uEVdBc1kMPLJN
+          8uItJPaAaYMkFEasnVlI/DV8suiK13BLT7bNpNZBQsQ3AlcBCoq9mt50C3slV1wIneaz9
+          qK+O++z7r8OTWUDMQqWE5d1m6jz1WIp5DROmnOvb9dfS73XsTcgmXwilrQt3VSvFCToga
+          gAVHcoWbIKfxgrbOhoLFr+68id3VwVKN+NXgkoxTAJSzFCWwrs0X4n4W6D4O9buQyFTiZ
+          s9o5rB1f2bdF5iI8Npqg6YchPtWn2eR78w1hRyge2HJk2RQgN1CqjpbiQ0uiEy0QA/Ksu
+          VTtuONyV3T7FUYXaK3cHYrCwhV/idquSNRCWnKQAbs8mU8w298UbpOq4lZk1Njeg9StIs
+          0DYyG1SX2k4mBS4//9i488qBSss2CBMhZWHbesSDi/OW4fNzz/2wm2FaW1uaJJSOTXEyJ
+          E3p4+eejcYknXR+XD6BWfSvSwabsCezGSCg7wg7CRFsuTYXx5a4y/+P8Jh+Y7Y=
+      password: !encrypted/pkcs1-oaep
+        - x/0RHX1OlOfFgyb5ed0sknZQi8waSQLzWv+Aog0CziVMf9r3MtZ29LAcrqp9VUdFRYGCk
+          Hf71TJb1Zb8b+WNcUJH2JjVo//Z1smU5F5xEqzhz0gTm1HYQjMAlqd1VNDYv0IpWl2dLE
+          sGnEOT/Uq0RfH3rRt+33GagmXBUNuOIMdx41ubrMaF6ddg8IbjISRaCdfPOlNIrj24gCj
+          a16UNiSyAhvqkod2G2HO7JE7Nv2//5hI1MD1o7sip8/eub12XtHMjpDRKR+KymX81LGAS
+          PeCAn+Hw41uUKnxI/OTW47YtNvQVZZ4gRTOKTumsSNSceFfbf5ljm/JHTWx0SO6Z/kvzH
+          RAJwBmLPHg7leD2wF9vWXwcmlyWJFyeEW/K/+6gYycQ2H0OnRuRxzYaNpSa96zPWUfNsA
+          3TEKJcXjFXJSr00KnWmUZw8ZmPYAziu+pZoBXpkIhYoP1MAtggv/pvVsODDHmokP9nVE6
+          s6YbtUXzthM/TgsE5KMZ2QP4udetj11RGDC+7fz/edtLcrpL3Nrq2rkJ2tRV+yR1ElKGx
+          b2YX7cwM/vx3DPhWRBPJJfOoSRl+ZJByDM1KKWmAB91LT9vB3oVk/vq2XUsbTH2w20LcK
+          xBXFJMtVHOavHIIWM7qHvkvZzWSBON7ydspje9MbYtTS5/97ccdLxDHA0MX0wM=
