@@ -57,8 +57,10 @@ def deckhand_render(documents=[],
             validate=validate)
         rendered_documents = [dict(d) for d in deckhand_eng.render()]
     except dh_errors.DeckhandException as e:
-        errors.append((DECKHAND_RENDER_EXCEPTION,
-                       'An unknown Deckhand exception occurred while trying'
-                       ' to render documents: %s' % str(e)))
+        errors.append(
+            (DECKHAND_RENDER_EXCEPTION,
+             'An unknown Deckhand exception occurred while trying'
+             ' to render documents: %s. Details: %s.' % (str(e),
+                                                         e.error_list)))
 
     return rendered_documents, errors
