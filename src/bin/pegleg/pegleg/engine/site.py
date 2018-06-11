@@ -79,6 +79,14 @@ def render(site_name, output_stream):
 
     rendered_documents, errors = util.deckhand.deckhand_render(
         documents=documents)
+    err_msg = ''
+    if errors:
+        for err in errors:
+            if isinstance(err, tuple) and len(err) > 1:
+                err_msg += ': '.join(err) + '\n'
+            else:
+                err_msg += str(err) + '\n'
+        raise click.ClickException(err_msg)
     yaml.dump_all(rendered_documents, output_stream, default_flow_style=False)
 
 
