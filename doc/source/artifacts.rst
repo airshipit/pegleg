@@ -77,7 +77,7 @@ definition library and the definition library
 for the ``revision``. The ``revision`` field and
 the ``site_type`` fields select the definition library from the
 ``type`` layer. And the ``site`` layer is defined by the single
-defintion library under the sitename.
+definition library under the sitename.
 
 Definition Library Layout
 =========================
