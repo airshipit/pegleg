@@ -12,17 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-PEGLEG_BUILD_CTX           ?= src/bin/pegleg
-IMAGE_NAME                 ?= pegleg
-IMAGE_PREFIX               ?= attcomdev
-DOCKER_REGISTRY            ?= quay.io
-IMAGE_TAG                  ?= latest
-HELM                       ?= helm
-PROXY                      ?= http://proxy_url
-USE_PROXY                  ?= false
-PUSH_IMAGE                 ?= false
-LABEL                      ?= commit-id
-IMAGE                      ?= $(DOCKER_REGISTRY)/$(IMAGE_PREFIX)/$(IMAGE_NAME):$(IMAGE_TAG)
+PEGLEG_BUILD_CTX ?= src/bin/pegleg
+IMAGE_NAME       ?= pegleg
+IMAGE_PREFIX     ?= attcomdev
+DOCKER_REGISTRY  ?= quay.io
+IMAGE_TAG        ?= latest
+HELM             ?= helm
+PROXY            ?= http://proxy.foo.com:8000
+NO_PROXY         ?= localhost,127.0.0.1,.svc.cluster.local
+USE_PROXY        ?= false
+PUSH_IMAGE       ?= false
+LABEL            ?= commit-id
+IMAGE            ?= $(DOCKER_REGISTRY)/$(IMAGE_PREFIX)/$(IMAGE_NAME):$(IMAGE_TAG)
 export
 
 # Build all docker images for this project
@@ -61,7 +62,13 @@ format: py_format
 .PHONY: build_pegleg
 build_pegleg:
 ifeq ($(USE_PROXY), true)
-	docker build -t $(IMAGE) --network=host --label $(LABEL) -f images/pegleg/Dockerfile --build-arg ctx_base=$(PEGLEG_BUILD_CTX) --build-arg http_proxy=$(PROXY) --build-arg https_proxy=$(PROXY) .
+	docker build -t $(IMAGE) --network=host --label $(LABEL) -f images/pegleg/Dockerfile --build-arg ctx_base=$(PEGLEG_BUILD_CTX) \
+		--build-arg http_proxy=$(PROXY) \
+		--build-arg https_proxy=$(PROXY) \
+		--build-arg HTTP_PROXY=$(PROXY) \
+		--build-arg HTTPS_PROXY=$(PROXY) \
+		--build-arg no_proxy=$(NO_PROXY) \
+		--build-arg NO_PROXY=$(NO_PROXY) .
 else
 	docker build -t $(IMAGE) --network=host --label $(LABEL) -f images/pegleg/Dockerfile --build-arg ctx_base=$(PEGLEG_BUILD_CTX) .
 endif
