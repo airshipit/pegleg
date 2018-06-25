@@ -2,24 +2,20 @@
 
 set -e
 
-realpath() {
-    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
-}
-
-SCRIPT_DIR=$(realpath "$(dirname "${0}")")
-SOURCE_DIR=${SCRIPT_DIR}/pegleg
-if [ -z "${WORKSPACE}" ]; then
-  WORKSPACE="/"
-fi
-
-IMAGE=${IMAGE:-artifacts-aic.atlantafoundry.com/att-comdev/pegleg:latest}
+: ${WORKSPACE:=$(pwd)}
+: ${IMAGE:=artifacts-aic.atlantafoundry.com/att-comdev/pegleg:latest}
 
 echo
-echo "== NOTE: Workspace $WORKSPACE  is available as /workspace in container context =="
+echo "== NOTE: Workspace $WORKSPACE is the execution directory in the container =="
 echo
+
+# Working directory inside container to execute commands from and mount from
+# host OS
+container_workspace_path='/workspace'
 
 docker run --rm -t \
     --net=none \
-    -v "${WORKSPACE}:/workspace" \
+    --workdir="$container_workspace_path" \
+    -v "${WORKSPACE}:$container_workspace_path" \
     "${IMAGE}" \
     pegleg "${@}"
