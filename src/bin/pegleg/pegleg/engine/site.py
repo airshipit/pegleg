@@ -12,17 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import click
 import collections
 import csv
 import json
-import yaml
 import logging
+import os
+
+import click
+import yaml
 
 from pegleg.engine import util
 
-__all__ = ['collect', 'impacted', 'list_', 'show', 'render']
+__all__ = ('collect', 'impacted', 'list_', 'show', 'render')
 
 LOG = logging.getLogger(__name__)
 
@@ -62,7 +63,7 @@ def _collect_to_file(site_name, save_location):
     # In case save_location already exists and isn't a directory.
     if not os.path.isdir(save_location):
         raise click.ClickException('save_location %s already exists, but must '
-                                   'be a directory')
+                                   'be a directory' % save_location)
 
     save_files = dict()
     try:
@@ -122,11 +123,24 @@ def render(site_name, output_stream):
 
 
 def list_(output_stream):
-    fieldnames = ['site_name', 'site_type', 'revision']
+    """List site names for a given repository."""
+
+    # TODO(felipemonteiro): This should output a formatted table, not rows of
+    # data without delimited columns.
+    fieldnames = ['site_name', 'site_type', 'repositories']
     writer = csv.DictWriter(
         output_stream, fieldnames=fieldnames, delimiter=' ')
     for site_name in util.files.list_sites():
         params = util.definition.load_as_params(site_name)
+        # TODO(felipemonteiro): This is a temporary hack around legacy manifest
+        # repositories containing the name of a directory that symbolizes a
+        # repository. Once all these manifest repositories migrate over to Git
+        # references instead, remove this hack.
+        # NOTE(felipemonteiro): The 'revision' information can instead be
+        # computed using :func:`process_site_repository` and storing into
+        # a configuration via a "set_site_revision" function, for example.
+        if 'revision' in params:
+            params.pop('revision')
         writer.writerow(params)
 
 

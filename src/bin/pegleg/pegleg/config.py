@@ -17,40 +17,64 @@ try:
         pass
 except NameError:
     GLOBAL_CONTEXT = {
-        'primary_repo': './',
-        'aux_repos': [],
+        'site_repo': './',
+        'extra_repos': [],
         'site_path': 'site'
     }
 
 
-def get_primary_repo():
-    return GLOBAL_CONTEXT['primary_repo']
+def get_site_repo():
+    return GLOBAL_CONTEXT['site_repo']
 
 
-def set_primary_repo(r):
-    GLOBAL_CONTEXT['primary_repo'] = r.rstrip('/') + '/'
+def set_site_repo(r):
+    GLOBAL_CONTEXT['site_repo'] = r.rstrip('/') + '/'
 
 
-def set_auxiliary_repo_list(a):
-    GLOBAL_CONTEXT['aux_repos'] = [r.rstrip('/') + '/' for r in a]
+def get_extra_repo_store():
+    return GLOBAL_CONTEXT.get('extra_repo_store', [])
 
 
-def add_auxiliary_repo(a):
-    GLOBAL_CONTEXT['aux_repos'].append(a.rstrip('/') + '/')
+def set_extra_repo_store(r):
+    GLOBAL_CONTEXT['extra_repo_store'] = r
 
 
-def get_auxiliary_repo_list():
-    return GLOBAL_CONTEXT['aux_repos']
+def set_repo_key(k):
+    GLOBAL_CONTEXT['repo_key'] = k
 
 
-def each_auxiliary_repo():
-    for a in GLOBAL_CONTEXT['aux_repos']:
+def get_repo_key():
+    return GLOBAL_CONTEXT.get('repo_key', None)
+
+
+def set_repo_username(u):
+    GLOBAL_CONTEXT['repo_username'] = u
+
+
+def get_repo_username():
+    return GLOBAL_CONTEXT.get('repo_username', None)
+
+
+def set_extra_repo_list(a):
+    GLOBAL_CONTEXT['extra_repos'] = [r.rstrip('/') + '/' for r in a]
+
+
+def add_extra_repo(a):
+    GLOBAL_CONTEXT['extra_repos'].append(a.rstrip('/') + '/')
+
+
+def get_extra_repo_list():
+    return GLOBAL_CONTEXT['extra_repos']
+
+
+def each_extra_repo():
+    for a in GLOBAL_CONTEXT['extra_repos']:
         yield a
 
 
 def all_repos():
-    repos = [get_primary_repo()]
-    repos.extend(get_auxiliary_repo_list())
+    repos = [get_site_repo()]
+    repos.extend(get_extra_repo_list())
     return repos
 
 

@@ -49,29 +49,76 @@ CLI Options
 
 Enable debug logging.
 
+.. _site:
+
 Site
 ----
+
 This allows you to set the primary and auxiliary repositories.
-
-**-p / --primary**
-
-Path to the root of the primary (containing site_definition.yaml) repo.
-(Required).
-
-**-a / --auxiliary**
-
-Path to the root of an auxiliary repo.
 
 ::
 
-    ./pegleg.sh site -p <primary_repo> -a <auxiliary_repo> <command> <options>
+  ./pegleg.sh site -r <site_repo> -e <extra_repo> <command> <options>
 
-    Example:
-    ./pegleg.sh site -p /workspace/repo_1 -a /workspace/repo_2
+**-r / --site-repository** (mandatory)
+
+Path to the root of the site repository (containing site_definition.yaml) repo.
+(Required). For example: /opt/aic-site-clcp-manifests.
+
+**-e / --extra-repository** (optional)
+
+Path to the root of extra repositories used for overriding those specified
+under the ``repositories`` field in a given :file:`site-definition.yaml`.
+
+These should be named per the site-definition file, e.g.:
+
+::
+
+  -e global=/opt/global -e secrets=/opt/secrets
+
+By default, the revision specified in the :file:`site-definition.yaml` for the
+site will be leveraged but can be
+:ref:`overridden <command-line-repository-overrides>` using:
+
+::
+
+  -e global=/opt/global@revision
+
+Example usage:
+
+::
+
+  ./pegleg.sh site -r /opt/aic-clcp-site-manifests/ \
+    -u <AUTH_USER> \
+    -k /opt/.ssh/gerrit.pub \
+    -e global=ssh://REPO_USERNAME@<GERRIT URL>:29418/aic-clcp-manifests.git@master \
     <command> <options>
+
+.. _self-contained-repo:
+
+Self-Contained Repository
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For self-contained repositories, specification of extra repositories is
+unnecessary. The following command can be used to deploy the manifests in
+the example repository ``/opt/airship-in-a-bottle`` for the *currently checked
+out revision*:
+
+::
+
+  pegleg site -r /opt/airship-in-a-bottle <command> <options>
+
+To specify a specific revision at run time, execute:
+
+::
+
+  pegleg site -r /opt/airship-in-a-bottle@<REVISION> <command> <options>
+
+Where ``<REVISION>`` must be a valid :ref:`git-reference`.
 
 Collect
 -------
+
 Output complete config for one site.
 
 **site_name**
@@ -80,7 +127,8 @@ Name of the site. (Required).
 
 **-s / --save-location**
 
-Where to output collected documents.
+Where to output collected documents. If omitted, the results will be dumped
+to ``stdout``.
 
 **-x <code>** (Optional, validation only).
 
@@ -101,25 +149,28 @@ Usage:
 
 ::
 
-    ./pegleg.sh <command> <options> collect site_name -s save_location
-    -x P001 -w P002 --validate
+    ./pegleg.sh <command> <options> collect <site_name> -s <save_location> \
+      -x P001 -w P002 --validate
 
 Example without validation:
 
 ::
 
-    ./pegleg.sh site -p /workspace/repo_1 -a /workspace/repo_2
-    collect site_name -s /workspace
+    ./pegleg.sh site -r /opt/aic-clcp-site-manifests \
+      -e global=/opt/aic-clcp-manifests \
+      collect <site_name> -s /workspace
 
 Example with validation:
 
 ::
 
-    ./pegleg.sh site -p /workspace/repo_1 -a /workspace/repo_2
-    collect site_name -s /workspace -x P004 --validate
+    ./pegleg.sh site -r /opt/aic-clcp-site-manifests \
+      -e global=/opt/aic-clcp-manifests \
+      collect <site_name> -s /workspace -x P004 --validate
 
 Impacted
 --------
+
 Find sites impacted by changed files.
 
 **-i / --input**
@@ -136,6 +187,7 @@ Where to output.
 
 List
 ----
+
 List known sites.
 
 **-o/--output**
@@ -147,10 +199,11 @@ Where to output.
     ./pegleg <command> <options> list
 
     Example:
-    ./pegleg site -p /workspace/repo_1 list -o /workspace
+    ./pegleg site -r /opt/aic-clcp-site-manifests list -o /workspace
 
 Show
 ----
+
 Show details for one site.
 
 **site_name**
@@ -166,33 +219,38 @@ Where to output.
     ./pegleg <command> <options> show site_name
 
     Example:
-    ./pegleg site -p /workspace/repo_1 show site_name -o /workspace
+    ./pegleg site -r /opt/aic-clcp-site-manifests show site_name -o /workspace
 
 .. _linting:
 
 Lint
 ----
+
 Sanity checks for repository content. Validations for linting are done
 utilizing `Deckhand Validations`_.
 
+Example:
+
 ::
 
-    ./pegleg.sh lint -p <primary_repo> -a <auxiliary_repo>
-    -f -x <lint_code> -w <lint_code>
+    ./pegleg.sh site -r <site_repo> -e <extra_repo> \
+      lint <site_name> \
+      -f -x <lint_code> -w <lint_code>
 
-    Example:
+The most basic way to lint a document set is as follows:
 
-    ./pegleg.sh lint -p /workspace/site-repo -a /workspace/secondary-repo
-    -x P001 -x P002 -w P003
+::
 
-**-p / --primary**
+    ./pegleg.sh site -r <site_repo> -e <extra_repo> lint <site_name>
 
-Path to the root of the primary (containing site_definition.yaml) repo.
-(Required).
+A more complex example involves excluding certain linting checks:
 
-**-a / --auxiliary**
+::
 
-Path to the root of an auxiliary repo.
+    ./pegleg.sh site -r /opt/aic-clcp-site-manifests \
+      -e global=/opt/aic-clcp-manifests \
+      lint <site_name> \
+      -x P001 -x P002 -w P003
 
 **-f / --fail-on-missing-sub-src**
 
@@ -224,5 +282,55 @@ Will warn of lint failures from the specified lint options.
     P002 - Deckhand rendering is expected to complete without errors.
     P003 - All repos contain expected directories.
 
+.. _command-line-repository-overrides:
 
-.. _`Deckhand Validations`: https://airship-deckhand.readthedocs.io/en/latest/validation.html
+CLI Repository Overrides
+------------------------
+
+Repository overrides should only be used for entries included underneath
+the ``repositories`` field for a given :file:`site-definition.yaml`.
+
+Overrides are specified via the ``-e`` flag for all :ref:`site` commands. They
+have the following format:
+
+::
+
+  -e <REPO_NAME>=<REPO_PATH_OR_URL>@<REVISION>
+
+Where:
+
+  * REPO_NAME is one of: ``global``, ``secrets`` or ``site``.
+  * REPO_PATH_OR_URL is one of:
+
+    * path (relative or absolute) - /opt/global or ../global though absolute is
+      recommended
+    * url (fully qualified) - must have following formats:
+
+      * ssh - <PROTOCOL>://<REPO_USERNAME>@<GERRIT URL>:<PORT>/<REPO_NAME>.git
+      * http|https - <PROTOCOL>://<GERRIT URL>/<REPO_NAME>.git
+
+    Where:
+
+      * <PROTOCOL> must be a valid authentication protocol: ssh, https, or http
+      * <REPO_USERNAME> must be a user with access rights to the repository.
+        This value will replace the literal string REPO_USERNAME in the
+        corresponding entry under the ``repositories`` field in the relevant
+        :file:`site-definition.yaml`, if applicable
+      * <GERRIT_URL> must be a valid Gerrit URL
+      * <PORT> must be a valid authentication port for SSH
+      * <REVISION> must be a valid :ref:`git-reference`
+      * <REPO_NAME> must be a valid Git repository name,
+        e.g. aic-clcp-site-manifests
+
+.. _git-reference:
+
+Git Reference
+^^^^^^^^^^^^^
+
+Valid Git references for checking out repositories include:
+
+  * 47676764d3935e4934624bf9593e9115984fe668 (commit ID)
+  * refs/changes/79/47079/12 (ref)
+  * master (branch name)
+
+.. _Deckhand Validations: https://airship-deckhand.readthedocs.io/en/latest/validation.html

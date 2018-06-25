@@ -47,8 +47,16 @@ def full(fail_on_missing_sub_src=False, exclude_lint=None, warn_lint=None):
     # be added to the error list if SCHEMA_STORAGE_POLICY_MISMATCH_FLAG
     messages.extend(_verify_file_contents())
 
+    # FIXME(felipemonteiro): Now that we are using revisioned repositories
+    # instead of flat directories with subfolders mirroring "revisions",
+    # this lint check analyzes ALL the directories (including these
+    # no-longer-valid "revision directories") against the new subset of
+    # relevant directories. We need to rewrite this check so that it works
+    # after site definitions have been refactored to move the manifests
+    # under fake repository folders into the common/ folders.
+    #
     # All repos contain expected directories
-    messages.extend(_verify_no_unexpected_files())
+    # messages.extend(_verify_no_unexpected_files())
 
     # Deckhand Rendering completes without error
     messages.extend(_verify_deckhand_render(fail_on_missing_sub_src))
@@ -71,8 +79,9 @@ def _verify_no_unexpected_files():
     expected_directories = set()
     for site_name in util.files.list_sites():
         params = util.definition.load_as_params(site_name)
-        expected_directories.update(util.files.directories_for(**params))
-
+        expected_directories.update(
+            util.files.directories_for(
+                site_name=params['site_name'], site_type=params['site_type']))
     LOG.debug('expected_directories: %s', expected_directories)
     found_directories = util.files.existing_directories()
     LOG.debug('found_directories: %s', found_directories)
@@ -174,7 +183,8 @@ def _gather_relevant_documents_per_site():
 
     for sitename in sitenames:
         params = util.definition.load_as_params(sitename)
-        paths = util.files.directories_for(**params)
+        paths = util.files.directories_for(
+            site_name=params['site_name'], site_type=params['site_type'])
         filenames = set(util.files.search(paths))
         for filename in filenames:
             with open(filename) as f:

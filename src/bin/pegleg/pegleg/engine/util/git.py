@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import atexit
 import logging
 import os
 import tempfile
 from urllib.parse import urlparse
 
+import click
 from git import exc as git_exc
 from git import Git
 from git import Repo
@@ -28,6 +30,8 @@ LOG = logging.getLogger(__name__)
 __all__ = [
     'git_handler',
 ]
+
+__MODIFIED_REPOS = []
 
 
 def git_handler(repo_url, ref=None, proxy_server=None, auth_key=None):
@@ -78,7 +82,6 @@ def git_handler(repo_url, ref=None, proxy_server=None, auth_key=None):
             raise ValueError('repo_url=%s must use one of the following '
                              'protocols: %s' %
                              (repo_url, ', '.join(supported_clone_protocols)))
-
     # otherwise, we're dealing with a local directory so although
     # we do not need to clone, we may need to process the reference
     # by checking that out and returning the directory they passed in
@@ -87,13 +90,13 @@ def git_handler(repo_url, ref=None, proxy_server=None, auth_key=None):
                   'Attempting to checkout ref=%s', repo_url, ref)
         try:
             # get absolute path of what is probably a directory
-            repo_url = os.path.abspath(repo_url)
+            repo_url, _ = normalize_repo_path(repo_url)
         except Exception:
-            msg = "The repo_url=%s is not a valid directory" % repo_url
+            msg = "The repo_url=%s is not a valid Git repo" % repo_url
             LOG.error(msg)
             raise NotADirectoryError(msg)
 
-        repo = Repo(repo_url)
+        repo = Repo(repo_url, search_parent_directories=True)
         if repo.is_dirty(untracked_files=True):
             LOG.error('The locally cloned repo_url=%s is dirty. Manual clean '
                       'up of tracked/untracked files required.', repo_url)
@@ -127,7 +130,7 @@ def _get_current_ref(repo_url):
     """
 
     try:
-        repo = Repo(repo_url)
+        repo = Repo(repo_url, search_parent_directories=True)
         current_ref = repo.head.ref.name
         LOG.debug('ref for repo_url=%s not specified, defaulting to currently '
                   'checked out ref=%s', repo_url, current_ref)
@@ -305,7 +308,7 @@ def _create_local_ref(g, branches, ref, newref, reftype=None):
             branches.append(newref)
 
 
-def is_repository(path):
+def is_repository(path, *args, **kwargs):
     """Checks whether the directory ``path`` is a Git repository.
 
     :param str path: Directory path to check.
@@ -313,7 +316,99 @@ def is_repository(path):
     :rtype: boolean
     """
     try:
-        Repo(path).git_dir
+        Repo(path, *args, **kwargs).git_dir
         return True
     except git_exc.InvalidGitRepositoryError:
         return False
+
+
+def is_equal(first_repo, other_repo):
+    """Compares whether two repositories are the same.
+
+    Sameness is defined as whether they point to the same remote repository.
+
+    :param str first_repo: Path or URL of first repository.
+    :param str other_repo: Path or URL of other repository.
+    :returns: True if both are the same, else False.
+    :rtype: boolean
+
+    """
+
+    try:
+        # Compare whether the first reference from each repository is the
+        # same: by doing so we know the repositories are the same.
+        first = Repo(first_repo, search_parent_directories=True)
+        other = Repo(other_repo, search_parent_directories=True)
+        first_rev = first.git.rev_list('master').splitlines()[-1]
+        other_rev = other.git.rev_list('master').splitlines()[-1]
+        return first_rev == other_rev
+    except Exception:
+        return False
+
+
+def repo_name(repo_url_or_path):
+    """Get the repository name for the local or remote repo at
+    ``repo_url_or_path``.
+
+    :param repo_url: URL of remote Git repo or path to local Git repo.
+    :returns: Corresponding repo name.
+    :rtype: str
+    :raises GitConfigException: If the path is not a valid Git repo.
+
+    """
+
+    repo = Repo(repo_url_or_path, search_parent_directories=True)
+    config_reader = repo.config_reader()
+    section = 'remote "origin"'
+    option = 'url'
+
+    if config_reader.has_section(section):
+        repo_url = config_reader.get_value(section, option)
+        return repo_url.split('/')[-1].split('.git')[0]
+    raise click.ClickException(
+        "Repo=%s is not a valid Git repository" % repo_url_or_path)
+
+
+def normalize_repo_path(repo_path):
+    """A utility function for retrieving the root repo path when the site
+    repository path contains subfolders.
+
+    Given (for example): ../airship-in-a-bottle/deployment_files@master
+
+    It is necessary to pass ../airship-in-a-bottle to Git for checkout/clone
+    as that is the actual repository path.
+
+    Yet it is necessary to pass ../airship-in-a-bottle/deployment_files to
+    :func:`util.definition.site_files_by_repo` for discovering the
+    site-definition.yaml.
+
+    """
+
+    orig_repo_path = repo_path
+    sub_path = ""
+
+    # Only resolve the root path if it's not a URL and exists.
+    if os.path.exists(repo_path):
+        repo_path = os.path.abspath(repo_path)
+        while (repo_path and os.path.exists(repo_path)
+               and not is_repository(repo_path)):
+            paths = repo_path.rsplit("/", 1)
+            if not all(paths):
+                break
+            repo_path = os.path.abspath(paths[0])
+            sub_path = os.path.join(sub_path, paths[1])
+        if not repo_path or not is_repository(repo_path):
+            raise click.ClickException(
+                "Specified site repo path=%s exists but isn't a Git "
+                "repository" % orig_repo_path)
+
+    return repo_path, sub_path
+
+
+@atexit.register
+def clean_repo():
+    global __MODIFIED_REPOS
+
+    for r in __MODIFIED_REPOS:
+        repo = Repo(r)
+        repo.head.reset(index=True, working_tree=True)

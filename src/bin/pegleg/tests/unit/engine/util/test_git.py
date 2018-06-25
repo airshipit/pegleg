@@ -67,13 +67,10 @@ def clean_git_repos():
 
     """
 
-    RELEVANT_REPOS = ('airship-armada', 'openstack-helm')
-
     root_tempdir = tempfile.gettempdir()
     for tempdir in os.listdir(root_tempdir):
         path = os.path.join(root_tempdir, tempdir)
-        if git.is_repository(path) and any(
-                path.endswith(x) for x in RELEVANT_REPOS):
+        if git.is_repository(path):
             shutil.rmtree(path, ignore_errors=True)
 
 
@@ -101,7 +98,9 @@ def _validate_git_clone(repo_dir, fetched_ref=None, checked_out_ref=None):
             assert checked_out_ref in git_file.read()
 
 
-def _assert_repo_url_was_cloned(mock_log, git_dir):
+def _assert_check_out_from_local_repo(mock_log, git_dir):
+    """Validates that check out happened from local repo, without a reclone.
+    """
     expected_msg = ('Treating repo_url=%s as an already-cloned repository')
     assert mock_log.debug.called
     mock_calls = mock_log.debug.mock_calls
@@ -180,7 +179,7 @@ def test_git_clone_existing_directory_checks_out_earlier_ref_from_local(
     ref = 'refs/changes/15/536215/34'
     git_dir = git.git_handler(git_dir, ref)
     _validate_git_clone(git_dir, checked_out_ref=ref)
-    _assert_repo_url_was_cloned(mock_log, git_dir)
+    _assert_check_out_from_local_repo(mock_log, git_dir)
 
 
 @pytest.mark.skipif(
@@ -200,7 +199,7 @@ def test_git_clone_existing_directory_checks_out_master_from_local(mock_log):
     ref = 'master'
     git_dir = git.git_handler(git_dir, ref)
     _validate_git_clone(git_dir, checked_out_ref=ref)
-    _assert_repo_url_was_cloned(mock_log, git_dir)
+    _assert_check_out_from_local_repo(mock_log, git_dir)
 
 
 @pytest.mark.skipif(
@@ -220,14 +219,14 @@ def test_git_clone_checkout_refpath_saves_references_locally(mock_log):
     ref = 'refs/changes/15/536215/34'
     git_dir = git.git_handler(git_dir, ref)
     _validate_git_clone(git_dir, checked_out_ref=ref)
-    _assert_repo_url_was_cloned(mock_log, git_dir)
+    _assert_check_out_from_local_repo(mock_log, git_dir)
 
     # Verify that passing in the hexsha variation of refpath
     # 'refs/changes/15/536215/34' also works.
     hexref = '276102a115dac3c0a6e91f9047d8b086bc8d2ff0'
     git_dir = git.git_handler(git_dir, hexref)
     _validate_git_clone(git_dir, checked_out_ref=hexref)
-    _assert_repo_url_was_cloned(mock_log, git_dir)
+    _assert_check_out_from_local_repo(mock_log, git_dir)
 
 
 @pytest.mark.skipif(
@@ -251,13 +250,13 @@ def test_git_clone_checkout_hexsha_saves_references_locally(mock_log):
     ref = 'bf126f46b1c175a8038949a87dafb0a716e3b9b6'
     git_dir = git.git_handler(git_dir, ref)
     _validate_git_clone(git_dir, checked_out_ref=ref)
-    _assert_repo_url_was_cloned(mock_log, git_dir)
+    _assert_check_out_from_local_repo(mock_log, git_dir)
 
     # Verify that passing in the refpath variation of hexsha also works.
     hexref = 'refs/changes/15/536215/35'
     git_dir = git.git_handler(git_dir, hexref)
     _validate_git_clone(git_dir, checked_out_ref=hexref)
-    _assert_repo_url_was_cloned(mock_log, git_dir)
+    _assert_check_out_from_local_repo(mock_log, git_dir)
 
 
 @pytest.mark.skipif(
@@ -278,7 +277,7 @@ def test_git_clone_existing_directory_checks_out_next_local_ref(mock_log):
     ref = 'refs/changes/54/457754/74'
     git_dir = git.git_handler(git_dir, ref)
     _validate_git_clone(git_dir, ref)
-    _assert_repo_url_was_cloned(mock_log, git_dir)
+    _assert_check_out_from_local_repo(mock_log, git_dir)
 
 
 @pytest.mark.skipif(
@@ -295,7 +294,7 @@ def test_git_checkout_without_reference_defaults_to_current(mock_log):
 
     git_dir = git.git_handler(git_dir, ref=None)  #  Defaults to commit ref.
     _validate_git_clone(git_dir, commit)  # Validate with the original ref.
-    _assert_repo_url_was_cloned(mock_log, git_dir)
+    _assert_check_out_from_local_repo(mock_log, git_dir)
 
 
 @pytest.mark.skipif(
@@ -355,7 +354,7 @@ def test_git_clone_existing_directory_raises_exc_for_invalid_ref(mock_log):
     ref = 'refs/changes/54/457754/9000'
     with pytest.raises(exceptions.GitException):
         git_dir = git.git_handler(git_dir, ref)
-    _assert_repo_url_was_cloned(mock_log, git_dir)
+    _assert_check_out_from_local_repo(mock_log, git_dir)
 
 
 @pytest.mark.skipif(
@@ -476,3 +475,53 @@ def test_git_clone_ssh_auth_method_missing_ssh_key(_):
     with pytest.raises(exceptions.GitSSHException):
         git.git_handler(
             url, ref='refs/changes/17/388517/5', auth_key='/home/user/.ssh/')
+
+
+@pytest.mark.skipif(
+    not is_connected(), reason='git clone requires network connectivity.')
+def test_is_repository():
+
+    cloned_directories = {}
+
+    def do_test(url, ref, subpath=None):
+        nonlocal cloned_directories
+
+        if url not in cloned_directories:
+            git_dir = git.git_handler(url, ref=ref)
+            _validate_git_clone(git_dir)
+            cloned_directories.setdefault(url, git_dir)
+        else:
+            git_dir = cloned_directories[url]
+
+        assert os.path.exists(git_dir)
+        assert git.is_repository(git_dir)
+
+        if subpath:
+            assert git.is_repository(
+                os.path.join(git_dir, subpath), search_parent_directories=True)
+
+    # airship-treasuremap
+    do_test(
+        url='http://github.com/openstack/airship-treasuremap',
+        ref='refs/changes/17/597217/1')
+    do_test(
+        url='http://github.com/openstack/airship-treasuremap',
+        ref='refs/changes/17/597217/1',
+        subpath='site')
+
+    # airship-in-a-bottle
+    do_test(
+        url='http://github.com/openstack/airship-in-a-bottle',
+        ref='refs/changes/39/596439/1')
+    do_test(
+        url='http://github.com/openstack/airship-in-a-bottle',
+        ref='refs/changes/39/596439/1',
+        subpath='deployment_files')
+    do_test(
+        url='http://github.com/openstack/airship-in-a-bottle',
+        ref='refs/changes/39/596439/1',
+        subpath='deployment_files/site')
+
+
+def test_is_repository_negative():
+    assert not git.is_repository(tempfile.mkdtemp())

@@ -67,17 +67,45 @@ to meet requirements.::
       schema: metadata/Document/v1
       storagePolicy: cleartext
     data:
-      revision: 'v1.0'
       site_type: 'cicd'
+      repositories:  # Optional field.
+        global:
+          revision: 47676764d3935e4934624bf9593e9115984fe668
+          url: ssh://REPO_USERNAME@gerrit:29418/aic-clcp-manifests.git
+        secrets:
+          revision: master
+          url: ssh://REPO_USERNAME@gerrit:29418/aic-clcp-security-manifests.git
 
-The ``revision`` field is used
-to select the definition libraries in the ``global`` layer. This
-layer will be composed of a union of documents in the ``common``
-definition library and the definition library
-for the ``revision``. The ``revision`` field and
-the ``site_type`` fields select the definition library from the
-``type`` layer. And the ``site`` layer is defined by the single
-definition library under the sitename.
+The ``repositories`` field (optional) maps default authentication information
+for each of the manifests repositories supported, for example:
+
+* global
+* secrets
+* site
+
+Each of the above fields must have 2 pieces of information:
+
+* ``revision`` (required) - specifies a valid :ref:`git-reference`.
+
+* ``url`` (required) - specifies the repository remote path. Consists of the
+  following required segments:
+
+  * protocol - http, https, or ssh.
+  * REPO_USERNAME - must be included for ssh only. Can be overridden with the
+    CLI via :ref:`command-line-repository-overrides`.
+  * port - e.g. 29418 - must be included for ssh only.
+  * repository name - e.g. aic-clcp-manifests
+
+Self-Contained Repository
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Note that if the ``repositories`` field is omitted, then this implies that the
+repository contains **all** the manifests required for site deployment. One
+such example is `Airship in a Bottle`_ which hosts all the manifests required
+for deploying a minimum OpenStack development environment.
+
+Please see the :ref:`related CLI documentation <self-contained-repo>` for
+information on how to issue relevant commands.
 
 Definition Library Layout
 =========================
@@ -157,3 +185,4 @@ site definition contains a set of documents.::
     in whatever way makes sense. The best practice here to define
     them by racks is only a suggestion.
 
+.. _Airship in a Bottle: https://github.com/openstack/airship-in-a-bottle

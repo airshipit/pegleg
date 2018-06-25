@@ -127,8 +127,10 @@ def test_verify_deckhand_render_site_documents_separately(
                 'schema': 'deckhand/Passphrase/v1'
             }, {
                 'data': {
-                    'revision': 'v1.0',
-                    'site_type': sitename
+                    'site_type': sitename,
+                    'repositories': {
+                        'global': mock.ANY
+                    }
                 },
                 'metadata': {
                     'layeringDefinition': {

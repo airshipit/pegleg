@@ -46,21 +46,42 @@ def main(*, verbose):
 
 @main.group(help='Commands related to sites')
 @click.option(
-    '-p',
-    '--primary',
-    'primary_repo',
+    '-r',
+    '--site-repository',
+    'site_repository',
     required=True,
     help=
-    'Path to the root of the primary (containing site_definition.yaml) repo.')
+    'Path or URL to the primary repository (containing site_definition.yaml) '
+    'repo.')
 @click.option(
-    '-a',
-    '--auxiliary',
-    'aux_repo',
+    '-e',
+    '--extra-repository',
+    'extra_repositories',
     multiple=True,
-    help='Path to the root of an auxiliary repo.')
-def site(primary_repo, aux_repo):
-    config.set_primary_repo(primary_repo)
-    config.set_auxiliary_repo_list(aux_repo or [])
+    help='Path or URL of additional repositories. These should be named per '
+    'the site-definition file, e.g. -e global=/opt/global -e '
+    'secrets=/opt/secrets. By default, the revision specified in the '
+    'site-definition for the site will be leveraged but can be overridden '
+    'using -e global=/opt/global@revision.')
+@click.option(
+    '-k',
+    '--repo-key',
+    'repo_key',
+    help='The SSH public key to use when cloning remote authenticated '
+    'repositories.')
+@click.option(
+    '-u',
+    '--repo-username',
+    'repo_username',
+    help=
+    'The SSH username to use when cloning remote authenticated repositories '
+    'specified in the site-definition file. Any occurrences of REPO_USERNAME '
+    'will be replaced with this value.')
+def site(*, site_repository, extra_repositories, repo_key, repo_username):
+    config.set_site_repo(site_repository)
+    config.set_extra_repo_store(extra_repositories or [])
+    config.set_repo_key(repo_key)
+    config.set_repo_username(repo_username)
 
 
 @site.command(help='Output complete config for one site')
@@ -104,6 +125,9 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     Collect can lint documents prior to collection if the ``--validate``
     flag is optionally included.
     """
+
+    engine.repository.process_repositories(site_name)
+
     if validate:
         # Lint the primary repo prior to document collection.
         _lint(
@@ -140,6 +164,7 @@ def impacted(*, input_stream, output_stream):
     default=sys.stdout,
     help='Where to output')
 def list_(*, output_stream):
+    engine.repository.process_site_repository(update_config=True)
     engine.site.list_(output_stream)
 
 
@@ -153,6 +178,7 @@ def list_(*, output_stream):
     help='Where to output')
 @click.argument('site_name')
 def show(*, output_stream, site_name):
+    engine.repository.process_repositories(site_name)
     engine.site.show(site_name, output_stream)
 
 
@@ -166,7 +192,39 @@ def show(*, output_stream, site_name):
     help='Where to output')
 @click.argument('site_name')
 def render(*, output_stream, site_name):
+    engine.repository.process_repositories(site_name)
     engine.site.render(site_name, output_stream)
+
+
+@site.command('lint', help='Lint a site')
+@click.option(
+    '-f',
+    '--fail-on-missing-sub-src',
+    'fail_on_missing_sub_src',
+    required=False,
+    type=click.BOOL,
+    default=True,
+    help='Fail when there is missing substitution source.')
+@click.option(
+    '-x',
+    '--exclude',
+    'exclude_lint',
+    multiple=True,
+    help='Excludes specified linting checks. Warnings will still be issued. '
+    '-w takes priority over -x.')
+@click.option(
+    '-w',
+    '--warn',
+    'warn_lint',
+    multiple=True,
+    help='Warn if linting check fails. -w takes priority over -x.')
+@click.argument('site_name')
+def lint(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
+    engine.repository.process_repositories(site_name)
+    _lint(
+        fail_on_missing_sub_src=fail_on_missing_sub_src,
+        exclude_lint=exclude_lint,
+        warn_lint=warn_lint)
 
 
 def _validate_revision_callback(_ctx, _param, value):
@@ -232,41 +290,3 @@ def _lint(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
         click.echo("Linting passed, but produced some warnings.")
         for w in warns:
             click.echo(w)
-
-
-@LINT_OPTION
-@main.command(help='Sanity checks for repository content')
-@click.option(
-    '-p',
-    '--primary',
-    'primary_repo',
-    required=True,
-    help=
-    'Path to the root of the primary (containing site_definition.yaml) repo.')
-@click.option(
-    '-a',
-    '--auxiliary',
-    'aux_repo',
-    multiple=True,
-    help='Path to the root of a auxiliary repo.')
-@click.option(
-    '-x',
-    '--exclude',
-    'exclude_lint',
-    multiple=True,
-    help='Excludes specified linting checks. Warnings will still be issued. '
-    '-w takes priority over -x.')
-@click.option(
-    '-w',
-    '--warn',
-    'warn_lint',
-    multiple=True,
-    help='Warn if linting check fails. -w takes priority over -x.')
-def lint(*, fail_on_missing_sub_src, primary_repo, aux_repo, exclude_lint,
-         warn_lint):
-    config.set_primary_repo(primary_repo)
-    config.set_auxiliary_repo_list(aux_repo or [])
-    _lint(
-        fail_on_missing_sub_src=fail_on_missing_sub_src,
-        exclude_lint=exclude_lint,
-        warn_lint=warn_lint)

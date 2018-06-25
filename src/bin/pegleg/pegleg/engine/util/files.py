@@ -48,18 +48,18 @@ def all():
     ])
 
 
-def create_global_directories(revision):
+def create_global_directories():
+    _create_tree(_global_root_path())
     _create_tree(_global_common_path())
-    _create_tree(_global_revision_path(revision))
 
 
-def create_site_directories(*, site_name, revision, **_kwargs):
+def create_site_directories(*, site_name, **_kwargs):
     _create_tree(_site_path(site_name))
 
 
-def create_site_type_directories(*, revision, site_type):
+def create_site_type_directories(*, site_type):
     _create_tree(_site_type_common_path(site_type))
-    _create_tree(_site_type_revision_path(site_type, revision))
+    _create_tree(_site_type_root_path(site_type))
 
 
 FULL_STRUCTURE = {
@@ -110,12 +110,10 @@ def _create_tree(root_path, *, tree=FULL_STRUCTURE):
             yaml.safe_dump(yaml_data, f)
 
 
-def directories_for(*, site_name, revision, site_type):
+def directories_for(*, site_name, site_type):
     library_list = [
-        _global_common_path(),
-        _global_revision_path(revision),
-        _site_type_common_path(site_type),
-        _site_type_revision_path(site_type, revision),
+        _global_root_path(),
+        _site_type_root_path(site_type),
         _site_path(site_name),
     ]
 
@@ -124,7 +122,7 @@ def directories_for(*, site_name, revision, site_type):
     ]
 
 
-def directories_for_each_repo(*, site_name, revision, site_type):
+def directories_for_each_repo(*, site_name, site_type):
     """Provide directories for each repo.
 
     When producing bucketized output files, the documents collected
@@ -132,10 +130,8 @@ def directories_for_each_repo(*, site_name, revision, site_type):
     by repo.
     """
     library_list = [
-        _global_common_path(),
-        _global_revision_path(revision),
-        _site_type_common_path(site_type),
-        _site_type_revision_path(site_type, revision),
+        _global_root_path(),
+        _site_type_root_path(site_type),
         _site_path(site_name),
     ]
 
@@ -150,16 +146,16 @@ def _global_common_path():
     return 'global/common'
 
 
-def _global_revision_path(revision):
-    return 'global/%s' % revision
+def _global_root_path():
+    return 'global'
 
 
 def _site_type_common_path(site_type):
     return 'type/%s/common' % site_type
 
 
-def _site_type_revision_path(site_type, revision):
-    return 'type/%s/%s' % (site_type, revision)
+def _site_type_root_path(site_type):
+    return 'type/%s' % site_type
 
 
 def _site_path(site_name):
@@ -169,7 +165,7 @@ def _site_path(site_name):
 def list_sites(primary_repo_base=None):
     """Get a list of site definition directories in the primary repo."""
     if not primary_repo_base:
-        primary_repo_base = config.get_primary_repo()
+        primary_repo_base = config.get_site_repo()
     full_site_path = os.path.join(primary_repo_base,
                                   config.get_rel_site_path())
     for path in os.listdir(full_site_path):

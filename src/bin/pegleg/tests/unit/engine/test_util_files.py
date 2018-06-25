@@ -24,7 +24,7 @@ def test_no_non_yamls(tmpdir):
     for x in range(3):  # Create 3 YAML files
         p.join("good-%d.yaml" % x).write('fake-content')
     p.join("bad.txt").write("fake-content")
-    config.set_primary_repo(str(tmpdir.listdir()[0]))
+    config.set_site_repo(str(tmpdir.listdir()[0]))
     results = list(files.all())
 
     assert 3 == len(results)

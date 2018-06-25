@@ -69,7 +69,7 @@ def create_tmp_deployment_files(tmpdir):
     }
 
     p = tmpdir.mkdir("deployment_files")
-    config.set_primary_repo(str(p))
+    config.set_site_repo(str(p))
 
     # Create global directories and files.
     files._create_tree(
@@ -123,7 +123,10 @@ def create_tmp_deployment_files(tmpdir):
         site_definition = """
 ---
 data:
-  revision: v1.0
+  repositories:
+    global:
+      revision: v1.0
+      url: http://nothing.com
   site_type: %s
 metadata:
   layeringDefinition: {abstract: false, layer: site}
