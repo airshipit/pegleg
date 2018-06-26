@@ -1,4 +1,5 @@
-FROM python:3.6
+ARG FROM=python:3.6
+FROM ${FROM}
 
 VOLUME /var/pegleg
 WORKDIR /var/pegleg
