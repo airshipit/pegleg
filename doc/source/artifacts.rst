@@ -66,7 +66,6 @@ to meet requirements.::
       schema: metadata/Document/v1
       storagePolicy: cleartext
     data:
-      platform_name: 'integration'
       revision: 'v1.0'
       site_type: 'cicd'
 
