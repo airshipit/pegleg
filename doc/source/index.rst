@@ -14,26 +14,32 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-.. tip::
+====================
+Pegleg Documentation
+====================
 
-  The Undercloud Platform is part of the AIC CP (AT&T Integrated Cloud
-  Containerized Platform). More details may be found by using the `Treasuremap`_
-
-Building this Documentation
----------------------------
-
-Use of ``tox -e docs`` will build an HTML version of this documentation that
-can be viewed using a browser at docs/build/index.html on the local filesystem.
-
-Conventions and Standards
--------------------------
+Overview
+--------
 
 .. toctree::
    :maxdepth: 2
 
    getting_started
-   authoring_strategy
-   artifacts
-   cli
 
-.. _Treasuremap: https://github.com/att-comdev/treasuremap
+Design
+------
+
+.. toctree::
+   :maxdepth: 2
+
+   artifacts
+   authoring_strategy
+
+Operator's Guide
+----------------
+
+.. toctree::
+   :maxdepth: 2
+
+   cli
+   exceptions

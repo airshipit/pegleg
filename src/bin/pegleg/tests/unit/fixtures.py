@@ -47,6 +47,9 @@ def _gen_document(**kwargs):
 def create_tmp_deployment_files(tmpdir):
     """Fixture that creates a temporary directory structure."""
     sitenames = ['cicd', 'lab']
+    # Used for ensuring the original global context is reset in memory
+    # following each test execution.
+    original_global_context = copy.deepcopy(config.GLOBAL_CONTEXT)
 
     SITE_TEST_STRUCTURE = {
         'directories': {
@@ -152,8 +155,5 @@ schema: pegleg/SiteDefinition/v1
 
     yield
 
-    config.GLOBAL_CONTEXT = {
-        'primary_repo': './',
-        'aux_repos': [],
-        'site_path': 'site'
-    }
+    # Restore the global context back to blank slate status.
+    config.GLOBAL_CONTEXT = original_global_context

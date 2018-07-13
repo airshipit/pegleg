@@ -16,9 +16,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../../src/bin/pegleg'))
 import sphinx_rtd_theme
 
 
@@ -52,7 +52,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'pegleg'
 copyright = u'2018 AT&T Intellectual Property.'
-author = u'pegleg Authors'
+author = u'Pegleg Authors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

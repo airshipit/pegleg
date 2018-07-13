@@ -1,3 +1,4 @@
+gitpython
 click==6.7
 jsonschema==2.6.0
 pyyaml==3.12

@@ -16,3 +16,4 @@
 from . import definition
 from . import files
 from . import deckhand
+from . import git
