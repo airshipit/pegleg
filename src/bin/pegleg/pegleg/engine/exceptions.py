@@ -77,3 +77,10 @@ class GitSSHException(BaseGitException):
                          (self._ssh_key_path))
 
         super(GitSSHException, self).__init__(self._message)
+
+
+class GitDirtyRepoException(BaseGitException):
+    """Exception that occurs when trying to checkout ref from dirty repo."""
+    message = ("Failed to checkout ref=%(ref)s from repo_url=%(repo_url)s. "
+               "Please manually clean all tracked/untracked files from repo "
+               "before proceeding.")

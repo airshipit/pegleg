@@ -93,11 +93,12 @@ def git_handler(repo_url, ref, proxy_server=None, auth_key=None):
             raise NotADirectoryError(msg)
 
         repo = Repo(repo_url)
-        if repo.is_dirty():
-            LOG.warning('The locally cloned repo_url=%s is dirty. '
-                        'Cleaning up untracked files.', repo_url)
-            # Reset the index and working tree to match current ref.
-            repo.head.reset(index=True, working_tree=True)
+        if repo.is_dirty(untracked_files=True):
+            LOG.error('The locally cloned repo_url=%s is dirty. Manual clean '
+                      'up of tracked/untracked files required.', repo_url)
+            # Raise an exception and force the user to clean up the repo.
+            # This is the safest approach to avoid data loss/corruption.
+            raise exceptions.GitDirtyRepoException(ref=ref, repo_url=repo_url)
 
         try:
             # Check whether the ref exists locally.
