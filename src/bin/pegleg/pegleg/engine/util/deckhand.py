@@ -52,7 +52,6 @@ def deckhand_render(documents=[],
     try:
         deckhand_eng = layering.DocumentLayering(
             documents,
-            substitution_sources=documents,
             fail_on_missing_sub_src=fail_on_missing_sub_src,
             validate=validate)
         rendered_documents = [dict(d) for d in deckhand_eng.render()]
