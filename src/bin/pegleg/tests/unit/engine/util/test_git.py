@@ -316,28 +316,6 @@ def test_git_clone_delete_repo_and_reclone(mock_log, clean_git_repo):
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_clone_clean_dirty_local_repo(mock_log, clean_git_repo):
-    """Validate that a dirty repo is cleaned before a ref is checked out."""
-    ref = 'refs/changes/54/457754/73'
-    repo_url = 'https://github.com/openstack/openstack-helm'
-    git_dir = git.git_handler(repo_url, ref)
-    _validate_git_clone(git_dir, ref)
-
-    file_to_rename = os.path.join(git_dir, os.listdir(git_dir)[0])
-    os.rename(file_to_rename, file_to_rename + '-renamed')
-
-    git_dir = git.git_handler(git_dir, ref)
-    _validate_git_clone(git_dir, ref)
-
-    assert mock_log.warning.called
-    mock_log.warning.assert_any_call(
-        'The locally cloned repo_url=%s is dirty. Cleaning up untracked '
-        'files.', git_dir)
-
-
-@pytest.mark.skipif(
-    not is_connected(), reason='git clone requires network connectivity.')
-@mock.patch.object(git, 'LOG', autospec=True)
 def test_git_clone_existing_directory_raises_exc_for_invalid_ref(
         mock_log, clean_git_repo):
     """Validate Git throws an error for an invalid ref when trying to checkout
@@ -354,6 +332,53 @@ def test_git_clone_existing_directory_raises_exc_for_invalid_ref(
     with pytest.raises(exceptions.GitException):
         git_dir = git.git_handler(git_dir, ref)
     _assert_repo_url_was_cloned(mock_log, git_dir)
+
+
+@pytest.mark.skipif(
+    not is_connected(), reason='git clone requires network connectivity.')
+@mock.patch.object(git, 'LOG', autospec=True)
+def test_git_checkout_dirty_repo_tracked_file_raises_exception(
+        mock_log, clean_git_repo):
+    """Validate Git throws an error when attempting to checkout a ref from
+    a dirty repo, with modified tracked file.
+    """
+    # Clone the openstack-helm repo and automatically checkout patch 73.
+    ref = 'refs/changes/54/457754/73'
+    repo_url = 'https://github.com/openstack/openstack-helm'
+    git_dir = git.git_handler(repo_url, ref)
+    _validate_git_clone(git_dir, ref)
+
+    # Simulate a dirty repo by removing the first file in it we encounter.
+    dirty_file = next(
+        os.path.join(git_dir, x) for x in os.listdir(git_dir)
+        if os.path.isfile(os.path.join(git_dir, x)))
+    os.remove(dirty_file)
+
+    with pytest.raises(exceptions.GitDirtyRepoException):
+        git.git_handler(git_dir, ref)
+
+
+@pytest.mark.skipif(
+    not is_connected(), reason='git clone requires network connectivity.')
+@mock.patch.object(git, 'LOG', autospec=True)
+def test_git_checkout_dirty_repo_untracked_file_raises_exception(
+        mock_log, clean_git_repo):
+    """Validate Git throws an error when attempting to checkout a ref from
+    a dirty repo, with untracked file.
+    """
+    # Clone the openstack-helm repo and automatically checkout patch 73.
+    ref = 'refs/changes/54/457754/73'
+    repo_url = 'https://github.com/openstack/openstack-helm'
+    git_dir = git.git_handler(repo_url, ref)
+    _validate_git_clone(git_dir, ref)
+
+    # Simulate a dirty repo by adding in a new untracked file.
+    with open(os.path.join(git_dir, test_utils.rand_name('test_file')),
+              'w') as f:
+        f.write('whatever')
+
+    with pytest.raises(exceptions.GitDirtyRepoException):
+        git.git_handler(git_dir, ref)
 
 
 @pytest.mark.skipif(
