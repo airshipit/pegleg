@@ -68,9 +68,8 @@ def site(primary_repo, aux_repo):
     '-s',
     '--save-location',
     'save_location',
-    type=click.Path(
-        file_okay=False, dir_okay=True, writable=True, resolve_path=True),
-    help='Where to output the complete site definition.')
+    help='Directory to output the complete site definition. Created '
+    'automatically if it does not already exist.')
 @click.option(
     '--validate',
     'validate',
@@ -98,6 +97,9 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     """Collects documents into a single site-definition.yaml file, which
     defines the entire site definition and contains all documents required
     for ingestion by Airship.
+
+    If ``save_location`` isn't specified, then the output is directed to
+    stdout.
 
     Collect can lint documents prior to collection if the ``--validate``
     flag is optionally included.

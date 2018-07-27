@@ -27,14 +27,45 @@ __all__ = ['collect', 'impacted', 'list_', 'show', 'render']
 LOG = logging.getLogger(__name__)
 
 
-def collect(site_name, save_location):
-    try:
-        save_files = dict()
-        if save_location is None:
-            raise ValueError('Missing param: save-location')
-        elif not os.path.exists(save_location):
-            raise FileNotFoundError('Invalid save-location path')
+def _read_and_format_yaml(filename):
+    with open(filename) as f:
+        lines_to_write = f.readlines()
+        if lines_to_write[0] != '---\n':
+            lines_to_write = ['---\n'] + lines_to_write
+        if lines_to_write[-1] != '...\n':
+            lines_to_write.append('...\n')
+    return lines_to_write or []
 
+
+def _collect_to_stdout(site_name):
+    """Collects all documents related to ``site_name`` and outputs them to
+    stdout via ``output_stream``.
+    """
+    try:
+        for repo_base, filename in util.definition.site_files_by_repo(
+                site_name):
+            for line in _read_and_format_yaml(filename):
+                # This code is a pattern to convert \r\n to \n.
+                click.echo("\n".join(line.splitlines()))
+    except Exception as ex:
+        raise click.ClickException("Error printing output: %s" % str(ex))
+
+
+def _collect_to_file(site_name, save_location):
+    """Collects all documents related to ``site_name`` and outputs them to
+    the file denoted by ``save_location``.
+    """
+    if not os.path.exists(save_location):
+        LOG.debug("Collection save location %s does not exist. Creating "
+                  "automatically.", save_location)
+        os.makedirs(save_location)
+    # In case save_location already exists and isn't a directory.
+    if not os.path.isdir(save_location):
+        raise click.ClickException('save_location %s already exists, but must '
+                                   'be a directory')
+
+    save_files = dict()
+    try:
         for repo_base, filename in util.definition.site_files_by_repo(
                 site_name):
             repo_name = os.path.normpath(repo_base).split(os.sep)[-1]
@@ -42,19 +73,19 @@ def collect(site_name, save_location):
             if repo_name not in save_files:
                 save_files[repo_name] = open(save_file, "w")
             LOG.debug("Collecting file %s to file %s" % (filename, save_file))
-
-            with open(filename) as f:
-                lines_to_write = f.readlines()
-                if lines_to_write[0] != '---\n':
-                    lines_to_write = ['---\n'] + lines_to_write
-                if lines_to_write[-1] != '...\n':
-                    lines_to_write.append('...\n')
-                save_files[repo_name].writelines(lines_to_write)
+            save_files[repo_name].writelines(_read_and_format_yaml(filename))
     except Exception as ex:
         raise click.ClickException("Error saving output: %s" % str(ex))
     finally:
         for f in save_files.values():
             f.close()
+
+
+def collect(site_name, save_location):
+    if save_location:
+        _collect_to_file(site_name, save_location)
+    else:
+        _collect_to_stdout(site_name)
 
 
 def impacted(input_stream, output_stream):
