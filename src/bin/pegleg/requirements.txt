@@ -2,4 +2,4 @@ gitpython
 click==6.7
 jsonschema==2.6.0
 pyyaml==3.12
-git+https://github.com/openstack/airship-deckhand.git@0ac33c233d59a731bf289db23ec4a882ff359168
+git+https://github.com/openstack/airship-deckhand.git@0b5aa2e98a1ab5ab8a58c9dec3c1f88ef00d17a9
