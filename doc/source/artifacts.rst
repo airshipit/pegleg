@@ -19,7 +19,7 @@ Definition Artifact Layout
 
 The definition artifacts are stored in the below directory structure. This
 structure is used only to assist humans in maintaining the data. When the
-documents are consumed by the UCP services, they are viewed as a flat set
+documents are consumed by the Airship services, they are viewed as a flat set
 of all documents.::
 
   deployment_files/deployment_files
@@ -45,7 +45,7 @@ of all documents.::
 
 The root-level listings of ``global``, ``type`` and ``site``
 are the layers as listed in the Deckhand
-_LayeringPolicy http://deckhand.readthedocs.io/en/latest/layering.html
+_LayeringPolicy https://airship-deckhand.readthedocs.io/en/latest/layering.html
 document. The process of choosing the definition libraries
 to compose the actual design for a site is described below.
 
@@ -140,7 +140,7 @@ site definition contains a set of documents.::
            |- rack1.yaml
            |- rack2.yaml
 
-  * Schemas - The schemas should all be sourced from the UCP
+  * Schemas - The schemas should all be sourced from the Airship
     service repositories. Care should be taken that the schemas
     included in the site definition are taken from the version of
     the service being deployed in the site.
