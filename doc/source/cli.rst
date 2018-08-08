@@ -225,4 +225,4 @@ Will warn of lint failures from the specified lint options.
     P003 - All repos contain expected directories.
 
 
-.. _`Deckhand Validations`: http://deckhand.readthedocs.io/en/latest/validation.html
+.. _`Deckhand Validations`: https://airship-deckhand.readthedocs.io/en/latest/validation.html

@@ -39,8 +39,7 @@ Shared Documents
 Secrets
 -------
 
-Several generic document types_ exist to support storing sensitive data
-encrypted.
+Several generic document types_ exist to support encryption of sensitive data.
 
 These must be utilized for all data considered sensitive.
 
@@ -81,10 +80,10 @@ to ensure you understand all the requirements for it.
 This catalogue pattern can also be utilized for the ``type`` layer
 if needed.
 
-.. _Deckhand: https://deckhand.readthedocs.io
-.. _layering: http://deckhand.readthedocs.io/en/latest/layering.html
-.. _substitution: http://deckhand.readthedocs.io/en/latest/substitution.html
-.. _types: http://deckhand.readthedocs.io/en/latest/document_types.html#provided-utility-document-kinds
+.. _Deckhand: https://airship-deckhand.readthedocs.io
+.. _layering: https://airship-deckhand.readthedocs.io/en/latest/layering.html
+.. _substitution: https://airship-deckhand.readthedocs.io/en/latest/substitution.html
+.. _types: https://airship-deckhand.readthedocs.io/en/latest/document-types.html#provided-utility-document-kinds
 
 
 Global Layer

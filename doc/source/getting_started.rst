@@ -34,27 +34,26 @@ Basic Usage
 
 Before using Pegleg, you must:
 
-Clone the Pegleg repository
+1. Clone the Pegleg repository:
 
 .. code-block:: console
 
-    git clone https://github.com/att-comdev/pegleg
+    git clone https://git.airshipit.org/airship-pegleg
 
-and install the required packages in pegleg/src/bin/pegleg
+2. Install the required packages in airship-pegleg/src/bin/pegleg:
 
 .. code-block:: console
 
-     pip3 install -r pegleg/src/bin/pegleg/requirements.txt -r pegleg/src/bin/pegleg/test-requirements.txt
+     pip3 install -r airship-pegleg/src/bin/pegleg/requirements.txt -r airship-pegleg/src/bin/pegleg/test-requirements.txt
 
-Next, add your repos containing your `site definition libraries`_ into your
-local system where Pegleg is running, as Pegleg can only work on files available
-in the local directory.
+3. Clone the repos containing your `site definition libraries`_ into the
+local filesystem where Pegleg is running, as Pegleg can only work with files
+available in the local directory.
 
 You will then be able to use all of Pegleg's features through the CLI. See CLI_ for more
 information.
 
-.. _Document Fundamentals: https://pegleg.readthedocs.io/en/latest/authoring_strategy.html
-.. _CLI: https://pegleg.readthedocs.io/en/latest/cli.html
-.. _Deckhand: http://deckhand.readthedocs.io/en/latest/
-.. _UCP: https://github.com/att-comdev/ucp-integration
-.. _site definition libraries: https://pegleg.readthedocs.io/en/latest/artifacts.html#definition-library-layout
+.. _Document Fundamentals: https://airship-pegleg.readthedocs.io/en/latest/authoring_strategy.html
+.. _CLI: https://airship-pegleg.readthedocs.io/en/latest/cli.html
+.. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/
+.. _site definition libraries: https://airship-pegleg.readthedocs.io/en/latest/artifacts.html#definition-library-layout
