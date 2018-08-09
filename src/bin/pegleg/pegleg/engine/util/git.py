@@ -30,7 +30,7 @@ __all__ = [
 ]
 
 
-def git_handler(repo_url, ref, proxy_server=None, auth_key=None):
+def git_handler(repo_url, ref=None, proxy_server=None, auth_key=None):
     """Handle directories that are Git repositories.
 
     If ``repo_url`` is a valid URL for which a local repository doesn't
@@ -46,7 +46,8 @@ def git_handler(repo_url, ref, proxy_server=None, auth_key=None):
 
     :param repo_url: URL of remote Git repo or path to local Git repo. If no
         local copy exists, clone it. Afterward, check out ``ref`` in the repo.
-    :param ref: branch, commit or reference in the repo to clone.
+    :param ref: branch, commit or reference in the repo to clone. None causes
+        the currently checked out reference to be used (if repo exists).
     :param proxy_server: optional, HTTP proxy to use while cloning the repo.
     :param auth_key: If supplied results in using SSH to clone the repository
         with the specified key.  If the value is None, SSH is not used.
@@ -65,8 +66,8 @@ def git_handler(repo_url, ref, proxy_server=None, auth_key=None):
     except Exception as e:
         raise ValueError('repo_url=%s is invalid. Details: %s' % (repo_url, e))
 
-    if not ref:
-        raise ValueError('ref=%s must be a non-empty, valid Git ref' % ref)
+    if ref is None:
+        ref = _get_current_ref(repo_url)
 
     if not os.path.exists(repo_url):
         # we need to clone the repo_url first since it doesn't exist and then
@@ -115,12 +116,31 @@ def git_handler(repo_url, ref, proxy_server=None, auth_key=None):
         return repo_url
 
 
-def _try_git_clone(repo_url, ref='master', proxy_server=None, auth_key=None):
+def _get_current_ref(repo_url):
+    """If no ``ref`` is provided, then the most logical assumption is that
+    the current revision in the checked out repo should be used. If the
+    repo hasn't been cloned yet, None will be returned, in which case GitPython
+    will use the repo's config's fetch refspec instead.
+
+    :param repo_url: URL of remote Git repo or path to local Git repo.
+
+    """
+
+    try:
+        repo = Repo(repo_url)
+        current_ref = repo.head.ref.name
+        LOG.debug('ref for repo_url=%s not specified, defaulting to currently '
+                  'checked out ref=%s', repo_url, current_ref)
+        return current_ref
+    except Exception as e:
+        return None
+
+
+def _try_git_clone(repo_url, ref=None, proxy_server=None, auth_key=None):
     """Try cloning Git repo from ``repo_url`` using the reference ``ref``.
 
     :param repo_url: URL of remote Git repo or path to local Git repo.
-    :param ref: branch, commit or reference in the repo to clone. Default is
-        'master'.
+    :param ref: branch, commit or reference in the repo to clone.
     :param proxy_server: optional, HTTP proxy to use while cloning the repo.
     :param auth_key: If supplied results in using SSH to clone the repository
         with the specified key.  If the value is None, SSH is not used.
@@ -176,8 +196,7 @@ def _get_clone_env_vars(repo_url, ref, auth_key):
     """Generate environment variables include SSH command for Git clone.
 
     :param repo_url: URL of remote Git repo or path to local Git repo.
-    :param ref: branch, commit or reference in the repo to clone. Default is
-        'master'.
+    :param ref: branch, commit or reference in the repo to clone.
     :param auth_key: If supplied results in using SSH to clone the repository
         with the specified key.  If the value is None, SSH is not used.
     :returns: Dictionary of key-value pairs for Git clone.
@@ -207,21 +226,20 @@ def _get_clone_env_vars(repo_url, ref, auth_key):
     return env_vars
 
 
-def _try_git_checkout(repo, repo_url, ref, fetch=True):
+def _try_git_checkout(repo, repo_url, ref=None, fetch=True):
     """Try to checkout a ``ref`` from ``repo``.
 
     Local branches are created for multiple variations of the ``ref``,
     including its refpath and hexpath (i.e. commit ID).
 
-    This is to locally "memoize" references that would otherwise require
+    This is to locally "cache" references that would otherwise require
     resolution upstream. We increase performance by creating local branches
     for these other ``ref`` formats when the ``ref`` is fetched remotely for
     the first time only.
 
     :param repo: Git Repo object.
     :param repo_url: URL of remote Git repo or path to local Git repo.
-    :param ref: branch, commit or reference in the repo to clone. Default is
-        'master'.
+    :param ref: branch, commit or reference in the repo to clone.
     :param fetch: Whether to fetch the ``ref`` from remote before checkout or
         to use the already-cloned local repo.
     :raises GitException: If ``ref`` could not be checked out.
@@ -285,3 +303,17 @@ def _create_local_ref(g, branches, ref, newref, reftype=None):
                       reftype, ref)
             g.checkout('FETCH_HEAD', b=newref)
             branches.append(newref)
+
+
+def is_repository(path):
+    """Checks whether the directory ``path`` is a Git repository.
+
+    :param str path: Directory path to check.
+    :returns: True if ``path`` is a repo, else False.
+    :rtype: boolean
+    """
+    try:
+        Repo(path).git_dir
+        return True
+    except git_exc.InvalidGitRepositoryError:
+        return False

@@ -86,7 +86,7 @@ def _validate_git_clone(repo_dir, fetched_ref=None, checked_out_ref=None):
 
     assert os.path.isdir(repo_dir)
     # Assert that the directory is a Git repo.
-    assert os.path.isdir(os.path.join(repo_dir, '.git'))
+    assert git.is_repository(repo_dir)
     if fetched_ref:
         # Assert the FETCH_HEAD is at the fetched_ref ref.
         with open(os.path.join(repo_dir, '.git', 'FETCH_HEAD'), 'r') \
@@ -286,6 +286,24 @@ def test_git_clone_existing_directory_checks_out_next_local_ref(
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
+def test_git_checkout_without_reference_defaults_to_current(
+        mock_log, clean_git_repo):
+    """Validate that the currently checked out ref is defaulted to when
+    ref=None is passed to ``git.git_handler``.
+    """
+    url = 'https://github.com/openstack/airship-armada'
+    commit = 'cba78d1d03e4910f6ab1691bae633c5bddce893d'
+    git_dir = git.git_handler(url, commit)
+    _validate_git_clone(git_dir, commit)
+
+    git_dir = git.git_handler(git_dir, ref=None)  #  Defaults to commit ref.
+    _validate_git_clone(git_dir, commit)  # Validate with the original ref.
+    _assert_repo_url_was_cloned(mock_log, git_dir)
+
+
+@pytest.mark.skipif(
+    not is_connected(), reason='git clone requires network connectivity.')
+@mock.patch.object(git, 'LOG', autospec=True)
 def test_git_clone_delete_repo_and_reclone(mock_log, clean_git_repo):
     """Validate that cloning a repo, then deleting it, then recloning it works.
     """
@@ -311,6 +329,16 @@ def test_git_clone_delete_repo_and_reclone(mock_log, clean_git_repo):
     assert first_git_dir != second_git_dir
     assert mock_log.debug.called
     mock_log.debug.assert_any_call('Cloning [%s]', repo_url)
+
+
+@pytest.mark.skipif(
+    not is_connected(), reason='git clone requires network connectivity.')
+@mock.patch.object(git, 'LOG', autospec=True)
+def test_git_checkout_none_ref_checks_out_master(mock_log, clean_git_repo):
+    """Validate that ref=None checks out master."""
+    url = 'https://github.com/openstack/airship-armada'
+    git_dir = git.git_handler(url, ref=None)
+    _validate_git_clone(git_dir, 'master')
 
 
 @pytest.mark.skipif(
