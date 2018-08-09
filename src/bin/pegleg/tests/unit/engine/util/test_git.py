@@ -16,6 +16,7 @@ import os
 import shutil
 import socket
 import requests
+import tempfile
 
 import fixtures
 import mock
@@ -25,7 +26,6 @@ from pegleg.engine import exceptions
 from pegleg.engine.util import git
 from tests.unit import test_utils
 
-_REPO_DIR = None
 _PROXY_SERVERS = {
     'http':
     os.getenv('HTTP_PROXY',
@@ -60,16 +60,21 @@ def is_connected_behind_proxy():
         return False
 
 
-@pytest.fixture()
-def clean_git_repo():
-    global _REPO_DIR
+@pytest.fixture(autouse=True)
+def clean_git_repos():
+    """Iterates through all temporarily created directories and deletes each
+    one that was created for testing.
 
-    try:
-        yield
-    finally:
-        if _REPO_DIR and os.path.exists(_REPO_DIR):
-            shutil.rmtree(_REPO_DIR)
-            _REPO_DIR = None
+    """
+
+    RELEVANT_REPOS = ('airship-armada', 'openstack-helm')
+
+    root_tempdir = tempfile.gettempdir()
+    for tempdir in os.listdir(root_tempdir):
+        path = os.path.join(root_tempdir, tempdir)
+        if git.is_repository(path) and any(
+                path.endswith(x) for x in RELEVANT_REPOS):
+            shutil.rmtree(path, ignore_errors=True)
 
 
 def _validate_git_clone(repo_dir, fetched_ref=None, checked_out_ref=None):
@@ -81,9 +86,6 @@ def _validate_git_clone(repo_dir, fetched_ref=None, checked_out_ref=None):
     :param checked_out_ref: Reference that is stored in HEAD following a local
         ref checkout.
     """
-    global _REPO_DIR
-    _REPO_DIR = repo_dir
-
     assert os.path.isdir(repo_dir)
     # Assert that the directory is a Git repo.
     assert git.is_repository(repo_dir)
@@ -110,7 +112,7 @@ def _assert_repo_url_was_cloned(mock_log, git_dir):
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-def test_git_clone_valid_url_http_protocol(clean_git_repo):
+def test_git_clone_valid_url_http_protocol():
     url = 'http://github.com/openstack/airship-armada'
     git_dir = git.git_handler(url, ref='master')
     _validate_git_clone(git_dir)
@@ -118,7 +120,7 @@ def test_git_clone_valid_url_http_protocol(clean_git_repo):
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-def test_git_clone_valid_url_https_protocol(clean_git_repo):
+def test_git_clone_valid_url_https_protocol():
     url = 'https://github.com/openstack/airship-armada'
     git_dir = git.git_handler(url, ref='master')
     _validate_git_clone(git_dir)
@@ -126,7 +128,7 @@ def test_git_clone_valid_url_https_protocol(clean_git_repo):
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-def test_git_clone_with_commit_reference(clean_git_repo):
+def test_git_clone_with_commit_reference():
     url = 'https://github.com/openstack/airship-armada'
     commit = 'cba78d1d03e4910f6ab1691bae633c5bddce893d'
     git_dir = git.git_handler(url, commit)
@@ -135,7 +137,7 @@ def test_git_clone_with_commit_reference(clean_git_repo):
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-def test_git_clone_with_patch_ref(clean_git_repo):
+def test_git_clone_with_patch_ref():
     ref = 'refs/changes/54/457754/73'
     git_dir = git.git_handler('https://github.com/openstack/openstack-helm',
                               ref)
@@ -146,7 +148,7 @@ def test_git_clone_with_patch_ref(clean_git_repo):
     not is_connected_behind_proxy(),
     reason='git clone requires proxy connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_clone_behind_proxy(mock_log, clean_git_repo):
+def test_git_clone_behind_proxy(mock_log):
     url = 'https://github.com/openstack/airship-armada'
     commit = 'cba78d1d03e4910f6ab1691bae633c5bddce893d'
 
@@ -163,7 +165,7 @@ def test_git_clone_behind_proxy(mock_log, clean_git_repo):
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
 def test_git_clone_existing_directory_checks_out_earlier_ref_from_local(
-        mock_log, clean_git_repo):
+        mock_log):
     """Validate Git checks out an earlier patch or ref that should exist
     locally (as a later ref was already fetched which should contain that
     revision history).
@@ -184,8 +186,7 @@ def test_git_clone_existing_directory_checks_out_earlier_ref_from_local(
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_clone_existing_directory_checks_out_master_from_local(
-        mock_log, clean_git_repo):
+def test_git_clone_existing_directory_checks_out_master_from_local(mock_log):
     """Validate Git checks out the ref of an already cloned repo that exists
     locally.
     """
@@ -205,8 +206,7 @@ def test_git_clone_existing_directory_checks_out_master_from_local(
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_clone_checkout_refpath_saves_references_locally(
-        mock_log, clean_git_repo):
+def test_git_clone_checkout_refpath_saves_references_locally(mock_log):
     """Validate that refpath/hexsha branches are created in the local repo
     following clone of the repo using a refpath during initial checkout.
     """
@@ -233,8 +233,7 @@ def test_git_clone_checkout_refpath_saves_references_locally(
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_clone_checkout_hexsha_saves_references_locally(
-        mock_log, clean_git_repo):
+def test_git_clone_checkout_hexsha_saves_references_locally(mock_log):
     """Validate that refpath/hexsha branches are created in the local repo
     following clone of the repo using a hexsha during initial checkout.
     """
@@ -264,8 +263,7 @@ def test_git_clone_checkout_hexsha_saves_references_locally(
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_clone_existing_directory_checks_out_next_local_ref(
-        mock_log, clean_git_repo):
+def test_git_clone_existing_directory_checks_out_next_local_ref(mock_log):
     """Validate Git fetches the newer ref upstream that doesn't exist locally
     in the cloned repo.
     """
@@ -286,8 +284,7 @@ def test_git_clone_existing_directory_checks_out_next_local_ref(
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_checkout_without_reference_defaults_to_current(
-        mock_log, clean_git_repo):
+def test_git_checkout_without_reference_defaults_to_current(mock_log):
     """Validate that the currently checked out ref is defaulted to when
     ref=None is passed to ``git.git_handler``.
     """
@@ -304,7 +301,7 @@ def test_git_checkout_without_reference_defaults_to_current(
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_clone_delete_repo_and_reclone(mock_log, clean_git_repo):
+def test_git_clone_delete_repo_and_reclone(mock_log):
     """Validate that cloning a repo, then deleting it, then recloning it works.
     """
     # Clone the openstack-helm repo and automatically checkout patch 73.
@@ -334,7 +331,7 @@ def test_git_clone_delete_repo_and_reclone(mock_log, clean_git_repo):
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_checkout_none_ref_checks_out_master(mock_log, clean_git_repo):
+def test_git_checkout_none_ref_checks_out_master(mock_log):
     """Validate that ref=None checks out master."""
     url = 'https://github.com/openstack/airship-armada'
     git_dir = git.git_handler(url, ref=None)
@@ -344,8 +341,7 @@ def test_git_checkout_none_ref_checks_out_master(mock_log, clean_git_repo):
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_clone_existing_directory_raises_exc_for_invalid_ref(
-        mock_log, clean_git_repo):
+def test_git_clone_existing_directory_raises_exc_for_invalid_ref(mock_log):
     """Validate Git throws an error for an invalid ref when trying to checkout
     a ref for an already-cloned repo.
     """
@@ -365,8 +361,7 @@ def test_git_clone_existing_directory_raises_exc_for_invalid_ref(
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_checkout_dirty_repo_tracked_file_raises_exception(
-        mock_log, clean_git_repo):
+def test_git_checkout_dirty_repo_tracked_file_raises_exception(mock_log):
     """Validate Git throws an error when attempting to checkout a ref from
     a dirty repo, with modified tracked file.
     """
@@ -389,8 +384,7 @@ def test_git_checkout_dirty_repo_tracked_file_raises_exception(
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
-def test_git_checkout_dirty_repo_untracked_file_raises_exception(
-        mock_log, clean_git_repo):
+def test_git_checkout_dirty_repo_untracked_file_raises_exception(mock_log):
     """Validate Git throws an error when attempting to checkout a ref from
     a dirty repo, with untracked file.
     """
@@ -411,7 +405,7 @@ def test_git_checkout_dirty_repo_untracked_file_raises_exception(
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-def test_git_clone_empty_url_raises_value_error(clean_git_repo):
+def test_git_clone_empty_url_raises_value_error():
     url = ''
     with pytest.raises(ValueError):
         git.git_handler(url, ref='master')
@@ -419,7 +413,7 @@ def test_git_clone_empty_url_raises_value_error(clean_git_repo):
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-def test_git_clone_invalid_url_type_raises_value_error(clean_git_repo):
+def test_git_clone_invalid_url_type_raises_value_error():
     url = 5
     with pytest.raises(ValueError):
         git.git_handler(url, ref='master')
@@ -427,8 +421,7 @@ def test_git_clone_invalid_url_type_raises_value_error(clean_git_repo):
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-def test_git_clone_invalid_local_repo_url_raises_notadirectory_error(
-        clean_git_repo):
+def test_git_clone_invalid_local_repo_url_raises_notadirectory_error():
     url = False
     with pytest.raises(NotADirectoryError):
         git.git_handler(url, ref='master')
@@ -436,7 +429,7 @@ def test_git_clone_invalid_local_repo_url_raises_notadirectory_error(
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-def test_git_clone_invalid_remote_url(clean_git_repo):
+def test_git_clone_invalid_remote_url():
     url = 'https://github.com/dummy/armada'
     with pytest.raises(exceptions.GitException):
         git.git_handler(url, ref='master')
@@ -444,7 +437,7 @@ def test_git_clone_invalid_remote_url(clean_git_repo):
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-def test_git_clone_invalid_remote_url_protocol(clean_git_repo):
+def test_git_clone_invalid_remote_url_protocol():
     url = 'ftp://foo.bar'
     with pytest.raises(ValueError):
         git.git_handler(url, ref='master')
@@ -452,7 +445,7 @@ def test_git_clone_invalid_remote_url_protocol(clean_git_repo):
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-def test_git_clone_fake_proxy(clean_git_repo):
+def test_git_clone_fake_proxy():
     url = 'https://github.com/openstack/airship-armada'
     proxy_url = test_utils.rand_name(
         'not.a.proxy.that.works.and.never.will', prefix='http://') + ":8080"
@@ -464,7 +457,7 @@ def test_git_clone_fake_proxy(clean_git_repo):
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch('os.path.exists', return_value=True, autospec=True)
-def test_git_clone_ssh_auth_method_fails_auth(_, clean_git_repo):
+def test_git_clone_ssh_auth_method_fails_auth(_):
     fake_user = test_utils.rand_name('fake_user')
     url = ('ssh://%s@review.openstack.org:29418/openstack/airship-armada' %
            fake_user)
@@ -476,7 +469,7 @@ def test_git_clone_ssh_auth_method_fails_auth(_, clean_git_repo):
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
 @mock.patch('os.path.exists', return_value=False, autospec=True)
-def test_git_clone_ssh_auth_method_missing_ssh_key(_, clean_git_repo):
+def test_git_clone_ssh_auth_method_missing_ssh_key(_):
     fake_user = test_utils.rand_name('fake_user')
     url = ('ssh://%s@review.openstack.org:29418/openstack/airship-armada' %
            fake_user)

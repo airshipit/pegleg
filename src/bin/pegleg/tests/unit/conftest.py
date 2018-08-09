@@ -23,7 +23,7 @@ from pegleg import config
 @pytest.fixture(autouse=True)
 def restore_config():
     """Used for ensuring the original global context is reset in memory
-    following each test execution. Simply import this file to use.
+    following each test execution.
     """
     original_global_context = copy.deepcopy(config.GLOBAL_CONTEXT)
     try:
