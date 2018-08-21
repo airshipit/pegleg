@@ -13,19 +13,17 @@
 - project:
     check:
       jobs:
+        - openstack-tox-pep8
         - airship-pegleg-linter
         - airship-pegleg-doc-build
-        - airship-pegleg-lint-pep8
         - airship-pegleg-unit-py35
-        - airship-pegleg-security-bandit
         - airship-pegleg-docker-build-gate
     gate:
       jobs:
+        - openstack-tox-pep8
         - airship-pegleg-linter
         - airship-pegleg-doc-build
-        - airship-pegleg-lint-pep8
         - airship-pegleg-unit-py35
-        - airship-pegleg-security-bandit
         - airship-pegleg-docker-build-gate
     post:
       jobs:
@@ -45,38 +43,10 @@
     nodeset: airship-pegleg-single-node
 
 - job:
-    name: airship-pegleg-lint-pep8
-    description: |
-      Lints Python files against the PEP8 standard
-    run: tools/gate/playbooks/pep8-linter.yaml
-    timeout: 300
-    nodeset: airship-pegleg-single-node
-    irrelevant-files:
-      - ^.*\.rst$
-      - ^doc/.*$
-      - ^etc/.*$
-      - ^releasenotes/.*$
-      - ^setup.cfg$
-
-- job:
     name: airship-pegleg-unit-py35
     description: |
       Executes unit tests under Python 3.5
     run: tools/gate/playbooks/unit-py35.yaml
-    timeout: 300
-    nodeset: airship-pegleg-single-node
-    irrelevant-files:
-      - ^.*\.rst$
-      - ^doc/.*$
-      - ^etc/.*$
-      - ^releasenotes/.*$
-      - ^setup.cfg$
-
-- job:
-    name: airship-pegleg-security-bandit
-    description: |
-      Executes the Bandit security scanner against Python files
-    run: tools/gate/playbooks/security-bandit.yaml
     timeout: 300
     nodeset: airship-pegleg-single-node
     irrelevant-files:
