@@ -12,20 +12,19 @@
 
 - project:
     templates:
+      - openstack-python35-jobs
       - openstack-python36-jobs
     check:
       jobs:
         - openstack-tox-pep8
         - airship-pegleg-linter
         - airship-pegleg-doc-build
-        - airship-pegleg-unit-py35
         - airship-pegleg-docker-build-gate
     gate:
       jobs:
         - openstack-tox-pep8
         - airship-pegleg-linter
         - airship-pegleg-doc-build
-        - airship-pegleg-unit-py35
         - airship-pegleg-docker-build-gate
     post:
       jobs:
@@ -43,20 +42,6 @@
       Lints all files by checking them for whitespace.
     run: tools/gate/playbooks/zuul-linter.yaml
     nodeset: airship-pegleg-single-node
-
-- job:
-    name: airship-pegleg-unit-py35
-    description: |
-      Executes unit tests under Python 3.5
-    run: tools/gate/playbooks/unit-py35.yaml
-    timeout: 300
-    nodeset: airship-pegleg-single-node
-    irrelevant-files:
-      - ^.*\.rst$
-      - ^doc/.*$
-      - ^etc/.*$
-      - ^releasenotes/.*$
-      - ^setup.cfg$
 
 - job:
     name: airship-pegleg-doc-build
