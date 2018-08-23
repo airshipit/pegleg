@@ -73,7 +73,7 @@
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node
     irrelevant-files:
-      - '^docs/.*'
+      - '^doc/.*'
     vars:
       publish: false
       tags:
@@ -88,7 +88,7 @@
     secrets:
       - airship_pegleg_quay_creds
     irrelevant-files:
-      - '^docs/.*'
+      - '^doc/.*'
     vars:
       publish: true
       tags:
