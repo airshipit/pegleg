@@ -3,7 +3,7 @@
 set -e
 
 : ${WORKSPACE:=$(pwd)}
-: ${IMAGE:=quay.io/attcomdev/pegleg:latest}
+: ${IMAGE:=quay.io/airshipit/pegleg:latest}
 
 echo
 echo "== NOTE: Workspace $WORKSPACE is the execution directory in the container =="
@@ -14,7 +14,7 @@ echo
 container_workspace_path='/workspace'
 
 docker run --rm -t \
-    --net=none \
+    --net=host \
     --workdir="$container_workspace_path" \
     -v "${WORKSPACE}:$container_workspace_path" \
     "${IMAGE}" \
