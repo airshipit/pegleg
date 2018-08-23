@@ -11,6 +11,8 @@
 # limitations under the License.
 
 - project:
+    templates:
+      - openstack-python36-jobs
     check:
       jobs:
         - openstack-tox-pep8
