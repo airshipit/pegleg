@@ -44,10 +44,11 @@ of all documents.::
              |- {definition library}
 
 The root-level listings of ``global``, ``type`` and ``site``
-are the layers as listed in the Deckhand
-_LayeringPolicy https://airship-deckhand.readthedocs.io/en/latest/layering.html
+are the layers as listed in the `Deckhand LayeringPolicy`_
 document. The process of choosing the definition libraries
 to compose the actual design for a site is described below.
+
+.. _Deckhand LayeringPolicy: https://airship-deckhand.readthedocs.io/en/latest/layering.html
 
 site_definition.yaml
 --------------------
