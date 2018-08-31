@@ -45,8 +45,8 @@ Git Exceptions
          :members:
          :show-inheritance:
          :undoc-members:
-  * - GitDirtyRepoException
-    - .. autoexception:: pegleg.engine.exceptions.GitDirtyRepoException
+  * - GitConfigException
+    - .. autoexception:: pegleg.engine.exceptions.GitConfigException
          :members:
          :show-inheritance:
          :undoc-members:

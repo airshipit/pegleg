@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import atexit
 import logging
 import os
 import tempfile
@@ -27,11 +26,7 @@ from pegleg.engine import exceptions
 
 LOG = logging.getLogger(__name__)
 
-__all__ = [
-    'git_handler',
-]
-
-__MODIFIED_REPOS = []
+__all__ = ('git_handler', )
 
 
 def git_handler(repo_url, ref=None, proxy_server=None, auth_key=None):
@@ -98,11 +93,15 @@ def git_handler(repo_url, ref=None, proxy_server=None, auth_key=None):
 
         repo = Repo(repo_url, search_parent_directories=True)
         if repo.is_dirty(untracked_files=True):
-            LOG.error('The locally cloned repo_url=%s is dirty. Manual clean '
-                      'up of tracked/untracked files required.', repo_url)
-            # Raise an exception and force the user to clean up the repo.
-            # This is the safest approach to avoid data loss/corruption.
-            raise exceptions.GitDirtyRepoException(ref=ref, repo_url=repo_url)
+            # NOTE(felipemonteiro): This code should never be executed on a
+            # real local repository. Wrapper logic around this module will
+            # only perform this functionality against a temporary replica of
+            # local repositories, making the below operations safe.
+            LOG.info('Replica of local repo=%s is dirty. Committing all '
+                     'tracked/untracked changes to ref=%s',
+                     repo_name(repo_url), ref)
+            repo.git.add(all=True)
+            repo.index.commit('Temporary Pegleg commit')
 
         try:
             # Check whether the ref exists locally.
@@ -365,8 +364,8 @@ def repo_name(repo_url_or_path):
     if config_reader.has_section(section):
         repo_url = config_reader.get_value(section, option)
         return repo_url.split('/')[-1].split('.git')[0]
-    raise click.ClickException(
-        "Repo=%s is not a valid Git repository" % repo_url_or_path)
+
+    raise exceptions.GitConfigException(repo_url=repo_url_or_path)
 
 
 def normalize_repo_path(repo_path):
@@ -403,12 +402,3 @@ def normalize_repo_path(repo_path):
                 "repository" % orig_repo_path)
 
     return repo_path, sub_path
-
-
-@atexit.register
-def clean_repo():
-    global __MODIFIED_REPOS
-
-    for r in __MODIFIED_REPOS:
-        repo = Repo(r)
-        repo.head.reset(index=True, working_tree=True)

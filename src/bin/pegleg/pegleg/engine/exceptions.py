@@ -51,7 +51,7 @@ class GitAuthException(BaseGitException):
         self._ssh_key_path = ssh_key_path
 
         self._message = ('Failed to authenticate for repo %s with ssh-key at '
-                         'path %s.' % (self._repo_url, self._ssh_key_path))
+                         'path %s' % (self._repo_url, self._ssh_key_path))
 
         super(GitAuthException, self).__init__(self._message)
 
@@ -62,7 +62,7 @@ class GitProxyException(BaseGitException):
 
     def __init__(self, location):
         self._location = location
-        self._message = ('Could not resolve proxy [%s].' % self._location)
+        self._message = ('Could not resolve proxy [%s]' % self._location)
 
         super(GitProxyException, self).__init__(self._message)
 
@@ -73,14 +73,12 @@ class GitSSHException(BaseGitException):
     def __init__(self, ssh_key_path):
         self._ssh_key_path = ssh_key_path
 
-        self._message = ('Failed to find specified SSH key: %s.' %
+        self._message = ('Failed to find specified SSH key: %s' %
                          (self._ssh_key_path))
 
         super(GitSSHException, self).__init__(self._message)
 
 
-class GitDirtyRepoException(BaseGitException):
-    """Exception that occurs when trying to checkout ref from dirty repo."""
-    message = ("Failed to checkout ref=%(ref)s from repo_url=%(repo_url)s. "
-               "Please manually clean all tracked/untracked files from repo "
-               "before proceeding.")
+class GitConfigException(BaseGitException):
+    """Exception that occurs when reading Git repo config fails."""
+    message = ("Failed to read Git config file for repo_url=%(repo_url)s")
