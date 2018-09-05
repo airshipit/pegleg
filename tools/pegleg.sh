@@ -13,9 +13,10 @@ echo
 # host OS
 container_workspace_path='/workspace'
 
-docker run --rm -t \
+docker run --rm -it \
     --net=host \
     --workdir="$container_workspace_path" \
+    -v "${HOME}/.ssh:${container_workspace_path}/.ssh" \
     -v "${WORKSPACE}:$container_workspace_path" \
     "${IMAGE}" \
     pegleg "${@}"
