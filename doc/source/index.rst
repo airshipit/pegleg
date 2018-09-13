@@ -35,6 +35,14 @@ Design
    artifacts
    authoring_strategy
 
+Developer's Guide
+-----------------
+
+.. toctree::
+   :maxdepth: 2
+
+   developer-overview
+
 Operator's Guide
 ----------------
 
