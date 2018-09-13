@@ -19,7 +19,15 @@ Pegleg CLI
 ==========
 
 The Pegleg CLI is used in conjunction with the script located in pegleg/tools
-called pegleg.sh.
+called ``pegleg.sh``.
+
+.. note::
+
+  The default workspace for the ``pegleg.sh`` script is ``/workspace``. The
+  examples below require that this workspace be used.
+
+Environment Variables
+=====================
 
 ::
 
@@ -33,6 +41,9 @@ called pegleg.sh.
 
         Example: $IMAGE=quay.io/attcomdev/pegleg:latest
 
+Usage
+=====
+
 To run:
 
 .. code-block:: console
@@ -41,6 +52,25 @@ To run:
     export IMAGE=<docker_image>
     ./pegleg.sh <command> <options>
 
+For example:
+
+.. code-block:: console
+
+  cd /opt/airship-pegleg
+  export WORKSPACE=/opt/airship-treasuremap
+  ./tools/pegleg.sh site -r /workspace --help
+
+.. note::
+
+  If ``sudo`` permissions are required to execute ``pegleg.sh``, then it is
+  necessary to use the ``-E`` flag with ``sudo`` in order for the current
+  environment to be used. For example:
+
+  .. code-block:: console
+
+    cd /opt/airship-pegleg
+    export WORKSPACE=/opt/airship-treasuremap
+    sudo -E ./tools/pegleg.sh site -r /workspace --help
 
 CLI Options
 ===========

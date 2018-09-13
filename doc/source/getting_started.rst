@@ -40,11 +40,7 @@ Before using Pegleg, you must:
 
     git clone https://git.airshipit.org/airship-pegleg
 
-2. Install the required packages in airship-pegleg/src/bin/pegleg:
-
-.. code-block:: console
-
-     pip3 install -r airship-pegleg/src/bin/pegleg/requirements.txt -r airship-pegleg/src/bin/pegleg/test-requirements.txt
+2. Install `Docker CE`_, as Pegleg relies on it for CLI execution.
 
 3. Clone the repos containing your `site definition libraries`_ into the
 local filesystem where Pegleg is running, as Pegleg can only work with files
@@ -54,6 +50,6 @@ You will then be able to use all of Pegleg's features through the CLI. See CLI_ 
 information.
 
 .. _Document Fundamentals: https://airship-pegleg.readthedocs.io/en/latest/authoring_strategy.html
-.. _CLI: https://airship-pegleg.readthedocs.io/en/latest/cli.html
-.. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/
+.. _Docker CE: https://docs.docker.com/install/
 .. _site definition libraries: https://airship-pegleg.readthedocs.io/en/latest/artifacts.html#definition-library-layout
+.. _CLI: https://airship-pegleg.readthedocs.io/en/latest/cli.html
