@@ -137,24 +137,6 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     engine.site.collect(site_name, save_location)
 
 
-@site.command(help='Find sites impacted by changed files')
-@click.option(
-    '-i',
-    '--input',
-    'input_stream',
-    type=click.File(mode='r'),
-    default=sys.stdin,
-    help='List of impacted files')
-@click.option(
-    '-o',
-    '--output',
-    'output_stream',
-    type=click.File(mode='w'),
-    default=sys.stdout)
-def impacted(*, input_stream, output_stream):
-    engine.site.impacted(input_stream, output_stream)
-
-
 @site.command('list', help='List known sites')
 @click.option(
     '-o',

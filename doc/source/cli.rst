@@ -198,23 +198,6 @@ Example with validation:
       -e global=/opt/aic-clcp-manifests \
       collect <site_name> -s /workspace -x P004 --validate
 
-Impacted
---------
-
-Find sites impacted by changed files.
-
-**-i / --input**
-
-List of impacted files.
-
-**-o / --output**
-
-Where to output.
-
-::
-
-    ./pegleg impacted -i <input_stream> -o <output_stream>
-
 List
 ----
 

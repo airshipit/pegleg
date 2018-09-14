@@ -56,6 +56,13 @@ def load(site, primary_repo_base=None):
 
 def load_as_params(site_name, primary_repo_base=None):
     definition = load(site_name, primary_repo_base)
+    # TODO(felipemonteiro): Currently we are filtering out "revision" from
+    # the params that are returned by this function because it is no longer
+    # supported. This is a workaround. As soon as the site definition repos
+    # switch to real repository format, then we can drop that workaround.
+    # Ideally, we should:
+    # 1) validate the site-definition.yaml format using lint module
+    # 2) extract only the required params here
     params = definition.get('data', {})
     params['site_name'] = site_name
     return params
