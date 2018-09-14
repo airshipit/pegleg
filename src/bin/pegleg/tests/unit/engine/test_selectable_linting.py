@@ -25,6 +25,7 @@ no longer relevant and so the lint logic for this rule needs to be updated.
 For more information, see: https://storyboard.openstack.org/#!/story/2003762
 """
 
+
 @mock.patch.object(lint, '_verify_deckhand_render', return_value=[])
 @mock.patch.object(lint, '_verify_no_unexpected_files', return_value=[])
 def test_lint_excludes_P001(*args):
