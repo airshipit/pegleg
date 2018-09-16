@@ -72,7 +72,7 @@ Pegleg strives to conform to the `Airship coding conventions`_.
 Python
 ------
 
-The Pegleg code base lives under ``/src/bin/pegleg``. Pegleg supports py35
+The Pegleg code base lives under ``pegleg``. Pegleg supports py35 and py36
 interpreters.
 
 Docker
@@ -88,10 +88,38 @@ Pegleg, as a containerized CLI, uses Docker via ``tools/pegleg.sh`` to
 execute CLI commands. Commands can also be executed using the ``Makefile``
 target: ``run_pegleg``.
 
+Virtual Environment
+-------------------
+
+Rather than, after each local code change, rebuilding the Pegleg image and
+overriding the ``IMAGE`` environment variable so ``tools/pegleg.sh`` uses
+the latest code changes, it is possible to use a virtual environment for
+much faster development.
+
+This can achieved by issuing the following commands (from the root Pegleg
+directory):
+
+.. code-block:: console
+
+  # Quick way of building a venv and installing all required dependencies into
+  # it.
+  tox -e py35 --notest
+  source .tox/py35/bin/activate
+  pip install -e .
+
+  # Now is it possible to run the Pegleg CLI to test local changes:
+  pegleg <command> <options>
+
+  # Or run unit tests:
+  pytest -k <regex>
+
+Note that after setting up the virtual environment, one only needs to source it
+in order to re-run unit tests or Pegleg CLI commands, to test local changes.
+
 Testing
 =======
 
-All Pegleg tests are nested under ``/src/bin/pegleg/tests``.
+All Pegleg tests are nested under ``tests``.
 
 Pegleg comes equipped with a number of `tox`_ targets for running unit tests,
 as well as `pep8`_ and `Bandit`_ checks.
