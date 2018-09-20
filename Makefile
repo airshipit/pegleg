@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-PEGLEG_BUILD_CTX  ?= src/bin/pegleg
+PEGLEG_BUILD_CTX  ?= pegleg
 IMAGE_NAME        ?= pegleg
 IMAGE_PREFIX      ?= airshipit
 DOCKER_REGISTRY   ?= quay.io
@@ -45,12 +45,12 @@ tests: run_tests
 
 .PHONY: security
 security:
-	tox -c src/bin/pegleg/tox.ini -e bandit
+	tox -e bandit
 
-# Run all unit tests under src/bin/pegleg
+# Run all unit tests under pegleg
 .PHONY: run_tests
 run_tests:
-	tox -c src/bin/pegleg/tox.ini -e py35
+	tox -e py35
 
 # Perform Linting
 .PHONY: lint
@@ -83,7 +83,7 @@ endif
 
 .PHONY: docs
 docs: clean
-	tox -edocs
+	tox -e docs
 
 .PHONY: clean
 clean:
@@ -91,8 +91,8 @@ clean:
 
 .PHONY: py_lint
 py_lint:
-	cd src/bin/pegleg;tox -e pep8
+	cd pegleg;tox -e pep8
 
 .PHONY: py_format
 py_format:
-	cd src/bin/pegleg;tox -e fmt
+	cd pegleg;tox -e fmt
