@@ -77,7 +77,7 @@ For example:
 CLI Options
 ===========
 
-**-v / --verbose**
+**-v / --verbose** (Optional). False by default.
 
 Enable debug logging.
 
@@ -92,12 +92,16 @@ This allows you to set the primary and auxiliary repositories.
 
   ./pegleg.sh site -r <site_repo> -e <extra_repo> <command> <options>
 
-**-r / --site-repository** (mandatory)
+Options
+^^^^^^^
+
+**-r / --site-repository** (Required).
 
 Path to the root of the site repository (containing site_definition.yaml) repo.
-(Required). For example: /opt/aic-site-clcp-manifests.
 
-**-e / --extra-repository** (optional)
+For example: /opt/aic-site-clcp-manifests.
+
+**-e / --extra-repository** (Optional).
 
 Path to the root of extra repositories used for overriding those specified
 under the ``repositories`` field in a given :file:`site-definition.yaml`.
@@ -116,6 +120,24 @@ site will be leveraged but can be
 
   -e global=/opt/global@revision
 
+**-k / --repo-key** (Optional, SSH only).
+
+The SSH public key to use when cloning remote authenticated repositories.
+
+Required for cloning repositories via SSH protocol.
+
+**-u / --repo-username** (Optional, SSH only).
+
+The SSH username to use when cloning remote authenticated repositories
+specified in the site-definition file. Any occurrences of ``REPO_USERNAME``
+in an entry under the ``repositories`` field in a given
+:file:`site-definition.yaml` will be replaced with this value.
+
+Required for cloning repositories via SSH protocol.
+
+Examples
+^^^^^^^^
+
 Example usage:
 
 ::
@@ -126,38 +148,16 @@ Example usage:
     -e global=ssh://REPO_USERNAME@<GERRIT URL>:29418/aic-clcp-manifests.git@master \
     <command> <options>
 
-.. _self-contained-repo:
-
-Self-Contained Repository
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-For self-contained repositories, specification of extra repositories is
-unnecessary. The following command can be used to deploy the manifests in
-the example repository ``/opt/airship-in-a-bottle`` for the *currently checked
-out revision*:
-
-::
-
-  pegleg site -r /opt/airship-in-a-bottle <command> <options>
-
-To specify a specific revision at run time, execute:
-
-::
-
-  pegleg site -r /opt/airship-in-a-bottle@<REVISION> <command> <options>
-
-Where ``<REVISION>`` must be a valid :ref:`git-reference`.
-
 Collect
 -------
 
 Output complete config for one site.
 
-**site_name**
+**site_name** (Required).
 
-Name of the site. (Required).
+Name of the site.
 
-**-s / --save-location**
+**-s / --save-location** (Optional).
 
 Where to output collected documents. If omitted, the results will be dumped
 to ``stdout``.
@@ -184,6 +184,9 @@ Usage:
     ./pegleg.sh <command> <options> collect <site_name> -s <save_location> \
       -x P001 -w P002 --validate
 
+Examples
+^^^^^^^^
+
 Example without validation:
 
 ::
@@ -205,36 +208,80 @@ List
 
 List known sites.
 
-**-o/--output**
+**-o/--output** (Optional).
 
 Where to output.
 
 ::
 
-    ./pegleg <command> <options> list
+  ./pegleg <command> <options> list
 
-    Example:
-    ./pegleg site -r /opt/aic-clcp-site-manifests list -o /workspace
+Results are dumped to ``stdout`` by default.
+
+Examples
+^^^^^^^^
+
+Example:
+
+::
+
+  ./pegleg site -r /opt/aic-clcp-site-manifests list -o /workspace
 
 Show
 ----
 
 Show details for one site.
 
-**site_name**
+**site_name** (Required).
 
-Name of site. (Required).
+Name of site.
 
-**-o /--output**
+**-o /--output** (Optional).
 
 Where to output.
 
 ::
 
-    ./pegleg <command> <options> show site_name
+  ./pegleg <command> <options> show site_name
 
-    Example:
-    ./pegleg site -r /opt/aic-clcp-site-manifests show site_name -o /workspace
+Results are dumped to ``stdout`` by default.
+
+Examples
+^^^^^^^^
+
+Example:
+
+::
+
+  ./pegleg site -r /opt/aic-clcp-site-manifests show site_name -o /workspace
+
+Render
+------
+
+Render documents via `Deckhand`_ for one site.
+
+**site_name** (Required).
+
+Name of site.
+
+**-o /--output** (Optional).
+
+Where to output.
+
+::
+
+  ./pegleg <command> <options> render site_name
+
+Results are dumped to ``stdout`` by default.
+
+Examples
+^^^^^^^^
+
+Example:
+
+::
+
+  ./pegleg site -r /opt/aic-clcp-site-manifests render site_name -o output
 
 .. _linting:
 
@@ -244,58 +291,61 @@ Lint
 Sanity checks for repository content. Validations for linting are done
 utilizing `Deckhand Validations`_.
 
-Example:
-
-::
-
-    ./pegleg.sh site -r <site_repo> -e <extra_repo> \
-      lint <site_name> \
-      -f -x <lint_code> -w <lint_code>
-
-The most basic way to lint a document set is as follows:
-
-::
-
-    ./pegleg.sh site -r <site_repo> -e <extra_repo> lint <site_name>
-
-A more complex example involves excluding certain linting checks:
-
-::
-
-    ./pegleg.sh site -r /opt/aic-clcp-site-manifests \
-      -e global=/opt/aic-clcp-manifests \
-      lint <site_name> \
-      -x P001 -x P002 -w P003
-
-**-f / --fail-on-missing-sub-src**
+**-f / --fail-on-missing-sub-src** (Optional).
 
 Raise Deckhand exception on missing substitution sources. Defaults to True.
 
-**-x <code>**
+**-x <code>** (Optional).
 
 Will exclude the specified lint option. -w takes priority over -x.
 
-**-w <code>**
+**-w <code>** (Optional).
 
 Will warn of lint failures from the specified lint options.
 
 ::
 
-    If you expect certain lint failures, then those lint options can be
-    excluded or you can choose to be warned about those failures using the
-    codes below.
+  If you expect certain lint failures, then those lint options can be
+  excluded or you can choose to be warned about those failures using the
+  codes below.
 
-    P001 - Document has storagePolicy cleartext (expected is encrypted) yet
-    its schema is a mandatory encrypted type.
+  P001 - Document has storagePolicy cleartext (expected is encrypted) yet
+  its schema is a mandatory encrypted type.
 
-    Where mandatory encrypted schema type is one of:
-    * deckhand/CertificateAuthorityKey/v1
-    * deckhand/CertificateKey/v1
-    * deckhand/Passphrase/v1
-    * deckhand/PrivateKey/v1
+  Where mandatory encrypted schema type is one of:
+  * deckhand/CertificateAuthorityKey/v1
+  * deckhand/CertificateKey/v1
+  * deckhand/Passphrase/v1
+  * deckhand/PrivateKey/v1
 
-    P002 - Deckhand rendering is expected to complete without errors.
-    P003 - All repos contain expected directories.
+  P002 - Deckhand rendering is expected to complete without errors.
+  P003 - All repos contain expected directories.
+
+Examples
+^^^^^^^^
+
+Generic example:
+
+::
+
+  ./pegleg.sh site -r <site_repo> -e <extra_repo> \
+    lint <site_name> \
+    -f -x <lint_code> -w <lint_code>
+
+The most basic way to lint a document set is as follows:
+
+::
+
+  ./pegleg.sh site -r <site_repo> -e <extra_repo> lint <site_name>
+
+A more complex example involves excluding certain linting checks:
+
+::
+
+  ./pegleg.sh site -r /opt/aic-clcp-site-manifests \
+    -e global=/opt/aic-clcp-manifests \
+    lint <site_name> \
+    -x P001 -x P002 -w P003
 
 .. _command-line-repository-overrides:
 
@@ -330,12 +380,35 @@ Where:
       * <REPO_USERNAME> must be a user with access rights to the repository.
         This value will replace the literal string REPO_USERNAME in the
         corresponding entry under the ``repositories`` field in the relevant
-        :file:`site-definition.yaml`, if applicable
+        :file:`site-definition.yaml` using ``-u`` CLI flag
       * <GERRIT_URL> must be a valid Gerrit URL
       * <PORT> must be a valid authentication port for SSH
       * <REVISION> must be a valid :ref:`git-reference`
       * <REPO_NAME> must be a valid Git repository name,
         e.g. aic-clcp-site-manifests
+
+.. _self-contained-repo:
+
+Self-Contained Repository
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For self-contained repositories, specification of extra repositories is
+unnecessary. The following command can be used to deploy the manifests in
+the example repository ``/opt/airship-in-a-bottle`` for the *currently checked
+out revision*:
+
+::
+
+  pegleg site -r /opt/airship-in-a-bottle/deployment_files <command> <options>
+
+To specify a specific revision at run time, execute:
+
+::
+
+  pegleg site -r /opt/airship-in-a-bottle/deployment_files@<REVISION> \
+    <command> <options>
+
+Where ``<REVISION>`` must be a valid :ref:`git-reference`.
 
 .. _git-reference:
 
@@ -348,4 +421,5 @@ Valid Git references for checking out repositories include:
   * refs/changes/79/47079/12 (ref)
   * master (branch name)
 
+.. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/rendering.html
 .. _Deckhand Validations: https://airship-deckhand.readthedocs.io/en/latest/validation.html
