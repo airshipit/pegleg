@@ -5,6 +5,8 @@ set -e
 : ${WORKSPACE:=$(pwd)}
 : ${IMAGE:=quay.io/airshipit/pegleg:latest}
 
+: ${TERM_OPTS:=-it}
+
 echo
 echo "== NOTE: Workspace $WORKSPACE is the execution directory in the container =="
 echo
@@ -13,7 +15,7 @@ echo
 # host OS
 container_workspace_path='/workspace'
 
-docker run --rm -it \
+docker run --rm $TERM_OPTS \
     --net=host \
     --workdir="$container_workspace_path" \
     -v "${HOME}/.ssh:${container_workspace_path}/.ssh" \
