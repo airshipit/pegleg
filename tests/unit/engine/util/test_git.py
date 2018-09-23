@@ -536,3 +536,33 @@ def test_is_repository():
 
 def test_is_repository_negative():
     assert not git.is_repository(tempfile.mkdtemp())
+
+
+@pytest.mark.skipif(
+    not is_connected(), reason='git clone requires network connectivity.')
+def test_repo_name():
+    url = "http://github.com/openstack/airship-pegleg"
+    git_dir = git.git_handler(url, ref="master")
+    _validate_git_clone(git_dir)
+
+    name = git.repo_name(git_dir)
+    expected = "airship-pegleg"
+    assert name == expected
+
+
+@pytest.mark.skipif(
+    not is_connected(), reason='git clone requires network connectivity.')
+def test_is_equal():
+    """Tests whether 2 repositories are equal => reference same remote repo."""
+
+    url = "http://github.com/openstack/airship-pegleg"
+    git_dir1 = git.git_handler(url, ref="master")
+    _validate_git_clone(git_dir1)
+
+    # Re-clone the same repo using a different ref.
+    url = "http://github.com/openstack/airship-pegleg"
+    git_dir2 = git.git_handler(url, ref="refs/changes/40/604640/4")
+    _validate_git_clone(git_dir2)
+
+    # Check whether both repos are equal.
+    assert git.is_equal(git_dir1, git_dir2)
