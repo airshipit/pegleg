@@ -19,6 +19,12 @@ setup(
     name='pegleg',
     python_requires='>=3.5.0',
     version='0.1.0',
+    description=('Pegleg is a document aggregator that provides early '
+                 'linting and validations via Deckhand, a document '
+                 'management micro-service within Airship.'),
+    url='https://github.com/openstack/airship-pegleg',
+    author='The Airship Authors',
+    license='Apache 2.0',
     packages=find_packages(),
     entry_points={
         'console_scripts': [

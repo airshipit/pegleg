@@ -48,8 +48,8 @@ Further Reading
 
 `Airship`_.
 
-.. |Doc Status| image:: https://readthedocs.org/projects/airship-pegleg/badge/?version=latest
-   :target: http://airship-pegleg.readthedocs.io/
+.. |Doc Status| image:: https://readthedocs.io/projects/airship-pegleg/badge/?version=latest
+   :target: https://airship-pegleg.readthedocs.io/
 .. _Deckhand: https://airship-deckhand.readthedocs.io
 .. _Airship: https://www.airshipit.org
 .. _Read the Docs:  https://airship-pegleg.readthedocs.io
