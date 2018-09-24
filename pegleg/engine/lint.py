@@ -19,13 +19,13 @@ import pkg_resources
 import yaml
 
 from pegleg import config
-from pegleg.engine import util
 from pegleg.engine.errorcodes import DOCUMENT_LAYER_MISMATCH
 from pegleg.engine.errorcodes import FILE_CONTAINS_INVALID_YAML
 from pegleg.engine.errorcodes import FILE_MISSING_YAML_DOCUMENT_HEADER
 from pegleg.engine.errorcodes import REPOS_MISSING_DIRECTORIES_FLAG
 from pegleg.engine.errorcodes import SCHEMA_STORAGE_POLICY_MISMATCH_FLAG
 from pegleg.engine.errorcodes import SECRET_NOT_ENCRYPTED_POLICY
+from pegleg.engine import util
 
 __all__ = ['full']
 
@@ -39,6 +39,21 @@ DECKHAND_SCHEMAS = {
 
 
 def full(fail_on_missing_sub_src=False, exclude_lint=None, warn_lint=None):
+    """Lint all sites in a repository.
+
+    :param bool fail_on_missing_sub_src: Whether to allow Deckhand rendering
+        to fail in the absence of a missing substitution source document which
+        might be the case in "offline mode".
+    :param list exclude_lint: List of lint rules to exclude. See those
+        defined in :mod:`pegleg.engine.errorcodes`.
+    :param list warn_lint: List of lint rules to warn about. See those
+        defined in :mod:`pegleg.engine.errorcodes`.
+    :raises ClickException: If a lint check was caught and it isn't contained
+        in ``exclude_lint`` or ``warn_lint``.
+    :returns: List of warnings produced, if any.
+
+    """
+
     exclude_lint = exclude_lint or []
     warn_lint = warn_lint or []
     messages = []
@@ -55,11 +70,83 @@ def full(fail_on_missing_sub_src=False, exclude_lint=None, warn_lint=None):
     # after site definitions have been refactored to move the manifests
     # under fake repository folders into the common/ folders.
     #
-    # All repos contain expected directories
     # messages.extend(_verify_no_unexpected_files())
 
-    # Deckhand Rendering completes without error
-    messages.extend(_verify_deckhand_render(fail_on_missing_sub_src))
+    # Deckhand rendering completes without error
+    messages.extend(
+        _verify_deckhand_render(
+            fail_on_missing_sub_src=fail_on_missing_sub_src))
+
+    return _filter_messages_by_warn_and_error_lint(
+        messages=messages, exclude_lint=exclude_lint, warn_lint=warn_lint)
+
+
+def site(site_name,
+         fail_on_missing_sub_src=False,
+         exclude_lint=None,
+         warn_lint=None):
+    """Lint ``site_name``.
+
+    :param str site_name: Name of site to lint.
+    :param bool fail_on_missing_sub_src: Whether to allow Deckhand rendering
+        to fail in the absence of a missing substitution source document which
+        might be the case in "offline mode".
+    :param list exclude_lint: List of lint rules to exclude. See those
+        defined in :mod:`pegleg.engine.errorcodes`.
+    :param list warn_lint: List of lint rules to warn about. See those
+        defined in :mod:`pegleg.engine.errorcodes`.
+    :raises ClickException: If a lint check was caught and it isn't contained
+        in ``exclude_lint`` or ``warn_lint``.
+    :returns: List of warnings produced, if any.
+
+    """
+
+    exclude_lint = exclude_lint or []
+    warn_lint = warn_lint or []
+    messages = []
+
+    # FIXME(felipemonteiro): Now that we are using revisioned repositories
+    # instead of flat directories with subfolders mirroring "revisions",
+    # this lint check analyzes ALL the directories (including these
+    # no-longer-valid "revision directories") against the new subset of
+    # relevant directories. We need to rewrite this check so that it works
+    # after site definitions have been refactored to move the manifests
+    # under fake repository folders into the common/ folders.
+    #
+    # messages.extend(_verify_no_unexpected_files(sitenames=[site_name]))
+
+    # If policy is cleartext and error is added this will put
+    # that particular message into the warns list and all others will
+    # be added to the error list if SCHEMA_STORAGE_POLICY_MISMATCH_FLAG
+    messages.extend(_verify_file_contents(sitename=site_name))
+
+    # Deckhand rendering completes without error
+    messages.extend(
+        _verify_deckhand_render(
+            sitename=site_name,
+            fail_on_missing_sub_src=fail_on_missing_sub_src))
+
+    return _filter_messages_by_warn_and_error_lint(
+        messages=messages, exclude_lint=exclude_lint, warn_lint=warn_lint)
+
+
+def _filter_messages_by_warn_and_error_lint(*,
+                                            messages=None,
+                                            exclude_lint=None,
+                                            warn_lint=None):
+    """Helper that only filters messages depending on whether or not they
+    are present in ``exclude_lint`` or ``warn_lint``.
+
+    Bubbles up errors only if the corresponding code for each is **not** found
+    in either ``exclude_lint`` or ``warn_lint``. If the code is found in
+    ``exclude_lint``, the lint code is ignored; if the code is found in
+    ``warn_lint``, the lint is warned about.
+
+    """
+
+    messages = messages or []
+    exclude_lint = exclude_lint or []
+    warn_lint = warn_lint or []
 
     errors = []
     warns = []
@@ -75,9 +162,11 @@ def full(fail_on_missing_sub_src=False, exclude_lint=None, warn_lint=None):
     return warns
 
 
-def _verify_no_unexpected_files():
+def _verify_no_unexpected_files(*, sitenames=None):
+    sitenames = sitenames or util.files.list_sites()
+
     expected_directories = set()
-    for site_name in util.files.list_sites():
+    for site_name in sitenames:
         params = util.definition.load_as_params(site_name)
         expected_directories.update(
             util.files.directories_for(
@@ -100,11 +189,15 @@ def _verify_no_unexpected_files():
     return errors
 
 
-def _verify_file_contents():
+def _verify_file_contents(*, sitename=None):
+    if sitename:
+        files = util.definition.site_files(sitename)
+    else:
+        files = util.files.all()
     schemas = _load_schemas()
 
     errors = []
-    for filename in util.files.all():
+    for filename in files:
         errors.extend(_verify_single_file(filename, schemas))
     return errors
 
@@ -171,47 +264,36 @@ def _verify_document(document, schemas, filename):
     return errors
 
 
-def _gather_relevant_documents_per_site():
-    """Gathers all relevant documents per site, which includes all type and
-    global documents that are needed to render each site document.
-
-    :returns: Dictionary of documents, keyed by each site name.
-    :rtype: dict
-    """
-    sitenames = list(util.files.list_sites())
-    documents_to_render = {s: [] for s in sitenames}
-
-    for sitename in sitenames:
-        params = util.definition.load_as_params(sitename)
-        paths = util.files.directories_for(
-            site_name=params['site_name'], site_type=params['site_type'])
-        filenames = set(util.files.search(paths))
-        for filename in filenames:
-            with open(filename) as f:
-                documents_to_render[sitename].extend(
-                    list(yaml.safe_load_all(f)))
-
-    return documents_to_render
-
-
-def _verify_deckhand_render(fail_on_missing_sub_src=False):
+def _verify_deckhand_render(*, sitename=None, fail_on_missing_sub_src=False):
     """Verify Deckhand render works by using all relevant deployment files.
 
     :returns: List of errors generated during rendering.
     """
     all_errors = []
-    documents_to_render = _gather_relevant_documents_per_site()
 
-    for sitename, documents in documents_to_render.items():
+    if sitename:
+        documents_to_render = util.definition.documents_for_site(sitename)
         LOG.debug('Rendering documents for site: %s.', sitename)
         _, errors = util.deckhand.deckhand_render(
-            documents=documents,
+            documents=documents_to_render,
             fail_on_missing_sub_src=fail_on_missing_sub_src,
             validate=True,
         )
         LOG.debug('Generated %d rendering errors for site: %s.', len(errors),
                   sitename)
         all_errors.extend(errors)
+    else:
+        documents_to_render = util.definition.documents_for_each_site()
+        for site_name, documents in documents_to_render.items():
+            LOG.debug('Rendering documents for site: %s.', site_name)
+            _, errors = util.deckhand.deckhand_render(
+                documents=documents,
+                fail_on_missing_sub_src=fail_on_missing_sub_src,
+                validate=True,
+            )
+            LOG.debug('Generated %d rendering errors for site: %s.',
+                      len(errors), site_name)
+            all_errors.extend(errors)
 
     return list(set(all_errors))
 

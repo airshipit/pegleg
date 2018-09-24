@@ -49,5 +49,5 @@ Operator's Guide
 .. toctree::
    :maxdepth: 2
 
-   cli
+   cli/cli
    exceptions

@@ -99,8 +99,8 @@ clean:
 
 .PHONY: py_lint
 py_lint:
-	cd pegleg;tox -e pep8
+	tox -e pep8
 
 .PHONY: py_format
 py_format:
-	cd pegleg;tox -e fmt
+	tox -e fmt

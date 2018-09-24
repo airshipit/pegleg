@@ -83,23 +83,59 @@ Enable debug logging.
 
 .. _site:
 
-Site
-----
+Repo
+====
 
-This allows you to set the primary and auxiliary repositories.
-
-::
-
-  ./pegleg.sh site -r <site_repo> -e <extra_repo> <command> <options>
+Allows you to perform repository-level operations.
 
 Options
-^^^^^^^
+-------
 
 **-r / --site-repository** (Required).
 
 Path to the root of the site repository (containing site_definition.yaml) repo.
 
 For example: /opt/aic-site-clcp-manifests.
+
+The revision can also be specified via (for example):
+
+::
+
+  -r /opt/aic-site-clcp-manifests@revision
+
+.. _cli-repo-lint:
+
+Lint
+----
+
+Sanity checks for repository content (all sites in the repository). To lint
+a specific site, see :ref:`site-level linting <cli-site-lint>`.
+
+See :ref:`linting` for more information.
+
+Site
+====
+
+Allows you to perform site-level operations.
+
+::
+
+  ./pegleg.sh site -r <site_repo> -e <extra_repo> <command> <options>
+
+Options
+-------
+
+**-r / --site-repository** (Required).
+
+Path to the root of the site repository (containing site_definition.yaml) repo.
+
+For example: /opt/aic-site-clcp-manifests.
+
+The revision can also be specified via (for example):
+
+::
+
+  -r /opt/aic-site-clcp-manifests@revision
 
 **-e / --extra-repository** (Optional).
 
@@ -111,6 +147,9 @@ These should be named per the site-definition file, e.g.:
 ::
 
   -e global=/opt/global -e secrets=/opt/secrets
+
+Repository Overrides
+^^^^^^^^^^^^^^^^^^^^
 
 By default, the revision specified in the :file:`site-definition.yaml` for the
 site will be leveraged but can be
@@ -172,8 +211,8 @@ Will warn of lint failures from the specified lint options.
 
 **--validate** (Optional, validation only). False by default.
 
-Perform validation of documents prior to collection. See :ref:`linting` for
-additional information on document linting. It is recommended that document
+Perform validation of documents prior to collection. See :ref:`cli-site-lint`
+for additional information on document linting. It is recommended that document
 linting be executed prior to document collection. However, ``--validate``
 is False by default for backwards compatibility concerns.
 
@@ -283,43 +322,18 @@ Example:
 
   ./pegleg site -r /opt/aic-clcp-site-manifests render site_name -o output
 
-.. _linting:
+.. _cli-site-lint:
 
 Lint
 ----
 
-Sanity checks for repository content. Validations for linting are done
-utilizing `Deckhand Validations`_.
+Sanity checks for repository content (for a specific site in the repository).
+Validations for linting are done utilizing `Deckhand Validations`_.
 
-**-f / --fail-on-missing-sub-src** (Optional).
+To lint all sites in the repository, see
+:ref:`repository-level linting <cli-repo-lint>`.
 
-Raise Deckhand exception on missing substitution sources. Defaults to True.
-
-**-x <code>** (Optional).
-
-Will exclude the specified lint option. -w takes priority over -x.
-
-**-w <code>** (Optional).
-
-Will warn of lint failures from the specified lint options.
-
-::
-
-  If you expect certain lint failures, then those lint options can be
-  excluded or you can choose to be warned about those failures using the
-  codes below.
-
-  P001 - Document has storagePolicy cleartext (expected is encrypted) yet
-  its schema is a mandatory encrypted type.
-
-  Where mandatory encrypted schema type is one of:
-  * deckhand/CertificateAuthorityKey/v1
-  * deckhand/CertificateKey/v1
-  * deckhand/Passphrase/v1
-  * deckhand/PrivateKey/v1
-
-  P002 - Deckhand rendering is expected to complete without errors.
-  P003 - All repos contain expected directories.
+See :ref:`linting` for more information.
 
 Examples
 ^^^^^^^^
@@ -420,6 +434,40 @@ Valid Git references for checking out repositories include:
   * 47676764d3935e4934624bf9593e9115984fe668 (commit ID)
   * refs/changes/79/47079/12 (ref)
   * master (branch name)
+
+.. _linting:
+
+Linting
+=======
+
+**-f / --fail-on-missing-sub-src** (Optional).
+
+Raise Deckhand exception on missing substitution sources. Defaults to True.
+
+**-x <code>** (Optional).
+
+Will exclude the specified lint option. -w takes priority over -x.
+
+**-w <code>** (Optional).
+
+Will warn of lint failures from the specified lint options.
+
+If you expect certain lint failures, then those lint options can be
+excluded or you can choose to be warned about those failures using the
+codes below.
+
+P001 - Document has storagePolicy cleartext (expected is encrypted) yet
+its schema is a mandatory encrypted type.
+
+Where mandatory encrypted schema type is one of:
+
+* deckhand/CertificateAuthorityKey/v1
+* deckhand/CertificateKey/v1
+* deckhand/Passphrase/v1
+* deckhand/PrivateKey/v1
+
+P002 - Deckhand rendering is expected to complete without errors.
+P003 - All repos contain expected directories.
 
 .. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/rendering.html
 .. _Deckhand Validations: https://airship-deckhand.readthedocs.io/en/latest/validation.html

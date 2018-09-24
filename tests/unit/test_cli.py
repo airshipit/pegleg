@@ -18,9 +18,11 @@ import shutil
 import tempfile
 
 from click.testing import CliRunner
+import mock
 import pytest
 
 from pegleg import cli
+from pegleg.engine import errorcodes
 from pegleg.engine.util import git
 
 
@@ -38,7 +40,7 @@ def is_connected():
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-class TestSiteCliActions(object):
+class BaseCLIActionTest(object):
     @classmethod
     def setup_class(cls):
         cls.runner = CliRunner()
@@ -58,6 +60,12 @@ class TestSiteCliActions(object):
             path = os.path.join(root_tempdir, tempdir)
             if git.is_repository(path):
                 shutil.rmtree(path, ignore_errors=True)
+
+
+class TestSiteCliActions(BaseCLIActionTest):
+    """Tests site-level CLI actions."""
+
+    ### Collect tests ###
 
     def test_collect_using_remote_repo_url(self):
         """Validates collect action using a remote URL."""
@@ -104,3 +112,135 @@ class TestSiteCliActions(object):
         # Validates that site manifests collected from cloned repositories
         # are written out to sensibly named files like airship-treasuremap.yaml
         assert collected_files[0] == ("%s.yaml" % self.repo_name)
+
+    ### Lint tests ###
+
+    def test_lint_site_using_remote_repo_url_with_exclude(self):
+        """Validates site lint action using remote repo URL."""
+        # Scenario:
+        #
+        # 1) Mock out Deckhand render (so we can ignore P005 issues)
+        # 2) Lint site with exclude flags (should clone repo automatically)
+
+        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+                                                           self.repo_rev)
+
+        lint_command = ['-r', repo_url, 'lint', self.site_name]
+        exclude_lint_command = [
+            '-x', errorcodes.SCHEMA_STORAGE_POLICY_MISMATCH_FLAG, '-x',
+            errorcodes.SECRET_NOT_ENCRYPTED_POLICY
+        ]
+
+        with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
+            mock_deckhand.deckhand_render.return_value = ([], [])
+            result = self.runner.invoke(cli.site,
+                                        lint_command + exclude_lint_command)
+
+        assert result.exit_code == 0
+        # A successful result (while setting lint checks to exclude) should
+        # output nothing.
+        assert not result.output
+
+    def test_lint_site_using_local_path_with_exclude(self):
+        """Validates site lint action using local repo path."""
+        # Scenario:
+        #
+        # 1) Mock out Deckhand render (so we can ignore P005 issues)
+        # 2) Lint site with exclude flags (should skip clone repo)
+
+        repo_path = self.treasuremap_path
+        lint_command = ['-r', repo_path, 'lint', self.site_name]
+        exclude_lint_command = [
+            '-x', errorcodes.SCHEMA_STORAGE_POLICY_MISMATCH_FLAG, '-x',
+            errorcodes.SECRET_NOT_ENCRYPTED_POLICY
+        ]
+
+        with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
+            mock_deckhand.deckhand_render.return_value = ([], [])
+            result = self.runner.invoke(cli.site,
+                                        lint_command + exclude_lint_command)
+
+        assert result.exit_code == 0
+        # A successful result (while setting lint checks to exclude) should
+        # output nothing.
+        assert not result.output
+
+    def test_lint_site_using_local_path_with_warn(self):
+        """Validates site lint action using local repo path."""
+        # Scenario:
+        #
+        # 1) Mock out Deckhand render (so we can ignore P005 issues)
+        # 2) Lint site with warn flags (should skip clone repo)
+
+        repo_path = self.treasuremap_path
+        lint_command = ['-r', repo_path, 'lint', self.site_name]
+        warn_lint_command = [
+            '-w', errorcodes.SCHEMA_STORAGE_POLICY_MISMATCH_FLAG, '-w',
+            errorcodes.SECRET_NOT_ENCRYPTED_POLICY
+        ]
+
+        with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
+            mock_deckhand.deckhand_render.return_value = ([], [])
+            result = self.runner.invoke(cli.site,
+                                        lint_command + warn_lint_command)
+
+        assert result.exit_code == 0
+        # A successful result (while setting lint checks to warns) should
+        # output warnings.
+        assert result.output
+
+
+class TestRepoCliActions(BaseCLIActionTest):
+    """Tests repo-level CLI actions."""
+
+    ### Lint tests ###
+
+    def test_lint_repo_using_remote_repo_url_with_exclude(self):
+        """Validates repo lint action using remote repo URL."""
+        # Scenario:
+        #
+        # 1) Mock out Deckhand render (so we can ignore P005 issues)
+        # 2) Lint repo with exclude flags (should clone repo automatically)
+
+        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+                                                           self.repo_rev)
+
+        lint_command = ['-r', repo_url, 'lint']
+        exclude_lint_command = [
+            '-x', errorcodes.SCHEMA_STORAGE_POLICY_MISMATCH_FLAG, '-x',
+            errorcodes.SECRET_NOT_ENCRYPTED_POLICY
+        ]
+
+        with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
+            mock_deckhand.deckhand_render.return_value = ([], [])
+            result = self.runner.invoke(cli.repo,
+                                        lint_command + exclude_lint_command)
+
+        assert result.exit_code == 0
+        # A successful result (while setting lint checks to exclude) should
+        # output nothing.
+        assert not result.output
+
+    def test_lint_repo_using_local_path_with_exclude(self):
+        """Validates repo lint action using local repo path."""
+        # Scenario:
+        #
+        # 1) Mock out Deckhand render (so we can ignore P005 issues)
+        # 2) Lint repo with exclude flags (should skip clone repo)
+
+        repo_path = self.treasuremap_path
+        lint_command = ['-r', repo_path, 'lint']
+        exclude_lint_command = [
+            '-x', errorcodes.SCHEMA_STORAGE_POLICY_MISMATCH_FLAG, '-x',
+            errorcodes.SECRET_NOT_ENCRYPTED_POLICY
+        ]
+
+        with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
+            mock_deckhand.deckhand_render.return_value = ([], [])
+            result = self.runner.invoke(cli.repo,
+                                        lint_command + exclude_lint_command)
+
+        assert result.exit_code == 0
+        # A successful result (while setting lint checks to exclude) should
+        # output nothing.
+        assert not result.output

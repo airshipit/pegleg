@@ -15,17 +15,14 @@
 import os
 
 import click
+import yaml
 
 from pegleg import config
-from . import files
+from pegleg.engine.util import files
 
 __all__ = [
-    'load',
-    'load_as_params',
-    'path',
-    'pluck',
-    'site_files',
-    'site_files_by_repo',
+    'load', 'load_as_params', 'path', 'pluck', 'site_files',
+    'site_files_by_repo', 'documents_for_each_site', 'documents_for_site'
 ]
 
 
@@ -80,3 +77,50 @@ def site_files_by_repo(site_name):
     for repo, dl in dir_map.items():
         for filename in files.search(dl):
             yield (repo, filename)
+
+
+def documents_for_each_site():
+    """Gathers all relevant documents per site, which includes all type and
+    global documents that are needed to render each site document.
+
+    :returns: Dictionary of documents, keyed by each site name.
+    :rtype: dict
+
+    """
+
+    sitenames = list(files.list_sites())
+    documents = {s: [] for s in sitenames}
+
+    for sitename in sitenames:
+        params = load_as_params(sitename)
+        paths = files.directories_for(
+            site_name=params['site_name'], site_type=params['site_type'])
+        filenames = set(files.search(paths))
+        for filename in filenames:
+            with open(filename) as f:
+                documents[sitename].extend(list(yaml.safe_load_all(f)))
+
+    return documents
+
+
+def documents_for_site(sitename):
+    """Gathers all relevant documents for a site, which includes all type and
+    global documents that are needed to render each site document.
+
+    :param str sitename: Site name for which to gather documents.
+    :returns: List of relevant documents.
+    :rtype: list
+
+    """
+
+    documents = []
+
+    params = load_as_params(sitename)
+    paths = files.directories_for(
+        site_name=params['site_name'], site_type=params['site_type'])
+    filenames = set(files.search(paths))
+    for filename in filenames:
+        with open(filename) as f:
+            documents.extend(list(yaml.safe_load_all(f)))
+
+    return documents

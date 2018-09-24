@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import functools
 import logging
 import sys
 
@@ -28,24 +29,7 @@ CONTEXT_SETTINGS = {
     'help_option_names': ['-h', '--help'],
 }
 
-
-@click.group(context_settings=CONTEXT_SETTINGS)
-@click.option(
-    '-v',
-    '--verbose',
-    is_flag=bool,
-    default=False,
-    help='Enable debug logging')
-def main(*, verbose):
-    if verbose:
-        log_level = logging.DEBUG
-    else:
-        log_level = logging.INFO
-    logging.basicConfig(format=LOG_FORMAT, level=log_level)
-
-
-@main.group(help='Commands related to sites')
-@click.option(
+REPOSITORY_OPTION = click.option(
     '-r',
     '--site-repository',
     'site_repository',
@@ -53,7 +37,8 @@ def main(*, verbose):
     help=
     'Path or URL to the primary repository (containing site_definition.yaml) '
     'repo.')
-@click.option(
+
+EXTRA_REPOSITORY_OPTION = click.option(
     '-e',
     '--extra-repository',
     'extra_repositories',
@@ -63,6 +48,105 @@ def main(*, verbose):
     'secrets=/opt/secrets. By default, the revision specified in the '
     'site-definition for the site will be leveraged but can be overridden '
     'using -e global=/opt/global@revision.')
+
+ALLOW_MISSING_SUBSTITUTIONS_OPTION = click.option(
+    '-f',
+    '--fail-on-missing-sub-src',
+    required=False,
+    type=click.BOOL,
+    default=True,
+    help=
+    "Raise Deckhand exception on missing substition sources. Defaults to True."
+)
+
+EXCLUDE_LINT_OPTION = click.option(
+    '-x',
+    '--exclude',
+    'exclude_lint',
+    multiple=True,
+    help='Excludes specified linting checks. Warnings will still be issued. '
+    '-w takes priority over -x.')
+
+WARN_LINT_OPTION = click.option(
+    '-w',
+    '--warn',
+    'warn_lint',
+    multiple=True,
+    help='Warn if linting check fails. -w takes priority over -x.')
+
+
+@click.group(context_settings=CONTEXT_SETTINGS)
+@click.option(
+    '-v',
+    '--verbose',
+    is_flag=bool,
+    default=False,
+    help='Enable debug logging')
+def main(*, verbose):
+    """Main CLI meta-group, which includes the following groups:
+
+    * site: site-level actions
+    * repo: repository-level actions
+    * stub (DEPRECATED)
+
+    """
+
+    if verbose:
+        log_level = logging.DEBUG
+    else:
+        log_level = logging.INFO
+    logging.basicConfig(format=LOG_FORMAT, level=log_level)
+
+
+@main.group(help='Commands related to repositories')
+@REPOSITORY_OPTION
+def repo(*, site_repository):
+    """Group for repo-level actions, which include:
+
+    * lint: lint all sites across the repository
+
+    """
+
+    config.set_site_repo(site_repository)
+
+
+def _lint_helper(*,
+                 fail_on_missing_sub_src,
+                 exclude_lint,
+                 warn_lint,
+                 site_name=None):
+    """Helper for executing lint on specific site or all sites in repo."""
+    if site_name:
+        func = functools.partial(engine.lint.site, site_name=site_name)
+    else:
+        func = engine.lint.full
+    warns = func(
+        fail_on_missing_sub_src=fail_on_missing_sub_src,
+        exclude_lint=exclude_lint,
+        warn_lint=warn_lint)
+    if warns:
+        click.echo("Linting passed, but produced some warnings.")
+        for w in warns:
+            click.echo(w)
+
+
+@repo.command('lint', help='Lint all sites in a repository')
+@ALLOW_MISSING_SUBSTITUTIONS_OPTION
+@EXCLUDE_LINT_OPTION
+@WARN_LINT_OPTION
+def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
+    """Lint all sites using checks defined in :mod:`pegleg.engine.errorcodes`.
+    """
+    engine.repository.process_site_repository(update_config=True)
+    _lint_helper(
+        fail_on_missing_sub_src=fail_on_missing_sub_src,
+        exclude_lint=exclude_lint,
+        warn_lint=warn_lint)
+
+
+@main.group(help='Commands related to sites')
+@REPOSITORY_OPTION
+@EXTRA_REPOSITORY_OPTION
 @click.option(
     '-k',
     '--repo-key',
@@ -78,6 +162,15 @@ def main(*, verbose):
     'specified in the site-definition file. Any occurrences of REPO_USERNAME '
     'will be replaced with this value.')
 def site(*, site_repository, extra_repositories, repo_key, repo_username):
+    """Group for site-level actions, which include:
+
+    * list: list available sites in a manifests repo
+    * lint: lint a site along with all its dependencies
+    * render: render a site using Deckhand
+    * show: show a sites' files
+
+    """
+
     config.set_site_repo(site_repository)
     config.set_extra_repo_store(extra_repositories or [])
     config.set_repo_key(repo_key)
@@ -130,7 +223,8 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
 
     if validate:
         # Lint the primary repo prior to document collection.
-        _lint(
+        _lint_helper(
+            site_name=site_name,
             fail_on_missing_sub_src=True,
             exclude_lint=exclude_lint,
             warn_lint=warn_lint)
@@ -178,40 +272,18 @@ def render(*, output_stream, site_name):
     engine.site.render(site_name, output_stream)
 
 
-@site.command('lint', help='Lint a site')
-@click.option(
-    '-f',
-    '--fail-on-missing-sub-src',
-    'fail_on_missing_sub_src',
-    required=False,
-    type=click.BOOL,
-    default=True,
-    help='Fail when there is missing substitution source.')
-@click.option(
-    '-x',
-    '--exclude',
-    'exclude_lint',
-    multiple=True,
-    help='Excludes specified linting checks. Warnings will still be issued. '
-    '-w takes priority over -x.')
-@click.option(
-    '-w',
-    '--warn',
-    'warn_lint',
-    multiple=True,
-    help='Warn if linting check fails. -w takes priority over -x.')
+@site.command('lint', help='Lint a given site in a repository')
+@ALLOW_MISSING_SUBSTITUTIONS_OPTION
+@EXCLUDE_LINT_OPTION
+@WARN_LINT_OPTION
 @click.argument('site_name')
-def lint(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
+def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
+    """Lint a given site using checks defined in
+    :mod:`pegleg.engine.errorcodes`.
+    """
     engine.repository.process_repositories(site_name)
-    _lint(
+    _lint_helper(
+        site_name=site_name,
         fail_on_missing_sub_src=fail_on_missing_sub_src,
         exclude_lint=exclude_lint,
         warn_lint=warn_lint)
-
-
-def _lint(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
-    warns = engine.lint.full(fail_on_missing_sub_src, exclude_lint, warn_lint)
-    if warns:
-        click.echo("Linting passed, but produced some warnings.")
-        for w in warns:
-            click.echo(w)
