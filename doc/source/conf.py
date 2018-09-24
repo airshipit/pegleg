@@ -18,7 +18,8 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../src/bin/pegleg'))
+sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../../'))
 import sphinx_rtd_theme
 
 
@@ -105,7 +106,7 @@ html_static_path = []
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ucpintdoc'
+htmlhelp_basename = 'peglegdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -128,3 +129,32 @@ latex_elements = {
     # 'figure_align': 'htbp',
 }
 
+# Grouping the document tree into LaTeX files. List of tuples
+# (source start file, target name, title,
+#  author, documentclass [howto, manual, or own class]).
+latex_documents = [
+    (master_doc, 'pegleg.tex', u'Pegleg Documentation',
+     u'Pegleg Authors', 'manual'),
+]
+
+
+# -- Options for manual page output ---------------------------------------
+
+# One entry per manual page. List of tuples
+# (source start file, name, description, authors, manual section).
+man_pages = [
+    (master_doc, 'pegleg', u'Pegleg Documentation',
+     [author], 1)
+]
+
+
+# -- Options for Texinfo output -------------------------------------------
+
+# Grouping the document tree into Texinfo files. List of tuples
+# (source start file, target name, title, author,
+#  dir menu entry, description, category)
+texinfo_documents = [
+    (master_doc, 'pegleg', u'Pegleg Documentation',
+     author, 'pegleg', 'Document-based aggregation and linting service.',
+     'Miscellaneous'),
+]

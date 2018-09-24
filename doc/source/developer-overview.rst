@@ -72,7 +72,7 @@ Pegleg strives to conform to the `Airship coding conventions`_.
 Python
 ------
 
-The Pegleg code base lives under ``/src/bin/pegleg``. Pegleg supports py35
+The Pegleg code base lives under ``pegleg``. Pegleg supports py35 and py36
 interpreters.
 
 Docker
@@ -91,7 +91,7 @@ target: ``run_pegleg``.
 Testing
 =======
 
-All Pegleg tests are nested under ``/src/bin/pegleg/tests``.
+All Pegleg tests are nested under ``tests``.
 
 Pegleg comes equipped with a number of `tox`_ targets for running unit tests,
 as well as `pep8`_ and `Bandit`_ checks.

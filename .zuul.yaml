@@ -66,7 +66,7 @@
     timeout: 300
     nodeset: airship-pegleg-single-node
     irrelevant-files:
-      - ^src/bin/pegleg/tests/.*$
+      - ^tests/.*$
       - ^setup.cfg$
 
 - job:
