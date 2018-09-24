@@ -104,7 +104,12 @@ def render(site_name, output_stream):
             else:
                 err_msg += str(err) + '\n'
         raise click.ClickException(err_msg)
-    yaml.dump_all(rendered_documents, output_stream, default_flow_style=False)
+    yaml.dump_all(
+        rendered_documents,
+        output_stream,
+        default_flow_style=False,
+        explicit_start=True,
+        explicit_end=True)
 
 
 def list_(output_stream):
