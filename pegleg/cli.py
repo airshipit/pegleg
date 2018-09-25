@@ -209,63 +209,6 @@ def lint(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
         warn_lint=warn_lint)
 
 
-def _validate_revision_callback(_ctx, _param, value):
-    if value is not None and value.startswith('v'):
-        return value
-    else:
-        raise click.BadParameter('revisions must start with "v"')
-
-
-@main.group(help='Create directory structure and stubs')
-def stub():
-    pass
-
-
-RELEASE_OPTION = click.option(
-    '-r',
-    '--revision',
-    callback=_validate_revision_callback,
-    required=True,
-    help='Configuration revision to use (e.g. v1.0)')
-
-SITE_TYPE_OPTION = click.option(
-    '-t',
-    '--site-type',
-    required=True,
-    help='Site type to use ("large", "medium", "cicd", "labs", etc.')
-
-LINT_OPTION = click.option(
-    '-f',
-    '--fail-on-missing-sub-src',
-    required=False,
-    type=click.BOOL,
-    default=True,
-    help=
-    "Raise deckhand exception on missing substition sources. Defaults to True."
-)
-
-
-@stub.command('global', help='Add global structure for a new revision')
-@RELEASE_OPTION
-def global_(*, revision):
-    engine.stub.global_(revision)
-
-
-@stub.command(help='Add a new site + revision')
-@click.argument('site_name')
-@RELEASE_OPTION
-@SITE_TYPE_OPTION
-def site(*, revision, site_type, site_name):
-    engine.stub.site(revision, site_type, site_name)
-
-
-@stub.command('site-type', help='Add a new site-type + revision')
-@RELEASE_OPTION
-@SITE_TYPE_OPTION
-def site_type(*, revision, site_type):
-    engine.stub.site_type(revision, site_type)
-
-
 def _lint(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
     warns = engine.lint.full(fail_on_missing_sub_src, exclude_lint, warn_lint)
     if warns:

@@ -49,15 +49,21 @@ def all():
 
 
 def create_global_directories():
+    # NOTE(felipemonteiro): Currently unused. Needed by old "stub" CLI command.
+    # Keeping this around because this utility may have future value.
     _create_tree(_global_root_path())
     _create_tree(_global_common_path())
 
 
 def create_site_directories(*, site_name, **_kwargs):
+    # NOTE(felipemonteiro): Currently unused. Needed by old "stub" CLI command.
+    # Keeping this around because this utility may have future value.
     _create_tree(_site_path(site_name))
 
 
 def create_site_type_directories(*, site_type):
+    # NOTE(felipemonteiro): Currently unused. Needed by old "stub" CLI command.
+    # Keeping this around because this utility may have future value.
     _create_tree(_site_type_common_path(site_type))
     _create_tree(_site_type_root_path(site_type))
 

@@ -20,7 +20,6 @@ from pegleg import config
 from . import files
 
 __all__ = [
-    'create',
     'load',
     'load_as_params',
     'path',
@@ -28,26 +27,6 @@ __all__ = [
     'site_files',
     'site_files_by_repo',
 ]
-
-
-def create(*, site_name, site_type, revision):
-    definition = {
-        'schema': 'pegleg/SiteDefinition/v1',
-        'metadata': {
-            'schema': 'metadata/Document/v1',
-            'name': site_name,
-            'storagePolicy': 'cleartext',
-            'layeringDefinition': {
-                'abstract': False,
-                'layer': 'site',
-            },
-        },
-        'data': {
-            'revision': revision,
-            'site_type': site_type,
-        }
-    }
-    files.dump(path(site_name), definition)
 
 
 def load(site, primary_repo_base=None):
