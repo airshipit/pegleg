@@ -20,53 +20,39 @@ Pegleg  Exceptions
 Base Exceptions
 ---------------
 
-.. list-table::
-  :widths: 5 50
-  :header-rows: 1
-
-  * - Exception Name
-    - Description
-  * - PeglegBaseException
-    - .. autoexception:: pegleg.engine.exceptions.PeglegBaseException
-         :members:
-         :undoc-members:
+.. autoexception:: pegleg.engine.exceptions.PeglegBaseException
+   :members:
+   :undoc-members:
 
 Git Exceptions
 --------------
 
-.. list-table::
-  :widths: 5 50
-  :header-rows: 1
+.. autoexception:: pegleg.engine.exceptions.BaseGitException
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
-  * - Exception Name
-    - Description
-  * - BaseGitException
-    - .. autoexception:: pegleg.engine.exceptions.BaseGitException
-         :members:
-         :show-inheritance:
-         :undoc-members:
-  * - GitConfigException
-    - .. autoexception:: pegleg.engine.exceptions.GitConfigException
-         :members:
-         :show-inheritance:
-         :undoc-members:
-  * - GitException
-    - .. autoexception:: pegleg.engine.exceptions.GitException
-         :members:
-         :show-inheritance:
-         :undoc-members:
-  * - GitAuthException
-    - .. autoexception:: pegleg.engine.exceptions.GitAuthException
-         :members:
-         :show-inheritance:
-         :undoc-members:
-  * - GitProxyException
-    - .. autoexception:: pegleg.engine.exceptions.GitProxyException
-         :members:
-         :show-inheritance:
-         :undoc-members:
-  * - GitSSHException
-    - .. autoexception:: pegleg.engine.exceptions.GitSSHException
-         :members:
-         :show-inheritance:
-         :undoc-members:
+.. autoexception:: pegleg.engine.exceptions.GitConfigException
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+.. autoexception:: pegleg.engine.exceptions.GitException
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+.. autoexception:: pegleg.engine.exceptions.GitAuthException
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+.. autoexception:: pegleg.engine.exceptions.GitProxyException
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+.. autoexception:: pegleg.engine.exceptions.GitSSHException
+   :members:
+   :show-inheritance:
+   :undoc-members:
