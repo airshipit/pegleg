@@ -131,16 +131,21 @@ def process_site_repository(update_config=False):
 
     repo_path_or_url, repo_revision = _extract_repo_url_and_revision(
         site_repo_or_path)
-    temp_site_repo = _copy_to_temp_folder(repo_path_or_url, "site")
-    _process_site_repository(temp_site_repo, repo_revision)
+
+    if os.path.exists(repo_path_or_url):
+        temp_site_repo = _copy_to_temp_folder(repo_path_or_url, "site")
+    else:
+        temp_site_repo = repo_path_or_url
+
+    new_repo_path = _process_site_repository(temp_site_repo, repo_revision)
 
     if update_config:
         # Overwrite the site repo in the config because further processing will
         # fail if they contain revision info in their paths.
-        LOG.debug("Updating site_repo=%s in config", temp_site_repo)
-        config.set_site_repo(temp_site_repo)
+        LOG.debug("Updating site_repo=%s in config", new_repo_path)
+        config.set_site_repo(new_repo_path)
 
-    return temp_site_repo
+    return new_repo_path
 
 
 def _process_site_repository(repo_url_or_path, repo_revision):
@@ -167,7 +172,8 @@ def _process_site_repository(repo_url_or_path, repo_revision):
     LOG.info("Processing repository %s with url=%s, repo_key=%s, "
              "repo_username=%s, revision=%s", repo_alias, repo_url_or_path,
              repo_key, repo_user, repo_revision)
-    _handle_repository(repo_url_or_path, ref=repo_revision, auth_key=repo_key)
+    return _handle_repository(
+        repo_url_or_path, ref=repo_revision, auth_key=repo_key)
 
 
 def _get_and_validate_site_repositories(site_name, site_data):

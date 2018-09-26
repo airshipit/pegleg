@@ -410,14 +410,15 @@ def test_process_site_repository():
     def _do_test(site_repo):
         expected = site_repo.rsplit('@', 1)[0]
 
-        with mock.patch.object(
-                config, 'get_site_repo', autospec=True,
-                return_value=site_repo) as mock_get_site_repo:
+        config.set_site_repo(site_repo)
 
-            with mock.patch.object(
-                    repository, '_handle_repository', autospec=True):
-                result = repository.process_site_repository()
-            assert expected == result
+        with mock.patch.object(
+                repository,
+                '_handle_repository',
+                autospec=True,
+                return_value=expected):
+            result = repository.process_site_repository()
+        assert expected == result
 
     # Ensure that the reference is always pruned.
     _do_test('http://github.com/openstack/treasuremap@master')
