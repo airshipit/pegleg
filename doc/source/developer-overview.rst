@@ -97,8 +97,8 @@ Pegleg comes equipped with a number of `tox`_ targets for running unit tests,
 as well as `pep8`_ and `Bandit`_ checks.
 
 .. _Airship: https://airshipit.readthedocs.io
-.. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/
-.. _Airship coding conventions: http://airshipit.readthedocs.io/en/latest/conventions.html
-.. _tox: https://tox.readthedocs.io/en/latest/
+.. _Deckhand: https://airship-deckhand.readthedocs.io/
+.. _Airship coding conventions: https://airshipit.readthedocs.io/en/latest/conventions.html
+.. _tox: https://tox.readthedocs.io/
 .. _pep8: https://www.python.org/dev/peps/pep-0008/
 .. _Bandit: https://github.com/PyCQA/bandit
