@@ -57,17 +57,17 @@ EXTRA_REPOSITORY_OPTION = click.option(
     'extra_repositories',
     multiple=True,
     help='Path or URL of additional repositories. These should be named per '
-    'the site-definition file, e.g. -e global=/opt/global -e '
-    'secrets=/opt/secrets. By default, the revision specified in the '
-    'site-definition for the site will be leveraged but can be overridden '
-    'using -e global=/opt/global@revision.')
+         'the site-definition file, e.g. -e global=/opt/global -e '
+         'secrets=/opt/secrets. By default, the revision specified in the '
+         'site-definition for the site will be leveraged but can be '
+         'overridden using -e global=/opt/global@revision.')
 
 REPOSITORY_KEY_OPTION = click.option(
     '-k',
     '--repo-key',
     'repo_key',
     help='The SSH public key to use when cloning remote authenticated '
-    'repositories.')
+         'repositories.')
 
 REPOSITORY_USERNAME_OPTION = click.option(
     '-u',
@@ -83,13 +83,15 @@ REPOSITORY_CLONE_PATH_OPTION = click.option(
     '--clone-path',
     'clone_path',
     help='The path where the repo will be cloned. By default the repo will be '
-    'cloned to the /tmp path. If this option is included and the repo already '
-    'exists, then the repo will not be cloned again and the user must specify '
-    'a new clone path or pass in the local copy of the repository as the site '
-    'repository. Suppose the repo name is airship-treasuremap and the clone '
-    'path is /tmp/mypath then the following directory is created '
-    '/tmp/mypath/airship-treasuremap which will contain the contents of the '
-    'repo')
+         'cloned to the /tmp path. If this option is '
+         'included and the repo already '
+         'exists, then the repo will not be cloned again and the '
+         'user must specify a new clone path or pass in the local copy '
+         'of the repository as the site repository. Suppose the repo '
+         'name is airship-treasuremap and the clone path is '
+         '/tmp/mypath then the following directory is '
+         'created /tmp/mypath/airship-treasuremap '
+         'which will contain the contents of the repo')
 
 ALLOW_MISSING_SUBSTITUTIONS_OPTION = click.option(
     '-f',
@@ -106,7 +108,7 @@ EXCLUDE_LINT_OPTION = click.option(
     'exclude_lint',
     multiple=True,
     help='Excludes specified linting checks. Warnings will still be issued. '
-    '-w takes priority over -x.')
+         '-w takes priority over -x.')
 
 WARN_LINT_OPTION = click.option(
     '-w',
@@ -225,7 +227,7 @@ def site(*, site_repository, clone_path, extra_repositories, repo_key,
     '--save-location',
     'save_location',
     help='Directory to output the complete site definition. Created '
-    'automatically if it does not already exist.')
+         'automatically if it does not already exist.')
 @click.option(
     '--validate',
     'validate',
@@ -241,7 +243,7 @@ def site(*, site_repository, clone_path, extra_repositories, repo_key,
     'exclude_lint',
     multiple=True,
     help='Excludes specified linting checks. Warnings will still be issued. '
-    '-w takes priority over -x.')
+         '-w takes priority over -x.')
 @click.option(
     '-w',
     '--warn',
@@ -344,8 +346,8 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
 @click.option(
     '--context-marker',
     help='Specifies a UUID (8-4-4-4-12 format) that will be used to correlate '
-    'logs, transactions, etc. in downstream activities triggered by this '
-    'interaction ',
+         'logs, transactions, etc. in downstream activities triggered by this '
+         'interaction ',
     required=False,
     type=click.UUID)
 @SITE_REPOSITORY_ARGUMENT
@@ -375,24 +377,26 @@ def upload(ctx, *, os_project_domain_name,
     click.echo(ShipyardHelper(ctx).upload_documents())
 
 
-@site.group(name='secrets', help='Commands to manage site secrets documents')
+@site.group(
+    name='secrets',
+    help='Commands to manage site secrets documents')
 def secrets():
     pass
 
 
 @secrets.command(
     'generate-pki',
-    help="""
-Generate certificates and keys according to all PKICatalog documents in the
-site. Regenerating certificates can be accomplished by re-running this command.
-""")
+    help='Generate certificates and keys according to all PKICatalog '
+         'documents in the site. Regenerating certificates can be '
+         'accomplished by re-running this command.')
 @click.option(
     '-a',
     '--author',
     'author',
-    help="""Identifying name of the author generating new certificates. Used
-for tracking provenance information in the PeglegManagedDocuments. An attempt
-is made to automatically determine this value, but should be provided.""")
+    help='Identifying name of the author generating new certificates. Used'
+         'for tracking provenance information in the PeglegManagedDocuments. '
+         'An attempt is made to automatically determine this value, '
+         'but should be provided.')
 @click.argument('site_name')
 def generate_pki(site_name, author):
     """Generate certificates, certificate authorities and keypairs for a given
@@ -442,27 +446,68 @@ def list_types(*, output_stream):
     engine.type.list_types(output_stream)
 
 
+@secrets.group(
+    name='generate',
+    help='Command group to generate site secrets documents.')
+def generate():
+    pass
+
+
+@generate.command(
+    'passphrases',
+    help='Command to generate site passphrases')
+@click.argument('site_name')
+@click.option(
+    '-s',
+    '--save-location',
+    'save_location',
+    required=True,
+    help='Directory to store the generated site passphrases in. It will '
+         'be created automatically, if it does not already exist. The '
+         'generated, wrapped, and encrypted passphrases files will be saved '
+         'in: <save_location>/site/<site_name>/secrets/passphrases/ '
+         'directory.')
+@click.option(
+    '-a',
+    '--author',
+    'author',
+    required=True,
+    help='Identifier for the program or person who is generating the secrets '
+         'documents')
+@click.option(
+    '-i',
+    '--interactive',
+    'interactive',
+    is_flag=bool,
+    default=False,
+    help='Generate passphrases interactively, not automatically')
+def generate_passphrases(*, site_name, save_location, author, interactive):
+    engine.repository.process_repositories(site_name)
+    engine.secrets.generate_passphrases(site_name, save_location, author,
+                                        interactive)
+
+
 @secrets.command(
     'encrypt',
     help='Command to encrypt and wrap site secrets '
-    'documents with metadata.storagePolicy set '
-    'to encrypted, in pegleg managed documents.')
+         'documents with metadata.storagePolicy set '
+         'to encrypted, in pegleg managed documents.')
 @click.option(
     '-s',
     '--save-location',
     'save_location',
     default=None,
     help='Directory to output the encrypted site secrets files. Created '
-    'automatically if it does not already exist. '
-    'If save_location is not provided, the output encrypted files will '
-    'overwrite the original input files (default behavior)')
+         'automatically if it does not already exist. '
+         'If save_location is not provided, the output encrypted files will '
+         'overwrite the original input files (default behavior)')
 @click.option(
     '-a',
     '--author',
     'author',
     required=True,
     help='Identifier for the program or person who is encrypting the secrets '
-    'documents')
+         'documents')
 @click.argument('site_name')
 def encrypt(*, save_location, author, site_name):
     engine.repository.process_repositories(site_name, overwrite_existing=True)
@@ -474,7 +519,7 @@ def encrypt(*, save_location, author, site_name):
 @secrets.command(
     'decrypt',
     help='Command to unwrap and decrypt one site '
-    'secrets document and print it to stdout.')
+         'secrets document and print it to stdout.')
 @click.option(
     '-f',
     '--filename',

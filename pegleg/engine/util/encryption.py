@@ -25,6 +25,8 @@ KEY_LENGTH = 32
 ITERATIONS = 10000
 LOG = logging.getLogger(__name__)
 
+__all__ = ('encrypt', 'decrypt')
+
 
 def encrypt(unencrypted_data,
             passphrase,

@@ -1,0 +1,212 @@
+---
+# The purpose of this file is to define the Passpharase certificates for the environment
+#
+schema: pegleg/PassphraseCatalog/v1
+metadata:
+  schema: metadata/Document/v1
+  name: cluster-passphrases
+  layeringDefinition:
+    abstract: false
+    layer: site
+  storagePolicy: cleartext
+data:
+  passphrases:
+    - description: 'short description of the passphrase'
+      document_name: ceph_swift_keystone_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_keystone_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_armada_keystone_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_postgres_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_oslo_db_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_deckhand_postgres_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_deckhand_keystone_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_barbican_keystone_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_barbican_oslo_db_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_oslo_messaging_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_drydock_postgres_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_drydock_keystone_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_maas_postgres_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_keystone_oslo_db_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_promenade_keystone_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_shipyard_keystone_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_shipyard_postgres_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_airflow_postgres_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: ucp_rabbitmq_erlang_cookie
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: maas_region_secret
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_barbican_oslo_db_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_barbican_oslo_messaging_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_barbican_oslo_messaging_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_barbican_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_barbican_rabbitmq_erlang_cookie
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_cinder_oslo_messaging_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_cinder_oslo_messaging_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_cinder_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_cinder_rabbitmq_erlang_cookie
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_glance_oslo_db_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_glance_oslo_messaging_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_glance_oslo_messaging_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_glance_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_glance_rabbitmq_erlang_cookie
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_heat_oslo_db_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_heat_oslo_messaging_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_heat_oslo_messaging_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_heat_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_heat_rabbitmq_erlang_cookie
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_heat_stack_user_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_heat_trustee_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_horizon_oslo_db_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_infra_elasticsearch_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_infra_grafana_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_infra_grafana_oslo_db_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_infra_grafana_oslo_db_session_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_infra_kibana_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_infra_openstack_exporter_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_infra_oslo_db_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_keystone_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_keystone_oslo_db_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_keystone_oslo_messaging_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_keystone_oslo_messaging_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_keystone_rabbitmq_erlang_cookie
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_neutron_oslo_db_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_neutron_oslo_messaging_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_neutron_oslo_messaging_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_neutron_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_neutron_rabbitmq_erlang_cookie
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_nova_oslo_db_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_nova_oslo_messaging_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_nova_oslo_messaging_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_nova_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_nova_rabbitmq_erlang_cookie
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_oslo_db_admin_password
+      encrypted: true
+    - description: 'short description of the passphrase'
+      document_name: osh_placement_password
+      encrypted: true
+...

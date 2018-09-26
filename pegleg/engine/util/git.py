@@ -141,6 +141,14 @@ def _get_current_ref(repo_url):
         return None
 
 
+def get_remote_url(repo_url):
+    try:
+        repo = Repo(repo_url, search_parent_directories=True)
+        return repo.remotes.origin.url
+    except Exception as e:
+        return None
+
+
 def _try_git_clone(repo_url,
                    ref=None,
                    proxy_server=None,

@@ -298,7 +298,8 @@ class PKIUtility(object):
             'layeringDefinition': {
                 'abstract': False,
                 'layer': 'site',
-            }
+            },
+            'storagePolicy': 'cleartext'
         }
         wrapped_data = PKIUtility._block_literal(
             data, block_strings=block_strings)

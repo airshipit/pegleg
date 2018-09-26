@@ -31,8 +31,9 @@ setup(
             'pegleg=pegleg.cli:main',
     ]},
     include_package_data=True,
+    package_dir={'pegleg': 'pegleg'},
     package_data={
-        'schemas': [
+        'pegleg': [
             'schemas/*.yaml',
         ],
     },

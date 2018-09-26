@@ -24,8 +24,7 @@ from pegleg.engine.catalog import pki_utility
 from pegleg.engine.common import managed_document as md
 from pegleg.engine import exceptions
 from pegleg.engine import util
-from pegleg.engine.util.pegleg_managed_document import \
-    PeglegManagedSecretsDocument
+from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 
 __all__ = ['PKIGenerator']
 
@@ -129,8 +128,8 @@ class PKIGenerator(object):
         if not docs:
             docs = generator(document_name, *args, **kwargs)
         else:
-            docs = [PeglegManagedSecretsDocument(doc).pegleg_document
-                    for doc in docs]
+            docs = PeglegSecretManagement(
+                docs=docs)
 
         # Adding these to output should be idempotent, so we use a dict.
 
@@ -214,6 +213,12 @@ class PKIGenerator(object):
             if not os.path.exists(dir_name):
                 LOG.debug('Creating secrets path: %s', dir_name)
                 os.makedirs(dir_name)
+
+            # Encrypt the document
+            document['data']['managedDocument']['metadata']['storagePolicy']\
+                = 'encrypted'
+            document = PeglegSecretManagement(docs=[
+                document]).get_encrypted_secrets()[0][0]
 
             with open(output_path, 'a') as f:
                 # Don't use safe_dump so we can block format certificate

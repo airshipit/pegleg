@@ -613,6 +613,90 @@ Example:
       /opt/security-manifests/site/site1/passwords/password1.yaml
 
 
+generate
+^^^^^^^^
+A sub-group of secrets command group, which allows you to auto-generate
+secrets documents of a site.
+
+.. note::
+
+  The types of documents that pegleg cli generates are
+  passphrases, certificate authorities, certificates and keys. Passphrases are
+  declared in a new ``pegleg/PassphraseCatalog/v1`` document, while CAs,
+  certificates, and keys are declared in the ``pegleg/PKICatalog/v1``.
+
+  The ``pegleg/PKICatalog/v1`` schema is identical with the existing
+  ``promenade/PKICatalog/v1``, promenade currently uses to generate the site
+  CAs, certificates, and keys.
+
+  The ``pegleg/PassphraseCatalog/v1`` schema is specified in
+  `Pegleg Passphrase Catalog`_
+
+::
+
+./pegleg.sh site -r <site_repo> -e <extra_repo> secrets generate <command> <options>
+
+passphrases
+"""""""""""
+Generates, wraps and encrypts passphrase documents specified in the
+``pegleg/PassphraseCatalog/v1`` document for a site. The site name, and the
+directory to store the generated documents are provided by the
+``site_name``, and the ``save_location`` command line parameters respectively.
+The generated passphrases are stored in:
+
+::
+
+<save_location>/site/<site_name>/passphrases/<passphrase_name.yaml>
+
+The schema for the generated passphrases is defined in
+`Pegleg Managed Documents`_
+
+**site_name** (Required).
+
+Name of the ``site``. The ``site_name`` must match a ``site`` name in the site
+repository folder structure. The ``generate`` command looks up the
+``site-name``, and searches recursively the ``site_name`` folder structure
+in the site repository for ``pegleg/PassphraseCatalog/v1`` documents. Then it
+parses the passphrase catalog documents it found, and generates one passphrase
+document for each passphrase ``document_name`` declared in the site passphrase
+catalog.
+
+**-a / --author** (Required)
+
+
+``Author`` is intended to document the application or the individual, who
+generates the site passphrase documents, mostly for tracking purposes. It
+is expected to be leveraged in an operator-specific manner.
+For instance the ``author`` can be the "userid" of the person running the
+command, or the "application-id" of the application executing the command.
+
+**-s / --save-location** (Required).
+
+Where to output generated passphrase documents. The passphrase documents
+are placed in the following folder structure under ``save_location``:
+
+::
+
+<save_location>/site/<site_name>/secrets/passphrases/<passphrase_name.yaml>
+
+Usage:
+
+::
+
+    ./pegleg.sh site <options> secrets generate passphrases <site_name> -a
+    <author_id> -s <save_location>
+
+Example
+""""""""
+
+::
+
+    ./pegleg.sh site -r /opt/site-manifests \
+      -e global=/opt/manifests \
+      -e secrets=/opt/security-manifests \
+      secrets generate passphrases <site_name> -a <author_id> -s /workspace
+
+
 CLI Repository Overrides
 ========================
 
@@ -719,8 +803,9 @@ Where mandatory encrypted schema type is one of:
 P002 - Deckhand rendering is expected to complete without errors.
 P003 - All repos contain expected directories.
 
-.. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/users/rendering.html
-.. _Deckhand Validations: https://airship-deckhand.readthedocs.io/en/latest/overview.html#validation
+.. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/rendering.html
+.. _Deckhand Validations: https://airship-deckhand.readthedocs.io/en/latest/validation.html
 .. _Pegleg Managed Documents: https://airship-specs.readthedocs.io/en/latest/specs/approved/pegleg-secrets.html#peglegmanageddocument
 .. _Shipyard: https://github.com/openstack/airship-shipyard
 .. _CLI documentation: https://airship-shipyard.readthedocs.io/en/latest/CLI.html#openstack-keystone-authorization-environment-variables
+.. _Pegleg Passphrase Catalog: https://airship-specs.readthedocs.io/en/latest/specs/approved/pegleg-secrets.html#document-generation

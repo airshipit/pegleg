@@ -71,3 +71,16 @@ PKI Exceptions
    :members:
    :show-inheritance:
    :undoc-members:
+
+Passphrase Exceptions
+---------------------
+
+.. autoexception:: pegleg.engine.exceptions.PassphraseSchemaNotFoundException
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+.. autoexception:: pegleg.engine.exceptions.PassphraseCatalogNotFoundException
+   :members:
+   :show-inheritance:
+   :undoc-members:

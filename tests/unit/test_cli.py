@@ -28,7 +28,6 @@ from pegleg.engine.util import git
 from tests.unit import test_utils
 from tests.unit.fixtures import temp_path
 
-
 TEST_PARAMS = {
     "site_name": "airship-seaworthy",
     "site_type": "foundry",
@@ -67,7 +66,7 @@ class BaseCLIActionTest(object):
         cls.repo_rev = TEST_PARAMS["repo_rev"]
         cls.repo_name = TEST_PARAMS["repo_name"]
         cls.treasuremap_path = git.git_handler(TEST_PARAMS["repo_url"],
-                                                  ref=TEST_PARAMS["repo_rev"])
+                                               ref=TEST_PARAMS["repo_rev"])
 
 
 class TestSiteCLIOptions(BaseCLIActionTest):
@@ -377,7 +376,8 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         with mock.patch('pegleg.cli.ShipyardHelper') as mock_obj:
             result = self.runner.invoke(cli.site,
-                ['-r', repo_path, 'upload', self.site_name])
+                                        ['-r', repo_path, 'upload',
+                                         self.site_name])
 
         assert result.exit_code == 0
         mock_obj.assert_called_once()
@@ -442,6 +442,14 @@ class TestRepoCliActions(BaseCLIActionTest):
 class TestSiteSecretsActions(BaseCLIActionTest):
     """Tests site secrets-related CLI actions."""
 
+    @classmethod
+    def setup_class(cls):
+        super(TestSiteSecretsActions, cls).setup_class()
+        cls.runner = CliRunner(env={
+            "PEGLEG_PASSPHRASE": 'ytrr89erARAiPE34692iwUMvWqqBvC',
+            "PEGLEG_SALT": "MySecretSalt"
+        })
+
     def _validate_generate_pki_action(self, result):
         assert result.exit_code == 0
 
@@ -455,7 +463,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         for generated_file in generated_files:
             with open(generated_file, 'r') as f:
                 result = yaml.safe_load_all(f)  # Validate valid YAML.
-                assert list(result), "%s file is empty" % filename
+                assert list(result), "%s file is empty" % generated_file
 
     @pytest.mark.skipif(
         not pki_utility.PKIUtility.cfssl_exists(),
@@ -493,9 +501,9 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         not pki_utility.PKIUtility.cfssl_exists(),
         reason='cfssl must be installed to execute these tests')
     @mock.patch.dict(os.environ, {
-            "PEGLEG_PASSPHRASE": "123456789012345678901234567890",
-            "PEGLEG_SALT": "123456"
-        })
+        "PEGLEG_PASSPHRASE": "123456789012345678901234567890",
+        "PEGLEG_SALT": "123456"
+    })
     def test_site_secrets_encrypt_local_repo_path(self):
         """Validates ``generate-pki`` action using local repo path."""
         # Scenario:
@@ -504,13 +512,15 @@ class TestSiteSecretsActions(BaseCLIActionTest):
 
         repo_path = self.treasuremap_path
         with open(os.path.join(repo_path, "site", "airship-seaworthy",
-                               "secrets", "passphrases", "ceph_fsid.yaml"), "r") \
+                               "secrets", "passphrases", "ceph_fsid.yaml"),
+                  "r") \
                 as ceph_fsid_fi:
             ceph_fsid = yaml.load(ceph_fsid_fi)
             ceph_fsid["metadata"]["storagePolicy"] = "encrypted"
 
         with open(os.path.join(repo_path, "site", "airship-seaworthy",
-                               "secrets", "passphrases", "ceph_fsid.yaml"), "w") \
+                               "secrets", "passphrases", "ceph_fsid.yaml"),
+                  "w") \
                 as ceph_fsid_fi:
             yaml.dump(ceph_fsid, ceph_fsid_fi)
 
@@ -520,7 +530,8 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         assert result.exit_code == 0
 
         with open(os.path.join(repo_path, "site", "airship-seaworthy",
-                               "secrets", "passphrases", "ceph_fsid.yaml"), "r") \
+                               "secrets", "passphrases", "ceph_fsid.yaml"),
+                  "r") \
                 as ceph_fsid_fi:
             ceph_fsid = yaml.load(ceph_fsid_fi)
             assert "encrypted" in ceph_fsid["data"]

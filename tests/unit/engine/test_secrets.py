@@ -33,8 +33,10 @@ from pegleg.engine.util.pegleg_secret_management import ENV_PASSPHRASE
 from pegleg.engine.util.pegleg_secret_management import ENV_SALT
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 from tests.unit import test_utils
-from tests.unit.fixtures import temp_path, create_tmp_deployment_files, _gen_document
-from tests.unit.test_cli import TestSiteSecretsActions, BaseCLIActionTest, TEST_PARAMS
+from tests.unit.fixtures import temp_path, create_tmp_deployment_files, \
+    _gen_document
+from tests.unit.test_cli import TestSiteSecretsActions, BaseCLIActionTest, \
+    TEST_PARAMS
 
 TEST_DATA = """
 ---
@@ -69,10 +71,9 @@ def test_encrypt_and_decrypt():
     ENV_SALT: 'MySecretSalt'
 })
 def test_short_passphrase():
-    with pytest.raises(
-            click.ClickException,
-            match=r'.*is not at least 24-character long.*'):
-        PeglegSecretManagement('file_path')
+    with pytest.raises(click.ClickException,
+                       match=r'.*is not at least 24-character long.*'):
+        PeglegSecretManagement(file_path='file_path', author='test_author')
 
 
 @mock.patch.dict(os.environ, {
@@ -129,6 +130,26 @@ def test_pegleg_secret_management_constructor_with_invalid_arguments():
         PeglegSecretManagement(file_path='file_path', docs=['doc1'])
     assert 'Either `file_path` or `docs` must be specified.' in str(
         err_info.value)
+    with pytest.raises(ValueError) as err_info:
+        PeglegSecretManagement(
+            file_path='file_path', generated=True, author='test_author')
+    assert 'If the document is generated, author and catalog must be ' \
+           'specified.' in str(err_info.value)
+    with pytest.raises(ValueError) as err_info:
+        PeglegSecretManagement(
+            docs=['doc'], generated=True)
+    assert 'If the document is generated, author and catalog must be ' \
+           'specified.' in str(err_info.value)
+    with pytest.raises(ValueError) as err_info:
+        PeglegSecretManagement(
+            docs=['doc'], generated=True, author='test_author')
+    assert 'If the document is generated, author and catalog must be ' \
+           'specified.' in str(err_info.value)
+    with pytest.raises(ValueError) as err_info:
+        PeglegSecretManagement(
+            docs=['doc'], generated=True, catalog='catalog')
+    assert 'If the document is generated, author and catalog must be ' \
+           'specified.' in str(err_info.value)
 
 
 @mock.patch.dict(os.environ, {
@@ -143,14 +164,19 @@ def test_encrypt_decrypt_using_file_path(temp_path):
     save_path = os.path.join(temp_path, 'encrypted_secrets_file.yaml')
 
     # encrypt documents and validate that they were encrypted
-    doc_mgr = PeglegSecretManagement(file_path=file_path)
-    doc_mgr.encrypt_secrets(save_path, 'test_author')
+    doc_mgr = PeglegSecretManagement(file_path=file_path, author='test_author')
+    doc_mgr.encrypt_secrets(save_path)
     doc = doc_mgr.documents[0]
     assert doc.is_encrypted()
     assert doc.data['encrypted']['by'] == 'test_author'
 
     # decrypt documents and validate that they were decrypted
-    doc_mgr = PeglegSecretManagement(save_path)
+    doc_mgr = PeglegSecretManagement(
+        file_path=file_path, author='test_author')
+    doc_mgr.encrypt_secrets(save_path)
+    # read back the encrypted file
+    doc_mgr = PeglegSecretManagement(
+        file_path=save_path, author='test_author')
     decrypted_data = doc_mgr.get_decrypted_secrets()
     assert test_data[0]['data'] == decrypted_data[0]['data']
     assert test_data[0]['schema'] == decrypted_data[0]['schema']
@@ -166,8 +192,9 @@ def test_encrypt_decrypt_using_docs(temp_path):
     save_path = os.path.join(temp_path, 'encrypted_secrets_file.yaml')
 
     # encrypt documents and validate that they were encrypted
-    doc_mgr = PeglegSecretManagement(docs=test_data)
-    doc_mgr.encrypt_secrets(save_path, 'test_author')
+    doc_mgr = PeglegSecretManagement(
+        docs=test_data, author='test_author')
+    doc_mgr.encrypt_secrets(save_path)
     doc = doc_mgr.documents[0]
     assert doc.is_encrypted()
     assert doc.data['encrypted']['by'] == 'test_author'
@@ -177,7 +204,8 @@ def test_encrypt_decrypt_using_docs(temp_path):
         encrypted_data = list(yaml.safe_load_all(stream))
 
     # decrypt documents and validate that they were decrypted
-    doc_mgr = PeglegSecretManagement(docs=encrypted_data)
+    doc_mgr = PeglegSecretManagement(
+        docs=encrypted_data, author='test_author')
     decrypted_data = doc_mgr.get_decrypted_secrets()
     assert test_data[0]['data'] == decrypted_data[0]['data']
     assert test_data[0]['schema'] == decrypted_data[0]['schema']
@@ -190,6 +218,10 @@ def test_encrypt_decrypt_using_docs(temp_path):
 @pytest.mark.skipif(
     not pki_utility.PKIUtility.cfssl_exists(),
     reason='cfssl must be installed to execute these tests')
+@mock.patch.dict(os.environ, {
+    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    ENV_SALT: 'MySecretSalt'
+})
 def test_generate_pki_using_local_repo_path(create_tmp_deployment_files):
     """Validates ``generate-pki`` action using local repo path."""
     # Scenario:
@@ -212,6 +244,10 @@ def test_generate_pki_using_local_repo_path(create_tmp_deployment_files):
 @pytest.mark.skipif(
     not pki_utility.PKIUtility.cfssl_exists(),
     reason='cfssl must be installed to execute these tests')
+@mock.patch.dict(os.environ, {
+    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    ENV_SALT: 'MySecretSalt'
+})
 def test_check_expiry(create_tmp_deployment_files):
     """ Validates check_expiry """
     repo_path = str(git.git_handler(TEST_PARAMS["repo_url"],
@@ -228,9 +264,11 @@ def test_check_expiry(create_tmp_deployment_files):
                 continue
             with open(generated_file, 'r') as f:
                 results = yaml.safe_load_all(f)  # Validate valid YAML.
+                results = PeglegSecretManagement(
+                    docs=results).get_decrypted_secrets()
                 for result in results:
-                    if result['data']['managedDocument']['schema'] == \
+                    if result['schema'] == \
                             "deckhand/Certificate/v1":
-                        cert = result['data']['managedDocument']['data']
+                        cert = result['data']
                         assert not pki_util.check_expiry(cert), \
                             "%s is expired!" % generated_file.name

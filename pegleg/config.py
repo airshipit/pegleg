@@ -26,7 +26,7 @@ except NameError:
         'clone_path': None,
         'site_path': 'site',
         'site_rev': None,
-        'type_path': 'type',
+        'type_path': 'type'
     }
 
 
