@@ -82,6 +82,27 @@ class TestSiteCliActions(object):
         # are written out to sensibly named files like airship-treasuremap.yaml
         assert collected_files[0] == ("%s.yaml" % self.repo_name)
 
+    def test_collect_using_remote_repo_url_ending_with_dot_git(self):
+        """Validates collect action using a remote URL ending in .git."""
+        # Scenario:
+        #
+        # 1) Create temporary save location
+        # 2) Collect into save location (should clone repo automatically)
+        # 3) Check that expected file name is there
+
+        save_location = tempfile.mkdtemp()
+        repo_url = 'https://github.com/openstack/%s@%s.git' % (self.repo_name,
+                                                               self.repo_rev)
+        result = self.runner.invoke(
+            cli.site,
+            ['-r', repo_url, 'collect', self.site_name, '-s', save_location])
+
+        collected_files = os.listdir(save_location)
+
+        assert result.exit_code == 0
+        assert len(collected_files) == 1
+        assert collected_files[0] == ("%s.yaml" % self.repo_name)
+
     def test_collect_using_local_path(self):
         """Validates collect action using a path to a local repo."""
         # Scenario:
@@ -101,6 +122,4 @@ class TestSiteCliActions(object):
 
         assert result.exit_code == 0
         assert len(collected_files) == 1
-        # Validates that site manifests collected from cloned repositories
-        # are written out to sensibly named files like airship-treasuremap.yaml
         assert collected_files[0] == ("%s.yaml" % self.repo_name)
