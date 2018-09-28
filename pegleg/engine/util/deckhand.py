@@ -41,10 +41,10 @@ def load_schemas_from_docs(documents):
     return schema_set, errors
 
 
-def deckhand_render(documents=[],
+def deckhand_render(documents=None,
                     fail_on_missing_sub_src=False,
                     validate=False):
-
+    documents = documents or []
     errors = []
     rendered_documents = []
 

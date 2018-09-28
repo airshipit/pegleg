@@ -25,7 +25,8 @@ except NameError:
         'extra_repos': [],
         'clone_path': None,
         'site_path': 'site',
-        'type_path': 'type'
+        'site_rev': None,
+        'type_path': 'type',
     }
 
 
@@ -47,6 +48,16 @@ def get_clone_path():
 def set_clone_path(p):
     """Set specified clone path (corresponds to ``-p`` CLI flag)."""
     GLOBAL_CONTEXT['clone_path'] = p
+
+
+def get_site_rev():
+    """Get site revision derived from the site repo URL/path, if provided."""
+    return GLOBAL_CONTEXT['site_rev']
+
+
+def set_site_rev(r):
+    """Set site revision derived from the site repo URL/path."""
+    GLOBAL_CONTEXT['site_rev'] = r
 
 
 def get_extra_repo_overrides():

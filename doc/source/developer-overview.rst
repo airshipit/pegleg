@@ -100,8 +100,8 @@ directory):
 
 .. code-block:: console
 
-  # Quick way of building a venv and installing all required dependencies into
-  # it.
+  # Quick way of building a virtualenv and installing all required
+  # dependencies into it.
   tox -e py36 --notest
   source .tox/py36/bin/activate
   pip install -e .
@@ -128,11 +128,11 @@ Unit Tests
 
 To run all unit tests, execute::
 
-  $ tox -epy36
+  $ tox -e py36
 
 To run unit tests using a regex, execute::
 
-  $ tox -epy36 -- <regex>
+  $ tox -e py36 -- <regex>
 
 .. _Airship: https://airshipit.readthedocs.io
 .. _Deckhand: https://airship-deckhand.readthedocs.io/

@@ -65,3 +65,13 @@ class GitConfigException(PeglegBaseException):
 class GitInvalidRepoException(PeglegBaseException):
     """Exception raised when an invalid repository is detected."""
     message = 'The repository path or URL is invalid: %(repo_path)s'
+
+
+#
+# PKI EXCEPTIONS
+#
+
+
+class IncompletePKIPairError(PeglegBaseException):
+    """Exception for incomplete private/public keypair."""
+    message = ("Incomplete keypair set %(kinds)s for name: %(name)s")

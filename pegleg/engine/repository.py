@@ -42,18 +42,19 @@ def _clean_temp_folders():
         shutil.rmtree(r, ignore_errors=True)
 
 
-def process_repositories(site_name):
+def process_repositories(site_name, overwrite_existing=False):
     """Process and setup all repositories including ensuring we are at the
     right revision based on the site's own site-definition.yaml file.
 
     :param site_name: Site name for which to clone relevant repos.
+    :param overwrite_existing: Whether to overwrite an existing directory
 
     """
 
     # Only tracks extra repositories - not the site (primary) repository.
     extra_repos = []
 
-    site_repo = process_site_repository()
+    site_repo = process_site_repository(overwrite_existing=overwrite_existing)
 
     # Retrieve extra repo data from site-definition.yaml files.
     site_data = util.definition.load_as_params(
@@ -94,7 +95,9 @@ def process_repositories(site_name):
                  "repo_username=%s, revision=%s", repo_alias, repo_url_or_path,
                  repo_key, repo_user, repo_revision)
 
-        temp_extra_repo = _process_repository(repo_url_or_path, repo_revision)
+        temp_extra_repo = _process_repository(
+            repo_url_or_path, repo_revision,
+            overwrite_existing=overwrite_existing)
         extra_repos.append(temp_extra_repo)
 
     # Overwrite the site repo and extra repos in the config because further
@@ -105,12 +108,13 @@ def process_repositories(site_name):
     config.set_extra_repo_list(extra_repos)
 
 
-def process_site_repository(update_config=False):
+def process_site_repository(update_config=False, overwrite_existing=False):
     """Process and setup site repository including ensuring we are at the right
     revision based on the site's own site-definition.yaml file.
 
     :param bool update_config: Whether to update Pegleg config with computed
         site repo path.
+    :param overwrite_existing: Whether to overwrite an existing directory
 
     """
 
@@ -122,8 +126,10 @@ def process_site_repository(update_config=False):
 
     repo_url_or_path, repo_revision = _extract_repo_url_and_revision(
         site_repo_or_path)
+    config.set_site_rev(repo_revision)
     repo_url_or_path = _format_url_with_repo_username(repo_url_or_path)
-    new_repo_path = _process_repository(repo_url_or_path, repo_revision)
+    new_repo_path = _process_repository(repo_url_or_path, repo_revision,
+                                        overwrite_existing=overwrite_existing)
 
     if update_config:
         # Overwrite the site repo in the config because further processing will
@@ -134,17 +140,19 @@ def process_site_repository(update_config=False):
     return new_repo_path
 
 
-def _process_repository(repo_url_or_path, repo_revision):
+def _process_repository(repo_url_or_path, repo_revision,
+                        overwrite_existing=False):
     """Process a repository located at ``repo_url_or_path``.
 
     :param str repo_url_or_path: Path to local repo or URL of remote URL.
     :param str repo_revision: branch, commit or ref in the repo to checkout.
+    :param overwrite_existing: Whether to overwrite an existing directory
 
     """
 
     global __REPO_FOLDERS
 
-    if os.path.exists(repo_url_or_path):
+    if os.path.exists(repo_url_or_path) and not overwrite_existing:
         repo_name = util.git.repo_name(repo_url_or_path)
         parent_temp_path = tempfile.mkdtemp()
         __REPO_FOLDERS.setdefault(repo_name, parent_temp_path)

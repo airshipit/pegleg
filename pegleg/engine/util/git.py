@@ -26,7 +26,8 @@ from pegleg.engine import exceptions
 
 LOG = logging.getLogger(__name__)
 
-__all__ = ('git_handler', )
+__all__ = ('git_handler', 'is_repository', 'is_equal', 'repo_url', 'repo_name',
+           'normalize_repo_path')
 
 
 def git_handler(repo_url,
@@ -377,21 +378,26 @@ def is_equal(first_repo, other_repo):
         return False
 
 
-def repo_name(repo_path):
-    """Get the repository name for local repo at ``repo_path``.
+def repo_url(repo_url_or_path):
+    """Get the repository URL for the local or remote repo at
+    ``repo_url_or_path``.
 
-    :param repo_path: Path to local Git repo.
+    :param repo_url_or_path: URL of remote Git repo or path to local Git repo.
     :returns: Corresponding repo name.
     :rtype: str
     :raises GitConfigException: If the path is not a valid Git repo.
 
     """
 
-    if not is_repository(normalize_repo_path(repo_path)[0]):
-        raise exceptions.GitConfigException(repo_path=repo_path)
+    # If ``repo_url_or_path`` is already a URL, no point in checking.
+    if not os.path.exists(repo_url_or_path):
+        return repo_url_or_path
+
+    if not is_repository(normalize_repo_path(repo_url_or_path)[0]):
+        raise exceptions.GitConfigException(repo_url=repo_url_or_path)
 
     # TODO(felipemonteiro): Support this for remote URLs too?
-    repo = Repo(repo_path, search_parent_directories=True)
+    repo = Repo(repo_url_or_path, search_parent_directories=True)
     config_reader = repo.config_reader()
     section = 'remote "origin"'
     option = 'url'
@@ -408,9 +414,24 @@ def repo_name(repo_path):
                 else:
                     return repo_url.split('/')[-1]
         except Exception:
-            raise exceptions.GitConfigException(repo_path=repo_path)
+            raise exceptions.GitConfigException(repo_url=repo_url_or_path)
 
-    raise exceptions.GitConfigException(repo_path=repo_path)
+    raise exceptions.GitConfigException(repo_url=repo_url_or_path)
+
+
+def repo_name(repo_url_or_path):
+    """Get the repository name for the local or remote repo at
+    ``repo_url_or_path``.
+
+    :param repo_url_or_path: URL of remote Git repo or path to local Git repo.
+    :returns: Corresponding repo name.
+    :rtype: str
+    :raises GitConfigException: If the path is not a valid Git repo.
+
+    """
+
+    _repo_url = repo_url(repo_url_or_path)
+    return _repo_url.split('/')[-1].split('.git')[0]
 
 
 def normalize_repo_path(repo_url_or_path):
@@ -435,7 +456,7 @@ def normalize_repo_path(repo_url_or_path):
     """
 
     repo_url_or_path = repo_url_or_path.rstrip('/')
-    orig_repo_path = repo_url_or_path
+    orig_repo_url_or_path = repo_url_or_path
     sub_path = ""
     is_local_repo = os.path.exists(repo_url_or_path)
 
@@ -455,8 +476,10 @@ def normalize_repo_path(repo_url_or_path):
             repo_url_or_path = os.path.abspath(repo_url_or_path)
 
     if not repo_url_or_path or not is_repository(repo_url_or_path):
-        msg = "The repo_path=%s is not a valid Git repo" % (orig_repo_path)
+        msg = "The repo_path=%s is not a valid Git repo" % (
+            orig_repo_url_or_path)
         LOG.error(msg)
-        raise exceptions.GitInvalidRepoException(repo_path=repo_url_or_path)
+        raise exceptions.GitInvalidRepoException(
+            repo_path=orig_repo_url_or_path)
 
     return repo_url_or_path, sub_path

@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# flake8: noqa
-from pegleg.engine.util import catalog
-from pegleg.engine.util import definition
-from pegleg.engine.util import deckhand
-from pegleg.engine.util import files
-from pegleg.engine.util import git
+- hosts: all
+  gather_facts: False
+  tasks:
+    - name: Install cfssl for Ubuntu
+      shell: |-
+        ./tools/install-cfssl.sh
+      become: yes
+      args:
+          chdir: "{{ zuul.project.src_dir }}"

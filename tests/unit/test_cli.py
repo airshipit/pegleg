@@ -19,12 +19,23 @@ from click.testing import CliRunner
 from mock import ANY
 import mock
 import pytest
+import yaml
 
 from pegleg import cli
+from pegleg.engine.catalog import pki_utility
 from pegleg.engine import errorcodes
 from pegleg.engine.util import git
 from tests.unit import test_utils
 from tests.unit.fixtures import temp_path
+
+
+TEST_PARAMS = {
+    "site_name": "airship-seaworthy",
+    "site_type": "foundry",
+    "repo_rev": '6b183e148b9bb7ba6f75c98dd13451088255c60b',
+    "repo_name": "airship-treasuremap",
+    "repo_url": "https://github.com/openstack/airship-treasuremap.git",
+}
 
 
 @pytest.mark.skipif(
@@ -50,13 +61,13 @@ class BaseCLIActionTest(object):
         cls.runner = CliRunner()
 
         # Pin so we know that airship-seaworthy is a valid site.
-        cls.site_name = "airship-seaworthy"
-        cls.site_type = "foundry"
+        cls.site_name = TEST_PARAMS["site_name"]
+        cls.site_type = TEST_PARAMS["site_type"]
 
-        cls.repo_rev = '6b183e148b9bb7ba6f75c98dd13451088255c60b'
-        cls.repo_name = "airship-treasuremap"
-        repo_url = "https://github.com/openstack/%s.git" % cls.repo_name
-        cls.treasuremap_path = git.git_handler(repo_url, ref=cls.repo_rev)
+        cls.repo_rev = TEST_PARAMS["repo_rev"]
+        cls.repo_name = TEST_PARAMS["repo_name"]
+        cls.treasuremap_path = git.git_handler(TEST_PARAMS["repo_url"],
+                                                  ref=TEST_PARAMS["repo_rev"])
 
 
 class TestSiteCLIOptions(BaseCLIActionTest):
@@ -426,6 +437,94 @@ class TestRepoCliActions(BaseCLIActionTest):
         # A successful result (while setting lint checks to exclude) should
         # output nothing.
         assert not result.output
+
+
+class TestSiteSecretsActions(BaseCLIActionTest):
+    """Tests site secrets-related CLI actions."""
+
+    def _validate_generate_pki_action(self, result):
+        assert result.exit_code == 0
+
+        generated_files = []
+        output_lines = result.output.split("\n")
+        for line in output_lines:
+            if self.repo_name in line:
+                generated_files.append(line)
+
+        assert len(generated_files), 'No secrets were generated'
+        for generated_file in generated_files:
+            with open(generated_file, 'r') as f:
+                result = yaml.safe_load_all(f)  # Validate valid YAML.
+                assert list(result), "%s file is empty" % filename
+
+    @pytest.mark.skipif(
+        not pki_utility.PKIUtility.cfssl_exists(),
+        reason='cfssl must be installed to execute these tests')
+    def test_site_secrets_generate_pki_using_remote_repo_url(self):
+        """Validates ``generate-pki`` action using remote repo URL."""
+        # Scenario:
+        #
+        # 1) Generate PKI using remote repo URL
+
+        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+                                                           self.repo_rev)
+
+        secrets_opts = ['secrets', 'generate-pki', self.site_name]
+
+        result = self.runner.invoke(cli.site, ['-r', repo_url] + secrets_opts)
+        self._validate_generate_pki_action(result)
+
+    @pytest.mark.skipif(
+        not pki_utility.PKIUtility.cfssl_exists(),
+        reason='cfssl must be installed to execute these tests')
+    def test_site_secrets_generate_pki_using_local_repo_path(self):
+        """Validates ``generate-pki`` action using local repo path."""
+        # Scenario:
+        #
+        # 1) Generate PKI using local repo path
+
+        repo_path = self.treasuremap_path
+        secrets_opts = ['secrets', 'generate-pki', self.site_name]
+
+        result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
+        self._validate_generate_pki_action(result)
+
+    @pytest.mark.skipif(
+        not pki_utility.PKIUtility.cfssl_exists(),
+        reason='cfssl must be installed to execute these tests')
+    @mock.patch.dict(os.environ, {
+            "PEGLEG_PASSPHRASE": "123456789012345678901234567890",
+            "PEGLEG_SALT": "123456"
+        })
+    def test_site_secrets_encrypt_local_repo_path(self):
+        """Validates ``generate-pki`` action using local repo path."""
+        # Scenario:
+        #
+        # 1) Encrypt a file in a local repo
+
+        repo_path = self.treasuremap_path
+        with open(os.path.join(repo_path, "site", "airship-seaworthy",
+                               "secrets", "passphrases", "ceph_fsid.yaml"), "r") \
+                as ceph_fsid_fi:
+            ceph_fsid = yaml.load(ceph_fsid_fi)
+            ceph_fsid["metadata"]["storagePolicy"] = "encrypted"
+
+        with open(os.path.join(repo_path, "site", "airship-seaworthy",
+                               "secrets", "passphrases", "ceph_fsid.yaml"), "w") \
+                as ceph_fsid_fi:
+            yaml.dump(ceph_fsid, ceph_fsid_fi)
+
+        secrets_opts = ['secrets', 'encrypt', '-a', 'test', self.site_name]
+        result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
+
+        assert result.exit_code == 0
+
+        with open(os.path.join(repo_path, "site", "airship-seaworthy",
+                               "secrets", "passphrases", "ceph_fsid.yaml"), "r") \
+                as ceph_fsid_fi:
+            ceph_fsid = yaml.load(ceph_fsid_fi)
+            assert "encrypted" in ceph_fsid["data"]
+            assert "managedDocument" in ceph_fsid["data"]
 
 
 class TestTypeCliActions(BaseCLIActionTest):

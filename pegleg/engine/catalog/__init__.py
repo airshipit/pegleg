@@ -13,8 +13,5 @@
 # limitations under the License.
 
 # flake8: noqa
-from pegleg.engine.util import catalog
-from pegleg.engine.util import definition
-from pegleg.engine.util import deckhand
-from pegleg.engine.util import files
-from pegleg.engine.util import git
+from pegleg.engine.catalog import pki_utility
+from pegleg.engine.catalog import pki_generator

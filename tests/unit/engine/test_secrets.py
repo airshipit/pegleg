@@ -12,23 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
 import os
-import tempfile
+from os import listdir
 
+import click
 import mock
 import pytest
 import yaml
+import tempfile
 
-from pegleg.engine.util import encryption as crypt
-from tests.unit import test_utils
+from pegleg import config
+from pegleg.engine import secrets
+from pegleg.engine.catalog import pki_utility
+from pegleg.engine.catalog.pki_generator import PKIGenerator
+from pegleg.engine.util import encryption as crypt, catalog, git
+from pegleg.engine.util import files
 from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument
-from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 from pegleg.engine.util.pegleg_secret_management import ENV_PASSPHRASE
 from pegleg.engine.util.pegleg_secret_management import ENV_SALT
-from tests.unit.fixtures import temp_path
-from pegleg.engine.util import files
+from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
+from tests.unit import test_utils
+from tests.unit.fixtures import temp_path, create_tmp_deployment_files, _gen_document
+from tests.unit.test_cli import TestSiteSecretsActions, BaseCLIActionTest, TEST_PARAMS
 
 TEST_DATA = """
 ---
@@ -67,6 +73,44 @@ def test_short_passphrase():
             click.ClickException,
             match=r'.*is not at least 24-character long.*'):
         PeglegSecretManagement('file_path')
+
+
+@mock.patch.dict(os.environ, {
+    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    ENV_SALT: 'MySecretSalt'})
+def test_secret_encrypt_and_decrypt(create_tmp_deployment_files, tmpdir):
+    site_dir = tmpdir.join("deployment_files", "site", "cicd")
+    passphrase_doc = """---
+schema: deckhand/Passphrase/v1
+metadata:
+  schema: metadata/Document/v1
+  name: {0}
+  storagePolicy: {1}
+  layeringDefinition:
+    abstract: False
+    layer: {2}
+data: {0}-password
+...
+""".format("cicd-passphrase-encrypted", "encrypted",
+           "site")
+    with open(os.path.join(str(site_dir), 'secrets',
+                           'passphrases',
+                           'cicd-passphrase-encrypted.yaml'), "w") \
+            as outfile:
+        outfile.write(passphrase_doc)
+
+    save_location = tmpdir.mkdir("encrypted_files")
+    save_location_str = str(save_location)
+
+    secrets.encrypt(save_location_str, "pytest", "cicd")
+    encrypted_files = listdir(save_location_str)
+    assert len(encrypted_files) > 0
+
+    # for _file in encrypted_files:
+    decrypted = secrets.decrypt(str(save_location.join(
+        "site/cicd/secrets/passphrases/"
+        "cicd-passphrase-encrypted.yaml")), "cicd")
+    assert yaml.load(decrypted) == yaml.load(passphrase_doc)
 
 
 def test_pegleg_secret_management_constructor():
@@ -141,3 +185,52 @@ def test_encrypt_decrypt_using_docs(temp_path):
         'name']
     assert test_data[0]['metadata']['storagePolicy'] == decrypted_data[0][
         'metadata']['storagePolicy']
+
+
+@pytest.mark.skipif(
+    not pki_utility.PKIUtility.cfssl_exists(),
+    reason='cfssl must be installed to execute these tests')
+def test_generate_pki_using_local_repo_path(create_tmp_deployment_files):
+    """Validates ``generate-pki`` action using local repo path."""
+    # Scenario:
+    #
+    # 1) Generate PKI using local repo path
+
+    repo_path = str(git.git_handler(TEST_PARAMS["repo_url"],
+                                    ref=TEST_PARAMS["repo_rev"]))
+    with mock.patch.dict(config.GLOBAL_CONTEXT, {"site_repo": repo_path}):
+        pki_generator = PKIGenerator(sitename=TEST_PARAMS["site_name"])
+        generated_files = pki_generator.generate()
+
+        assert len(generated_files), 'No secrets were generated'
+        for generated_file in generated_files:
+            with open(generated_file, 'r') as f:
+                result = yaml.safe_load_all(f)  # Validate valid YAML.
+                assert list(result), "%s file is empty" % generated_file.name
+
+
+@pytest.mark.skipif(
+    not pki_utility.PKIUtility.cfssl_exists(),
+    reason='cfssl must be installed to execute these tests')
+def test_check_expiry(create_tmp_deployment_files):
+    """ Validates check_expiry """
+    repo_path = str(git.git_handler(TEST_PARAMS["repo_url"],
+                                    ref=TEST_PARAMS["repo_rev"]))
+    with mock.patch.dict(config.GLOBAL_CONTEXT, {"site_repo": repo_path}):
+        pki_generator = PKIGenerator(sitename=TEST_PARAMS["site_name"])
+        generated_files = pki_generator.generate()
+
+        pki_util = pki_utility.PKIUtility()
+
+        assert len(generated_files), 'No secrets were generated'
+        for generated_file in generated_files:
+            if "certificate" not in generated_file:
+                continue
+            with open(generated_file, 'r') as f:
+                results = yaml.safe_load_all(f)  # Validate valid YAML.
+                for result in results:
+                    if result['data']['managedDocument']['schema'] == \
+                            "deckhand/Certificate/v1":
+                        cert = result['data']['managedDocument']['data']
+                        assert not pki_util.check_expiry(cert), \
+                            "%s is expired!" % generated_file.name

@@ -81,10 +81,10 @@ CLI Options
 
 Enable debug logging.
 
-.. _site:
+.. _repo-group:
 
-Repo
-====
+Repo Group
+==========
 
 Allows you to perform repository-level operations.
 
@@ -127,8 +127,10 @@ a specific site, see :ref:`site-level linting <cli-site-lint>`.
 
 See :ref:`linting` for more information.
 
-Site
-====
+.. _site-group:
+
+Site Group
+==========
 
 Allows you to perform site-level operations.
 
@@ -303,7 +305,7 @@ Show details for one site.
 
 Name of site.
 
-**-o /--output** (Optional).
+**-o/--output** (Optional).
 
 Where to output.
 
@@ -331,7 +333,7 @@ Render documents via `Deckhand`_ for one site.
 
 Name of site.
 
-**-o /--output** (Optional).
+**-o/--output** (Optional).
 
 Where to output.
 
@@ -418,6 +420,39 @@ Usage:
 
     ./pegleg.sh site <options> upload <site_name> --context-marker=<uuid>
 
+Site Secrets Group
+==================
+
+Subgroup of :ref:`site-group`.
+
+Generate PKI
+------------
+
+Generate certificates and keys according to all PKICatalog documents in the
+site using the PKI module. Regenerating certificates can be
+accomplished by re-running this command.
+
+Pegleg places generated document files in ``<site>/secrets/passphrases``,
+``<site>/secrets/certificates``, or ``<site>/secrets/keypairs`` as
+appropriate:
+
+* The generated filenames for passphrases will follow the pattern
+  :file:`<passphrase-doc-name>.yaml`.
+* The generated filenames for certificate authorities will follow the pattern
+  :file:`<ca-name>_ca.yaml`.
+* The generated filenames for certificates will follow the pattern
+  :file:`<ca-name>_<certificate-doc-name>_certificate.yaml`.
+* The generated filenames for certificate keys will follow the pattern
+  :file:`<ca-name>_<certificate-doc-name>_key.yaml`.
+* The generated filenames for keypairs will follow the pattern
+  :file:`<keypair-doc-name>.yaml`.
+
+Dashes in the document names will be converted to underscores for consistency.
+
+**site_name** (Required).
+
+Name of site.
+
 Examples
 ^^^^^^^^
 
@@ -426,6 +461,14 @@ Examples
     ./pegleg.sh site -r <site_repo> -e <extra_repo> \
       upload <site_name> <options>
 
+
+::
+
+  ./pegleg.sh site -r <site_repo> -e <extra_repo> \
+    secrets generate-pki \
+    <site_name> \
+    -o <output> \
+    -f <filename>
 
 .. _command-line-repository-overrides:
 
@@ -571,13 +614,13 @@ Example:
 
 
 CLI Repository Overrides
-------------------------
+========================
 
 Repository overrides should only be used for entries included underneath
 the ``repositories`` field for a given :file:`site-definition.yaml`.
 
-Overrides are specified via the ``-e`` flag for all :ref:`site` commands. They
-have the following format:
+Overrides are specified via the ``-e`` flag for all :ref:`site-group` commands.
+They have the following format:
 
 ::
 
@@ -611,7 +654,7 @@ Where:
 .. _self-contained-repo:
 
 Self-Contained Repository
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 For self-contained repositories, specification of extra repositories is
 unnecessary. The following command can be used to deploy the manifests in

@@ -3,5 +3,8 @@ click==6.7
 jsonschema==2.6.0
 pyyaml==3.12
 cryptography==2.3.1
+python-dateutil==2.7.3
+
+# External dependencies
 git+https://github.com/openstack/airship-deckhand.git@7d697012fcbd868b14670aa9cf895acfad5a7f8d
 git+https://github.com/openstack/airship-shipyard.git@44f7022df6438de541501c2fdd5c46df198b82bf#egg=shipyard_client&subdirectory=src/bin/shipyard_client

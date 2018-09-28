@@ -20,6 +20,7 @@ import click
 
 from pegleg import config
 from pegleg import engine
+from pegleg.engine import catalog
 from pegleg.engine.util.shipyard_helper import ShipyardHelper
 
 LOG = logging.getLogger(__name__)
@@ -130,7 +131,6 @@ def main(*, verbose):
 
     * site: site-level actions
     * repo: repository-level actions
-    * stub (DEPRECATED)
 
     """
 
@@ -208,7 +208,7 @@ def site(*, site_repository, clone_path, extra_repositories, repo_key,
     * list: list available sites in a manifests repo
     * lint: lint a site along with all its dependencies
     * render: render a site using Deckhand
-    * show: show a sites' files
+    * show: show a site's files
 
     """
 
@@ -375,6 +375,39 @@ def upload(ctx, *, os_project_domain_name,
     click.echo(ShipyardHelper(ctx).upload_documents())
 
 
+@site.group(name='secrets', help='Commands to manage site secrets documents')
+def secrets():
+    pass
+
+
+@secrets.command(
+    'generate-pki',
+    help="""
+Generate certificates and keys according to all PKICatalog documents in the
+site. Regenerating certificates can be accomplished by re-running this command.
+""")
+@click.option(
+    '-a',
+    '--author',
+    'author',
+    help="""Identifying name of the author generating new certificates. Used
+for tracking provenance information in the PeglegManagedDocuments. An attempt
+is made to automatically determine this value, but should be provided.""")
+@click.argument('site_name')
+def generate_pki(site_name, author):
+    """Generate certificates, certificate authorities and keypairs for a given
+    site.
+
+    """
+
+    engine.repository.process_repositories(site_name,
+                                           overwrite_existing=True)
+    pkigenerator = catalog.pki_generator.PKIGenerator(site_name, author=author)
+    output_paths = pkigenerator.generate()
+
+    click.echo("Generated PKI files written to:\n%s" % '\n'.join(output_paths))
+
+
 @main.group(help='Commands related to types')
 @MAIN_REPOSITORY_OPTION
 @REPOSITORY_CLONE_PATH_OPTION
@@ -409,11 +442,6 @@ def list_types(*, output_stream):
     engine.type.list_types(output_stream)
 
 
-@site.group(name='secrets', help='Commands to manage site secrets documents')
-def secrets():
-    pass
-
-
 @secrets.command(
     'encrypt',
     help='Command to encrypt and wrap site secrets '
@@ -437,7 +465,9 @@ def secrets():
     'documents')
 @click.argument('site_name')
 def encrypt(*, save_location, author, site_name):
-    engine.repository.process_repositories(site_name)
+    engine.repository.process_repositories(site_name, overwrite_existing=True)
+    if save_location is None:
+        save_location = config.get_site_repo()
     engine.secrets.encrypt(save_location, author, site_name)
 
 
@@ -453,4 +483,9 @@ def encrypt(*, save_location, author, site_name):
 @click.argument('site_name')
 def decrypt(*, file_name, site_name):
     engine.repository.process_repositories(site_name)
-    engine.secrets.decrypt(file_name, site_name)
+    try:
+        click.echo(engine.secrets.decrypt(file_name, site_name))
+    except FileNotFoundError:
+        raise click.exceptions.FileError("Couldn't find file %s, "
+                                         "check your arguments and try "
+                                         "again." % file_name)

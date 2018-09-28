@@ -30,7 +30,7 @@ schema: deckhand/Passphrase/v1
 metadata:
   schema: metadata/Document/v1
   name: %(name)s
-  storagePolicy: cleartext
+  storagePolicy: %(storagePolicy)s
   layeringDefinition:
     abstract: False
     layer: %(layer)s
@@ -40,6 +40,8 @@ data: %(name)s-password
 
 
 def _gen_document(**kwargs):
+    if "storagePolicy" not in kwargs:
+        kwargs["storagePolicy"] = "cleartext"
     test_document = TEST_DOCUMENT % kwargs
     return yaml.load(test_document)
 
@@ -154,7 +156,7 @@ schema: pegleg/SiteDefinition/v1
         cicd_path = os.path.join(str(p), files._site_path(site))
         files._create_tree(cicd_path, tree=test_structure)
 
-    yield
+    yield tmpdir
 
 
 @pytest.fixture()

@@ -63,3 +63,11 @@ Authentication Exceptions
 .. autoexception:: pegleg.engine.util.shipyard_helper.AuthValuesError
    :members:
    :undoc-members:
+
+PKI Exceptions
+--------------
+
+.. autoexception:: pegleg.engine.exceptions.IncompletePKIPairError
+   :members:
+   :show-inheritance:
+   :undoc-members:
