@@ -80,7 +80,7 @@ class TestSiteCliActions(object):
         assert len(collected_files) == 1
         # Validates that site manifests collected from cloned repositories
         # are written out to sensibly named files like airship-treasuremap.yaml
-        assert collected_files[0].endswith("%s.yaml" % self.repo_name)
+        assert collected_files[0] == ("%s.yaml" % self.repo_name)
 
     def test_collect_using_local_path(self):
         """Validates collect action using a path to a local repo."""
@@ -103,4 +103,4 @@ class TestSiteCliActions(object):
         assert len(collected_files) == 1
         # Validates that site manifests collected from cloned repositories
         # are written out to sensibly named files like airship-treasuremap.yaml
-        assert collected_files[0].endswith("%s.yaml" % self.repo_name)
+        assert collected_files[0] == ("%s.yaml" % self.repo_name)

@@ -157,7 +157,11 @@ def _try_git_clone(repo_url, ref=None, proxy_server=None, auth_key=None):
 
     # the name here is important as it bubbles back up to the output filename
     # and ensure we handle url/foo.git/ cases. prefix is 'tmp' by default.
-    temp_dir = tempfile.mkdtemp(suffix=repo_url.rstrip('/').split('/')[-1])
+    root_temp_dir = tempfile.mkdtemp()
+    repo_name = repo_url.rstrip('/').split('/')[-1]
+    temp_dir = os.path.join(root_temp_dir, repo_name)
+    os.makedirs(temp_dir)
+
     env_vars = _get_clone_env_vars(repo_url, ref, auth_key)
     ssh_cmd = env_vars.get('GIT_SSH_COMMAND')
 
