@@ -8,3 +8,4 @@ pegleg.egg-info
 build
 dist
 .cache
+*.pyc

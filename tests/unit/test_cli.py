@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-import requests
 import shutil
 import tempfile
 
@@ -24,22 +23,12 @@ import pytest
 from pegleg import cli
 from pegleg.engine import errorcodes
 from pegleg.engine.util import git
-
-
-def is_connected():
-    """Verifies whether network connectivity is up.
-
-    :returns: True if connected else False.
-    """
-    try:
-        r = requests.get("http://www.github.com/", proxies={})
-        return r.ok
-    except requests.exceptions.RequestException:
-        return False
+from tests.unit import test_utils
 
 
 @pytest.mark.skipif(
-    not is_connected(), reason='git clone requires network connectivity.')
+    not test_utils.is_connected(),
+    reason='git clone requires network connectivity.')
 class BaseCLIActionTest(object):
     """Tests end-to-end flows for all Pegleg CLI actions, with minimal mocking.
 
@@ -95,7 +84,7 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         collected_files = os.listdir(save_location)
 
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         assert len(collected_files) == 1
         # Validates that site manifests collected from cloned repositories
         # are written out to sensibly named files like airship-treasuremap.yaml
@@ -139,7 +128,7 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         collected_files = os.listdir(save_location)
 
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         assert len(collected_files) == 1
         assert collected_files[0] == ("%s.yaml" % self.repo_name)
 
@@ -166,7 +155,7 @@ class TestSiteCliActions(BaseCLIActionTest):
             result = self.runner.invoke(cli.site,
                                         lint_command + exclude_lint_command)
 
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         # A successful result (while setting lint checks to exclude) should
         # output nothing.
         assert not result.output
@@ -190,7 +179,7 @@ class TestSiteCliActions(BaseCLIActionTest):
             result = self.runner.invoke(cli.site,
                                         lint_command + exclude_lint_command)
 
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         # A successful result (while setting lint checks to exclude) should
         # output nothing.
         assert not result.output
@@ -214,7 +203,7 @@ class TestSiteCliActions(BaseCLIActionTest):
             result = self.runner.invoke(cli.site,
                                         lint_command + warn_lint_command)
 
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         # A successful result (while setting lint checks to warns) should
         # output warnings.
         assert result.output
@@ -235,8 +224,7 @@ class TestSiteCliActions(BaseCLIActionTest):
             result = self.runner.invoke(cli.site, ['-r', repo_url, 'list'])
 
         m_writer = mock_writer.return_value
-        m_writer.add_row.assert_called_with([self.site_name,
-                                                  'foundry'])
+        m_writer.add_row.assert_called_with([self.site_name, 'foundry'])
 
     def test_list_sites_using_local_path(self):
         """Validates list action using local repo path."""
@@ -251,8 +239,7 @@ class TestSiteCliActions(BaseCLIActionTest):
             result = self.runner.invoke(cli.site, ['-r', repo_path, 'list'])
 
         m_writer = mock_writer.return_value
-        m_writer.add_row.assert_called_with([self.site_name,
-                                                  'foundry'])
+        m_writer.add_row.assert_called_with([self.site_name, 'foundry'])
 
     ### Show tests ###
 
@@ -270,10 +257,8 @@ class TestSiteCliActions(BaseCLIActionTest):
                 cli.site, ['-r', repo_url, 'show', self.site_name])
 
         m_writer = mock_writer.return_value
-        m_writer.add_row.assert_called_with(['',
-                                             self.site_name,
-                                             'foundry',
-                                             mock.ANY])
+        m_writer.add_row.assert_called_with(
+            ['', self.site_name, 'foundry', mock.ANY])
 
     def test_show_site_using_local_path(self):
         """Validates show action using local repo path."""
@@ -287,10 +272,8 @@ class TestSiteCliActions(BaseCLIActionTest):
                 cli.site, ['-r', repo_path, 'show', self.site_name])
 
         m_writer = mock_writer.return_value
-        m_writer.add_row.assert_called_with(['',
-                                             self.site_name,
-                                             'foundry',
-                                             mock.ANY])
+        m_writer.add_row.assert_called_with(
+            ['', self.site_name, 'foundry', mock.ANY])
 
     ### Render tests ###
 
@@ -361,7 +344,7 @@ class TestRepoCliActions(BaseCLIActionTest):
             result = self.runner.invoke(cli.repo,
                                         lint_command + exclude_lint_command)
 
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         # A successful result (while setting lint checks to exclude) should
         # output nothing.
         assert not result.output
@@ -385,7 +368,7 @@ class TestRepoCliActions(BaseCLIActionTest):
             result = self.runner.invoke(cli.repo,
                                         lint_command + exclude_lint_command)
 
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         # A successful result (while setting lint checks to exclude) should
         # output nothing.
         assert not result.output
@@ -393,6 +376,22 @@ class TestRepoCliActions(BaseCLIActionTest):
 
 class TestTypeCliActions(BaseCLIActionTest):
     """Tests type-level CLI actions."""
+
+    def setup(self):
+        self.expected_types = ['foundry']
+
+    def _assert_table_has_expected_sites(self, mock_output):
+        output_table = mock_output.write.mock_calls[0][1][0]
+        for expected_type in self.expected_types:
+            assert expected_type in output_table
+
+    def _validate_type_list_action(self, repo_path_or_url):
+        mock_output = mock.Mock()
+        result = self.runner.invoke(
+            cli.type, ['-r', repo_path_or_url, 'list', '-o', mock_output])
+
+        assert result.exit_code == 0, result.output
+        self._assert_table_has_expected_sites(mock_output)
 
     def test_list_types_using_remote_repo_url(self):
         """Validates list types action using remote repo URL."""
@@ -402,13 +401,7 @@ class TestTypeCliActions(BaseCLIActionTest):
 
         repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
-
-        # Mock out PrettyTable to determine output.
-        with mock.patch('pegleg.engine.type.PrettyTable') as mock_writer:
-            result = self.runner.invoke(cli.type, ['-r', repo_url, 'list'])
-
-        m_writer = mock_writer.return_value
-        m_writer.add_row.assert_called_with(['foundry'])
+        self._validate_type_list_action(repo_url)
 
     def test_list_types_using_local_repo_path(self):
         """Validates list types action using local repo path."""
@@ -417,10 +410,55 @@ class TestTypeCliActions(BaseCLIActionTest):
         # 1) List types for local repo path
 
         repo_path = self.treasuremap_path
+        self._validate_type_list_action(repo_path)
 
-        # Mock out PrettyTable to determine output.
-        with mock.patch('pegleg.engine.type.PrettyTable') as mock_writer:
-            result = self.runner.invoke(cli.type, ['-r', repo_path, 'list'])
 
-        m_writer = mock_writer.return_value
-        m_writer.add_row.assert_called_with(['foundry'])
+class TestSiteCliActionsWithSubdirectory(BaseCLIActionTest):
+    """Tests site CLI actions with subdirectories in repository paths."""
+
+    def setup(self):
+        self.expected_sites = ['demo', 'gate-multinode', 'dev', 'dev-proxy']
+
+    def _assert_table_has_expected_sites(self, mock_output):
+        output_table = mock_output.write.mock_calls[0][1][0]
+        for expected_site in self.expected_sites:
+            assert expected_site in output_table
+
+    def _validate_site_action(self, repo_path_or_url):
+        mock_output = mock.Mock()
+        result = self.runner.invoke(
+            cli.site, ['-r', repo_path_or_url, 'list', '-o', mock_output])
+
+        assert result.exit_code == 0, result.output
+        self._assert_table_has_expected_sites(mock_output)
+
+    def test_site_action_with_subpath_in_remote_url(self):
+        """Validates list action with subpath in remote URL."""
+        # Scenario:
+        #
+        # 1) List sites for https://github.com/airship-in-a-bottle/
+        #    deployment_files (subpath in remote URL)
+
+        # Perform site action using remote URL.
+        repo_name = 'airship-in-a-bottle'
+        repo_rev = '7a0717adc68261c7adb3a3db74a9326d6103519f'
+        repo_url = 'https://github.com/openstack/%s/deployment_files@%s' % (
+            repo_name, repo_rev)
+
+        self._validate_site_action(repo_url)
+
+    def test_site_action_with_subpath_in_local_repo_path(self):
+        """Validates list action with subpath in local repo path."""
+        # Scenario:
+        #
+        # 1) List sites for local repo at /tmp/.../airship-in-a-bottle/
+        #    deployment_files
+
+        # Perform site action using local repo path.
+        repo_name = 'airship-in-a-bottle'
+        repo_rev = '7a0717adc68261c7adb3a3db74a9326d6103519f'
+        repo_url = 'https://github.com/openstack/%s' % repo_name
+        _repo_path = git.git_handler(repo_url, ref=repo_rev)
+        repo_path = os.path.join(_repo_path, 'deployment_files')
+
+        self._validate_site_action(repo_path)

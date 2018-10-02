@@ -171,10 +171,9 @@ def _filter_messages_by_warn_and_error_lint(*,
             errors_table.add_row([code, textwrap.fill(message, line_length)])
 
     if errors:
-        raise click.ClickException('Linting failed:\n' +
-                                   errors_table.get_string() +
-                                   '\nLinting warnings:\n' +
-                                   warnings_table.get_string())
+        raise click.ClickException(
+            'Linting failed:\n' + errors_table.get_string() +
+            '\nLinting warnings:\n' + warnings_table.get_string())
     return warns
 
 

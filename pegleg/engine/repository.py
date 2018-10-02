@@ -81,29 +81,27 @@ def process_repositories(site_name):
         # Extract URL and revision, prioritizing overrides over the defaults in
         # the site-definition.yaml.
         if repo_alias in repo_overrides:
-            repo_path_or_url = repo_overrides[repo_alias]['url']
+            repo_url_or_path = repo_overrides[repo_alias]['url']
             repo_revision = repo_overrides[repo_alias]['revision']
         else:
-            repo_path_or_url = site_def_repos[repo_alias]['url']
+            repo_url_or_path = site_def_repos[repo_alias]['url']
             repo_revision = site_def_repos[repo_alias]['revision']
 
         # If a repo user is provided, do the necessary replacements.
         if repo_user:
-            if "REPO_USERNAME" not in repo_path_or_url:
+            if "REPO_USERNAME" not in repo_url_or_path:
                 LOG.warning(
                     "A repository username was specified but no REPO_USERNAME "
-                    "string found in repository url %s", repo_path_or_url)
+                    "string found in repository url %s", repo_url_or_path)
             else:
-                repo_path_or_url = repo_path_or_url.replace(
+                repo_url_or_path = repo_url_or_path.replace(
                     'REPO_USERNAME', repo_user)
 
         LOG.info("Processing repository %s with url=%s, repo_key=%s, "
-                 "repo_username=%s, revision=%s", repo_alias, repo_path_or_url,
+                 "repo_username=%s, revision=%s", repo_alias, repo_url_or_path,
                  repo_key, repo_user, repo_revision)
 
-        temp_extra_repo = _copy_to_temp_folder(repo_path_or_url, repo_alias)
-        temp_extra_repo = _handle_repository(
-            temp_extra_repo, ref=repo_revision, auth_key=repo_key)
+        temp_extra_repo = _process_repository(repo_url_or_path, repo_revision)
         extra_repos.append(temp_extra_repo)
 
     # Overwrite the site repo and extra repos in the config because further
@@ -129,15 +127,9 @@ def process_site_repository(update_config=False):
         raise ValueError("Site repository directory (%s) must be specified" %
                          site_repo_or_path)
 
-    repo_path_or_url, repo_revision = _extract_repo_url_and_revision(
+    repo_url_or_path, repo_revision = _extract_repo_url_and_revision(
         site_repo_or_path)
-
-    if os.path.exists(repo_path_or_url):
-        temp_site_repo = _copy_to_temp_folder(repo_path_or_url, "site")
-    else:
-        temp_site_repo = repo_path_or_url
-
-    new_repo_path = _process_site_repository(temp_site_repo, repo_revision)
+    new_repo_path = _process_repository(repo_url_or_path, repo_revision)
 
     if update_config:
         # Overwrite the site repo in the config because further processing will
@@ -148,6 +140,30 @@ def process_site_repository(update_config=False):
     return new_repo_path
 
 
+def _process_repository(repo_url_or_path, repo_revision):
+    """Process a repository located at ``repo_url_or_path``.
+
+    :param str repo_url_or_path: Path to local repo or URL of remote URL.
+    :param str repo_revision: branch, commit or ref in the repo to checkout.
+
+    """
+
+    global __REPO_FOLDERS
+
+    if os.path.exists(repo_url_or_path):
+        repo_name = util.git.repo_name(repo_url_or_path)
+        new_temp_path = os.path.join(tempfile.mkdtemp(), repo_name)
+        norm_path, sub_path = util.git.normalize_repo_path(repo_url_or_path)
+        shutil.copytree(src=norm_path, dst=new_temp_path, symlinks=True)
+        __REPO_FOLDERS.setdefault(repo_name, new_temp_path)
+        git_repo_path = _process_site_repository(new_temp_path, repo_revision)
+        return os.path.join(git_repo_path, sub_path)
+    else:
+        repo_url, sub_path = util.git.normalize_repo_path(repo_url_or_path)
+        git_repo_path = _process_site_repository(repo_url, repo_revision)
+        return os.path.join(git_repo_path, sub_path)
+
+
 def _process_site_repository(repo_url_or_path, repo_revision):
     """Process the primary or site repository located at ``repo_url_or_path``.
 
@@ -155,13 +171,15 @@ def _process_site_repository(repo_url_or_path, repo_revision):
     repository. If ``repo_url_or_path`` doesn't already exist, clone it.
     If it does, extra the appropriate revision and check it out.
 
-    :param repo_url_or_path: Repo URL and associated auth information. E.g.:
+    :param repo_url_or_path: Repo path or URL and associated auth information.
+        If URL, examples include:
 
         * ssh://REPO_USERNAME@<GERRIT_URL>:29418/aic-clcp-manifests.git@<ref>
         * https://<GERRIT_URL>/aic-clcp-manifests.git@<ref>
         * http://<GERRIT_URL>/aic-clcp-manifests.git@<ref>
         * <LOCAL_REPO_PATH>@<ref>
         * same values as above without @<ref>
+    :param str repo_revision: branch, commit or ref in the repo to checkout.
 
     """
 
@@ -184,25 +202,6 @@ def _get_and_validate_site_repositories(site_name, site_data):
                  "your repository is self-contained and doesn't require "
                  "extra repositories for correct rendering." % site_name)
     return site_data.get('repositories', {})
-
-
-def _copy_to_temp_folder(repo_path_or_url, repo_alias):
-    """Helper to ensure that local repos remain untouched by Pegleg processing.
-    This is accomplished by copying local repos into temp folders.
-
-    """
-
-    global __REPO_FOLDERS
-
-    if os.path.exists(repo_path_or_url):
-        repo_name = util.git.repo_name(repo_path_or_url)
-        new_temp_path = os.path.join(tempfile.mkdtemp(), repo_name)
-        norm_path, sub_path = util.git.normalize_repo_path(repo_path_or_url)
-        shutil.copytree(src=norm_path, dst=new_temp_path, symlinks=True)
-        __REPO_FOLDERS.setdefault(repo_name, new_temp_path)
-        return os.path.join(new_temp_path, sub_path)
-    else:
-        return repo_path_or_url
 
 
 def _process_repository_overrides(site_def_repos):
@@ -270,10 +269,10 @@ def _process_repository_overrides(site_def_repos):
     return repo_overrides
 
 
-def _extract_repo_url_and_revision(repo_path_or_url):
+def _extract_repo_url_and_revision(repo_url_or_path):
     """Break up repository path/url into the repo URL and revision.
 
-    :param repo_path_or_url: Repo URL and associated auth information. E.g.:
+    :param repo_url_or_path: Repo URL and associated auth information. E.g.:
 
         * ssh://REPO_USERNAME@<GERRIT_URL>:29418/aic-clcp-manifests.git@<ref>
         * https://<GERRIT_URL>/aic-clcp-manifests.git@<ref>
@@ -287,17 +286,17 @@ def _extract_repo_url_and_revision(repo_path_or_url):
     # this with auth
     revision = None
     try:
-        if '@' in repo_path_or_url:
+        if '@' in repo_url_or_path:
             # extract revision from repo URL or path
-            repo_url_or_path, revision = repo_path_or_url.rsplit('@', 1)
+            repo_url_or_path, revision = repo_url_or_path.rsplit('@', 1)
             revision = revision[:-1] if revision.endswith('/') else revision
             if revision.endswith(".git"):
                 revision = revision[:-4]
         else:
-            repo_url_or_path = repo_path_or_url
+            repo_url_or_path = repo_url_or_path
     except Exception:
         # TODO(felipemonteiro): Use internal exceptions for this.
-        raise click.ClickException(_INVALID_FORMAT_MSG % repo_path_or_url)
+        raise click.ClickException(_INVALID_FORMAT_MSG % repo_url_or_path)
 
     return repo_url_or_path, revision
 
