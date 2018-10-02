@@ -88,6 +88,34 @@ Pegleg, as a containerized CLI, uses Docker via ``tools/pegleg.sh`` to
 execute CLI commands. Commands can also be executed using the ``Makefile``
 target: ``run_pegleg``.
 
+Virtual Environment
+-------------------
+
+Rather than, after each local code change, rebuilding the Pegleg image and
+overriding the ``IMAGE`` environment variable so ``tools/pegleg.sh`` uses
+the latest code changes, it is possible to use a virtual environment for
+much faster development.
+
+This can achieved by issuing the following commands (from the root Pegleg
+directory):
+
+.. code-block:: console
+
+  # Quick way of building a venv and installing all required dependencies into
+  # it.
+  tox -e py35 --notest
+  source .tox/py35/bin/activate
+  pip install -e .
+
+  # Now is it possible to run the Pegleg CLI to test local changes:
+  pegleg <command> <options>
+
+  # Or run unit tests:
+  pytest -k <regex>
+
+Note that after setting up the virtual environment, one only needs to source it
+in order to re-run unit tests or Pegleg CLI commands, to test local changes.
+
 Testing
 =======
 
