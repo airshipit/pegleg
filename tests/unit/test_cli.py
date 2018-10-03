@@ -244,3 +244,42 @@ class TestRepoCliActions(BaseCLIActionTest):
         # A successful result (while setting lint checks to exclude) should
         # output nothing.
         assert not result.output
+
+
+class TestTypeCliActions(BaseCLIActionTest):
+    """Tests type-level CLI actions."""
+
+    def test_list_types_using_remote_repo_url(self):
+        """Validates list types action using remote repo URL."""
+        # Scenario:
+        #
+        # 1) List types (should clone repo automatically)
+
+        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+                                                           self.repo_rev)
+
+        # NOTE(felipemonteiro): Pegleg currently doesn't dump a table to stdout
+        # for this CLI call so mock out the csv DictWriter to determine output.
+        with mock.patch('pegleg.engine.type.csv.DictWriter') as mock_writer:
+            result = self.runner.invoke(cli.type, ['-r', repo_url, 'list'])
+
+        assert result.exit_code == 0
+        m_writer = mock_writer.return_value
+        m_writer.writerow.assert_any_call({'type_name': 'foundry'})
+
+    def test_list_types_using_local_repo_path(self):
+        """Validates list types action using local repo path."""
+        # Scenario:
+        #
+        # 1) List types for local repo path
+
+        repo_path = self.treasuremap_path
+
+        # NOTE(felipemonteiro): Pegleg currently doesn't dump a table to stdout
+        # for this CLI call so mock out the csv DictWriter to determine output.
+        with mock.patch('pegleg.engine.type.csv.DictWriter') as mock_writer:
+            result = self.runner.invoke(cli.type, ['-r', repo_path, 'list'])
+
+        assert result.exit_code == 0
+        m_writer = mock_writer.return_value
+        m_writer.writerow.assert_any_call({'type_name': 'foundry'})

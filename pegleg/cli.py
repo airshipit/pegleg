@@ -29,7 +29,7 @@ CONTEXT_SETTINGS = {
     'help_option_names': ['-h', '--help'],
 }
 
-REPOSITORY_OPTION = click.option(
+MAIN_REPOSITORY_OPTION = click.option(
     '-r',
     '--site-repository',
     'site_repository',
@@ -48,6 +48,22 @@ EXTRA_REPOSITORY_OPTION = click.option(
     'secrets=/opt/secrets. By default, the revision specified in the '
     'site-definition for the site will be leveraged but can be overridden '
     'using -e global=/opt/global@revision.')
+
+REPOSITORY_KEY_OPTION = click.option(
+    '-k',
+    '--repo-key',
+    'repo_key',
+    help='The SSH public key to use when cloning remote authenticated '
+    'repositories.')
+
+REPOSITORY_USERNAME_OPTION = click.option(
+    '-u',
+    '--repo-username',
+    'repo_username',
+    help=
+    'The SSH username to use when cloning remote authenticated repositories '
+    'specified in the site-definition file. Any occurrences of REPO_USERNAME '
+    'will be replaced with this value.')
 
 ALLOW_MISSING_SUBSTITUTIONS_OPTION = click.option(
     '-f',
@@ -99,8 +115,12 @@ def main(*, verbose):
 
 
 @main.group(help='Commands related to repositories')
-@REPOSITORY_OPTION
-def repo(*, site_repository):
+@MAIN_REPOSITORY_OPTION
+# TODO(felipemonteiro): Support EXTRA_REPOSITORY_OPTION as well to be
+# able to lint multiple repos together.
+@REPOSITORY_USERNAME_OPTION
+@REPOSITORY_KEY_OPTION
+def repo(*, site_repository, repo_key, repo_username):
     """Group for repo-level actions, which include:
 
     * lint: lint all sites across the repository
@@ -108,6 +128,8 @@ def repo(*, site_repository):
     """
 
     config.set_site_repo(site_repository)
+    config.set_repo_key(repo_key)
+    config.set_repo_username(repo_username)
 
 
 def _lint_helper(*,
@@ -145,22 +167,10 @@ def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
 
 
 @main.group(help='Commands related to sites')
-@REPOSITORY_OPTION
+@MAIN_REPOSITORY_OPTION
 @EXTRA_REPOSITORY_OPTION
-@click.option(
-    '-k',
-    '--repo-key',
-    'repo_key',
-    help='The SSH public key to use when cloning remote authenticated '
-    'repositories.')
-@click.option(
-    '-u',
-    '--repo-username',
-    'repo_username',
-    help=
-    'The SSH username to use when cloning remote authenticated repositories '
-    'specified in the site-definition file. Any occurrences of REPO_USERNAME '
-    'will be replaced with this value.')
+@REPOSITORY_USERNAME_OPTION
+@REPOSITORY_KEY_OPTION
 def site(*, site_repository, extra_repositories, repo_key, repo_username):
     """Group for site-level actions, which include:
 
@@ -238,7 +248,7 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     'output_stream',
     type=click.File(mode='w'),
     default=sys.stdout,
-    help='Where to output')
+    help='Where to output. Defaults to sys.stdout.')
 def list_(*, output_stream):
     engine.repository.process_site_repository(update_config=True)
     engine.site.list_(output_stream)
@@ -251,7 +261,7 @@ def list_(*, output_stream):
     'output_stream',
     type=click.File(mode='w'),
     default=sys.stdout,
-    help='Where to output')
+    help='Where to output. Defaults to sys.stdout.')
 @click.argument('site_name')
 def show(*, output_stream, site_name):
     engine.repository.process_repositories(site_name)
@@ -265,7 +275,7 @@ def show(*, output_stream, site_name):
     'output_stream',
     type=click.File(mode='w'),
     default=sys.stdout,
-    help='Where to output')
+    help='Where to output. Defaults to sys.stdout.')
 @click.argument('site_name')
 def render(*, output_stream, site_name):
     engine.repository.process_repositories(site_name)
@@ -287,3 +297,34 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
         fail_on_missing_sub_src=fail_on_missing_sub_src,
         exclude_lint=exclude_lint,
         warn_lint=warn_lint)
+
+
+@main.group(help='Commands related to types')
+@MAIN_REPOSITORY_OPTION
+@EXTRA_REPOSITORY_OPTION
+@REPOSITORY_USERNAME_OPTION
+@REPOSITORY_KEY_OPTION
+def type(*, site_repository, extra_repositories, repo_key, repo_username):
+    """Group for repo-level actions, which include:
+
+    * list: list all types across the repository
+
+    """
+    config.set_site_repo(site_repository)
+    config.set_extra_repo_store(extra_repositories or [])
+    config.set_repo_key(repo_key)
+    config.set_repo_username(repo_username)
+
+
+@type.command('list', help='List known types')
+@click.option(
+    '-o',
+    '--output',
+    'output_stream',
+    type=click.File(mode='w'),
+    default=sys.stdout,
+    help='Where to output. Defaults to sys.stdout.')
+def list_types(*, output_stream):
+    """List type names for a given repository."""
+    engine.repository.process_site_repository(update_config=True)
+    engine.type.list_types(output_stream)
