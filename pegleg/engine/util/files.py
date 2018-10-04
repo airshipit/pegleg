@@ -29,9 +29,12 @@ __all__ = [
     'directories_for',
     'directory_for',
     'dump',
+    'read',
+    'write',
     'existing_directories',
     'search',
     'slurp',
+    'check_file_save_location',
 ]
 
 DIR_DEPTHS = {
@@ -234,6 +237,48 @@ def dump(path, data):
         yaml.dump(data, f, explicit_start=True)
 
 
+def read(path):
+    """
+    Read the yaml file ``path`` and return its contents as a list of
+    dicts
+    """
+
+    if not os.path.exists(path):
+        raise click.ClickException(
+            '{} not found. Pegleg must be run from the root of a '
+            'configuration repository.'.format(path))
+
+    with open(path) as stream:
+        try:
+            return list(yaml.safe_load_all(stream))
+        except yaml.YAMLError as e:
+            raise click.ClickException('Failed to parse %s:\n%s' % (path, e))
+
+
+def write(file_path, data):
+    """
+    Write the data to destination file_path.
+
+    If the directory structure of the file_path should not exist, create it.
+    If the file should exit, overwrite it with new data,
+
+    :param file_path: Destination file for the written data file
+    :type file_path: str
+    :param data: data to be written to the destination file
+    :type data: dict or a list of dicts
+    """
+
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+    with open(file_path, 'w') as stream:
+        yaml.safe_dump_all(
+            data,
+            stream,
+            explicit_start=True,
+            explicit_end=True,
+            default_flow_style=False)
+
+
 def _recurse_subdirs(search_path, depth):
     directories = set()
     try:
@@ -257,3 +302,25 @@ def search(search_paths):
             for filename in filenames:
                 if filename.endswith(".yaml"):
                     yield os.path.join(root, filename)
+
+
+def check_file_save_location(save_location):
+    """
+    Verify exists and is a valid directory. If it does not exist create it.
+
+    :param save_location: Base directory to save the result of the
+    encryption or decryption of site secrets.
+    :type save_location: string, directory path
+    :raises click.ClickException: If pre-flight check should fail.
+    """
+
+    if save_location:
+        if not os.path.exists(save_location):
+            LOG.debug("Save location %s does not exist. Creating "
+                      "automatically.", save_location)
+            os.makedirs(save_location)
+        # In case save_location already exists and isn't a directory.
+        if not os.path.isdir(save_location):
+            raise click.ClickException(
+                'save_location %s already exists, '
+                'but is not a directory'.format(save_location))

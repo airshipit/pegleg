@@ -391,6 +391,105 @@ A more complex example involves excluding certain linting checks:
 
 .. _command-line-repository-overrides:
 
+Secrets
+-------
+
+A sub-group of site command group, which allows you to perform secrets
+level operations for secrets documents of a site.
+
+::
+
+  ./pegleg.sh site -r <site_repo> -e <extra_repo> secrets <command> <options>
+
+
+Encrypt
+^^^^^^^
+
+Encrypt one site's secrets documents, which have the
+metadata.storagePolicy set to encrypted, and wrap them in `pegleg managed
+documents <https://airship-specs.readthedocs.io/en/latest/specs/approved/pegleg-secrets.html#peglegmanageddocument>`_.
+
+**Note**: The encrypt command is idempotent. If the command is executed more
+than once for a given site, it will skip the files, which are already
+encrypted and wrapped in a pegleg managed document, and will only encrypt the
+documents not encrypted before.
+
+**site_name** (Required).
+
+Name of the site.
+
+**-a / --author** (Required)
+
+Identifier for the program or person who is encrypting the secrets documents.
+
+**-s / --save-location** (Optional).
+
+Where to output encrypted and wrapped documents. If omitted, the results
+will overwrite the original documents.
+
+Usage:
+
+::
+
+    ./pegleg.sh site <options> secrets encrypt <site_name> -a <author_id> -s <save_location>
+
+Examples
+""""""""
+
+Example with optional save location:
+
+::
+
+    ./pegleg.sh site -r /opt/site-manifests \
+      -e global=/opt/manifests \
+      -e secrets=/opt/security-manifests \
+      secrets encrypt <site_name> -a <author_id> -s /workspace
+
+Example without optional save location:
+
+::
+
+    ./pegleg.sh site -r /opt/site-manifests \
+      -e global=/opt/manifests \
+      -e secrets=/opt/security-manifests \
+      secrets encrypt <site_name> -a <author_id>
+
+Decrypt
+^^^^^^^
+
+Unwrap an encrypted secrets document from a `pegleg managed
+document <https://airship-specs.readthedocs.io/en/latest/specs/approved/pegleg-secrets.html#peglegmanageddocument>`_,
+decrypt the encrypted secrets, and dump the cleartext secrets file to
+``stdout``.
+
+**site_name** (Required).
+
+Name of the site.
+
+**-f / filename** (Required).
+
+The absolute path to the pegleg managed encrypted secrets file.
+
+Usage:
+
+::
+
+    ./pegleg.sh site <options> secrets decrypt <site_name> -f <file_path>
+
+Examples
+""""""""
+
+Example:
+
+::
+
+    ./pegleg.sh site -r /opt/site-manifests \
+      -e global=/opt/manifests \
+      -e secrets=/opt/security-manifests \
+      secrets decrypt site1 -f \
+      /opt/security-manifests/site/site1/passwords/password1.yaml
+
+
 CLI Repository Overrides
 ------------------------
 
