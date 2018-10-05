@@ -2,7 +2,7 @@
 Pegleg
 ======
 
-|Doc Status|
+|Docker Repository on Quay| |Doc Status|
 
 Introduction
 ============
@@ -48,7 +48,9 @@ Further Reading
 
 `Airship`_.
 
-.. |Doc Status| image:: https://readthedocs.io/projects/airship-pegleg/badge/?version=latest
+.. |Docker Repository on Quay| image:: https://quay.io/repository/airshipit/pegleg/status
+   :target: https://quay.io/repository/airshipit/pegleg
+.. |Doc Status| image:: https://readthedocs.org/projects/airship-pegleg/badge/?version=latest
    :target: https://airship-pegleg.readthedocs.io/
 .. _Deckhand: https://airship-deckhand.readthedocs.io
 .. _Airship: https://www.airshipit.org
