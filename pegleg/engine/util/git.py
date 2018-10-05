@@ -317,7 +317,9 @@ def is_repository(path, *args, **kwargs):
     :param str path: Directory path to check.
     :returns: True if ``path`` is a repo, else False.
     :rtype: boolean
+
     """
+
     try:
         Repo(path, *args, **kwargs).git_dir
         return True
@@ -336,6 +338,9 @@ def is_equal(first_repo, other_repo):
     :rtype: boolean
 
     """
+
+    if not is_repository(first_repo) or not is_repository(other_repo):
+        return False
 
     try:
         # Compare whether the first reference from each repository is the
@@ -360,6 +365,9 @@ def repo_name(repo_url_or_path):
 
     """
 
+    if not is_repository(repo_url_or_path):
+        raise exceptions.GitConfigException(repo_url=repo_url_or_path)
+
     repo = Repo(repo_url_or_path, search_parent_directories=True)
     config_reader = repo.config_reader()
     section = 'remote "origin"'
@@ -367,7 +375,10 @@ def repo_name(repo_url_or_path):
 
     if config_reader.has_section(section):
         repo_url = config_reader.get_value(section, option)
-        return repo_url.split('/')[-1].split('.git')[0]
+        try:
+            return repo_url.split('/')[-1].split('.git')[0]
+        except Exception:
+            raise exceptions.GitConfigException(repo_url=repo_url_or_path)
 
     raise exceptions.GitConfigException(repo_url=repo_url_or_path)
 
