@@ -180,6 +180,18 @@ def list_sites(primary_repo_base=None):
             yield path
 
 
+def list_types(primary_repo_base=None):
+    """Get a list of type directories in the primary repo."""
+    if not primary_repo_base:
+        primary_repo_base = config.get_site_repo()
+    full_type_path = os.path.join(primary_repo_base,
+                                  config.get_rel_type_path())
+    for path in os.listdir(full_type_path):
+        joined_path = os.path.join(full_type_path, path)
+        if os.path.isdir(joined_path):
+            yield path
+
+
 def directory_for(*, path):
     for r in config.all_repos():
         if path.startswith(r):

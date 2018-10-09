@@ -19,7 +19,8 @@ except NameError:
     GLOBAL_CONTEXT = {
         'site_repo': './',
         'extra_repos': [],
-        'site_path': 'site'
+        'site_path': 'site',
+        'type_path': 'type'
     }
 
 
@@ -85,3 +86,12 @@ def get_rel_site_path():
 def set_rel_site_path(p):
     p = p or 'site'
     GLOBAL_CONTEXT['site_path'] = p
+
+
+def get_rel_type_path():
+    return GLOBAL_CONTEXT.get('type_path', 'type')
+
+
+def set_rel_type_path(p):
+    p = p or 'type'
+    GLOBAL_CONTEXT['type_path'] = p
