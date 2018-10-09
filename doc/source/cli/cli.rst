@@ -389,6 +389,44 @@ A more complex example involves excluding certain linting checks:
     lint <site_name> \
     -x P001 -x P002 -w P003
 
+Upload
+-------
+
+Uploads documents to `Shipyard`_.
+
+**site_name** (Required).
+
+Name of the site. The ``site_name`` must match a ``site`` name in the site
+repository folder structure
+
+**--os-<various>=<value>** (Required).
+
+Shipyard needs these options for authenticating with OpenStack Keystone.
+This option can be set as environment variables or it can be passed via
+the command line.
+
+Please reference Shipyard's `CLI documentation`_ for information related to these options.
+
+**--context-marker=<uuid>** (Optional).
+
+Specifies a UUID (8-4-4-4-12 format) that will be used to correlate logs,
+transactions, etc. in downstream activities triggered by this interaction.
+
+Usage:
+
+::
+
+    ./pegleg.sh site <options> upload <site_name> --context-marker=<uuid>
+
+Examples
+^^^^^^^^
+
+::
+
+    ./pegleg.sh site -r <site_repo> -e <extra_repo> \
+      upload <site_name> <options>
+
+
 .. _command-line-repository-overrides:
 
 Secrets
@@ -641,3 +679,5 @@ P003 - All repos contain expected directories.
 .. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/users/rendering.html
 .. _Deckhand Validations: https://airship-deckhand.readthedocs.io/en/latest/overview.html#validation
 .. _Pegleg Managed Documents: https://airship-specs.readthedocs.io/en/latest/specs/approved/pegleg-secrets.html#peglegmanageddocument
+.. _Shipyard: https://github.com/openstack/airship-shipyard
+.. _CLI documentation: https://airship-shipyard.readthedocs.io/en/latest/CLI.html#openstack-keystone-authorization-environment-variables

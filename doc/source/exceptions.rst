@@ -56,3 +56,10 @@ Git Exceptions
    :members:
    :show-inheritance:
    :undoc-members:
+
+Authentication Exceptions
+-------------------------
+
+.. autoexception:: pegleg.engine.util.shipyard_helper.AuthValuesError
+   :members:
+   :undoc-members:

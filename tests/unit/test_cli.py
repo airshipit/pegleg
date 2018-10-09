@@ -16,6 +16,7 @@ import os
 import shutil
 
 from click.testing import CliRunner
+from mock import ANY
 import mock
 import pytest
 
@@ -353,6 +354,22 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         repo_path = self.treasuremap_path
         self._validate_render_site_action(repo_path)
+
+    def test_upload_documents_shipyard_using_local_repo_path(self):
+        """Validates ShipyardHelper is called with correct arguments."""
+        # Scenario:
+        #
+        # 1) Mock out ShipyardHelper
+        # 2) Check ShipyardHelper was called with correct arguments
+
+        repo_path = self.treasuremap_path
+
+        with mock.patch('pegleg.cli.ShipyardHelper') as mock_obj:
+            result = self.runner.invoke(cli.site,
+                ['-r', repo_path, 'upload', self.site_name])
+
+        assert result.exit_code == 0
+        mock_obj.assert_called_once()
 
 
 class TestRepoCliActions(BaseCLIActionTest):

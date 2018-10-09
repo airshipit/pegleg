@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import click
+import collections
 import os
 import yaml
 import logging
 
 from pegleg import config
+from pegleg.engine import util
 from pegleg.engine.util import pegleg_managed_document as md
 
 LOG = logging.getLogger(__name__)
@@ -36,6 +38,7 @@ __all__ = [
     'search',
     'slurp',
     'check_file_save_location',
+    'collect_files_by_repo',
 ]
 
 DIR_DEPTHS = {
@@ -366,3 +369,15 @@ def check_file_save_location(save_location):
             raise click.ClickException(
                 'save_location %s already exists, '
                 'but is not a directory'.format(save_location))
+
+
+def collect_files_by_repo(site_name):
+    """ Collects file by repo name in memory."""
+
+    collected_files_by_repo = collections.defaultdict(list)
+    for repo_base, filename in util.definition.site_files_by_repo(
+            site_name):
+        repo_name = os.path.normpath(repo_base).split(os.sep)[-1]
+        documents = util.files.read(filename)
+        collected_files_by_repo[repo_name].extend(documents)
+    return collected_files_by_repo

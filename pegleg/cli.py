@@ -20,6 +20,7 @@ import click
 
 from pegleg import config
 from pegleg import engine
+from pegleg.engine.util.shipyard_helper import ShipyardHelper
 
 LOG = logging.getLogger(__name__)
 
@@ -323,6 +324,56 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
         fail_on_missing_sub_src=fail_on_missing_sub_src,
         exclude_lint=exclude_lint,
         warn_lint=warn_lint)
+
+
+@site.command('upload', help='Upload documents to Shipyard')
+# Keystone authentication parameters
+@click.option('--os-project-domain-name',
+              envvar='OS_PROJECT_DOMAIN_NAME',
+              required=False,
+              default='default')
+@click.option('--os-user-domain-name',
+              envvar='OS_USER_DOMAIN_NAME',
+              required=False,
+              default='default')
+@click.option('--os-project-name', envvar='OS_PROJECT_NAME', required=False)
+@click.option('--os-username', envvar='OS_USERNAME', required=False)
+@click.option('--os-password', envvar='OS_PASSWORD', required=False)
+@click.option(
+    '--os-auth-url', envvar='OS_AUTH_URL', required=False)
+# Option passed to Shipyard client context
+@click.option(
+    '--context-marker',
+    help='Specifies a UUID (8-4-4-4-12 format) that will be used to correlate '
+    'logs, transactions, etc. in downstream activities triggered by this '
+    'interaction ',
+    required=False,
+    type=click.UUID)
+@SITE_REPOSITORY_ARGUMENT
+@click.pass_context
+def upload(ctx, *, os_project_domain_name,
+           os_user_domain_name, os_project_name, os_username,
+           os_password, os_auth_url, context_marker, site_name):
+    if not ctx.obj:
+        ctx.obj = {}
+
+    # Build API parameters required by Shipyard API Client.
+    auth_vars = {
+        'project_domain_name': os_project_domain_name,
+        'user_domain_name': os_user_domain_name,
+        'project_name': os_project_name,
+        'username': os_username,
+        'password': os_password,
+        'auth_url': os_auth_url
+    }
+
+    ctx.obj['API_PARAMETERS'] = {
+        'auth_vars': auth_vars
+    }
+    ctx.obj['context_marker'] = str(context_marker)
+    ctx.obj['site_name'] = site_name
+
+    click.echo(ShipyardHelper(ctx).upload_documents())
 
 
 @main.group(help='Commands related to types')

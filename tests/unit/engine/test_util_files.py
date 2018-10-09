@@ -12,10 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import mock
+
 from pegleg import config
 from pegleg.engine.util import files
 from tests.unit.fixtures import create_tmp_deployment_files
 
+TEST_DATA = [('/tmp/test_repo', 'test_file.yaml')]
+TEST_DATA_2 = [{'schema': 'pegleg/SiteDefinition/v1', 'data': 'test'}]
 
 def test_no_non_yamls(tmpdir):
     p = tmpdir.mkdir("deployment_files").mkdir("global")
@@ -51,3 +55,13 @@ def test_list_all_files(create_tmp_deployment_files):
     assert len(actual_files) == len(expected_files)
     for idx, file in enumerate(actual_files):
         assert file.endswith(expected_files[idx])
+
+@mock.patch('pegleg.engine.util.definition.site_files_by_repo',autospec=True,
+            return_value=TEST_DATA)
+@mock.patch('pegleg.engine.util.files.read', autospec=True,
+            return_value=TEST_DATA_2)
+def test_collect_files_by_repo(*args):
+    result = files.collect_files_by_repo('test-site')
+
+    assert 'test_repo' in result
+    assert 'schema' in result['test_repo'][0]
