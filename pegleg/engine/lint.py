@@ -16,7 +16,11 @@ import click
 import logging
 import os
 import pkg_resources
+import shutil
+import textwrap
 import yaml
+
+from prettytable import PrettyTable
 
 from pegleg import config
 from pegleg.engine.errorcodes import DOCUMENT_LAYER_MISMATCH
@@ -150,15 +154,27 @@ def _filter_messages_by_warn_and_error_lint(*,
 
     errors = []
     warns = []
+    # Create tables to output CLI results
+    errors_table = PrettyTable()
+    errors_table.field_names = ['error_code', 'error_message']
+    warnings_table = PrettyTable()
+    warnings_table.field_names = ['warning_code', 'warning_message']
+    # Calculate terminal size to always make sure that the table output
+    # is readable regardless of screen size
+    line_length = int(shutil.get_terminal_size().columns / 1.5)
     for code, message in messages:
         if code in warn_lint:
             warns.append('%s: %s' % (code, message))
+            warnings_table.add_row([code, textwrap.fill(message, line_length)])
         elif code not in exclude_lint:
             errors.append('%s: %s' % (code, message))
+            errors_table.add_row([code, textwrap.fill(message, line_length)])
 
     if errors:
-        raise click.ClickException('\n'.join(
-            ['Linting failed:'] + errors + ['Linting warnings:'] + warns))
+        raise click.ClickException('Linting failed:\n' +
+                                   errors_table.get_string() +
+                                   '\nLinting warnings:\n' +
+                                   warnings_table.get_string())
     return warns
 
 

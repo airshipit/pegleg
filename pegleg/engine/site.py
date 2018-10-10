@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import csv
-import json
 import logging
 import os
 
 import click
 import yaml
+
+from prettytable import PrettyTable
 
 from pegleg.engine import util
 
@@ -115,11 +115,10 @@ def render(site_name, output_stream):
 def list_(output_stream):
     """List site names for a given repository."""
 
-    # TODO(felipemonteiro): This should output a formatted table, not rows of
-    # data without delimited columns.
-    fieldnames = ['site_name', 'site_type', 'repositories']
-    writer = csv.DictWriter(
-        output_stream, fieldnames=fieldnames, delimiter=' ')
+    # Create a table to output site information for all sites for a given repo
+    site_table = PrettyTable()
+    site_table.field_names = ['site_name', 'site_type']
+
     for site_name in util.files.list_sites():
         params = util.definition.load_as_params(site_name)
         # TODO(felipemonteiro): This is a temporary hack around legacy manifest
@@ -131,10 +130,24 @@ def list_(output_stream):
         # a configuration via a "set_site_revision" function, for example.
         if 'revision' in params:
             params.pop('revision')
-        writer.writerow(params)
+        site_table.add_row([params['site_name'], params['site_type']])
+    # Write table to specified output_stream
+    output_stream.write(site_table.get_string() + "\n")
 
 
 def show(site_name, output_stream):
     data = util.definition.load_as_params(site_name)
     data['files'] = list(util.definition.site_files(site_name))
-    json.dump(data, output_stream, indent=2, sort_keys=True)
+    # Create a table to output site information for specific site
+    site_table = PrettyTable()
+    site_table.field_names = ['revision', 'site_name', 'site_type', 'files']
+    if 'revision' in data.keys():
+        for file in data['files']:
+            site_table.add_row([data['revision'], data['site_name'],
+                                data['site_type'], file])
+    else:
+        for file in data['files']:
+            site_table.add_row(["", data['site_name'],
+                               data['site_type'], file])
+    # Write tables to specified output_stream
+    output_stream.write(site_table.get_string() + "\n")

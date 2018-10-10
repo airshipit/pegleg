@@ -211,17 +211,13 @@ class TestSiteCliActions(BaseCLIActionTest):
         repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
 
-        # NOTE(felipemonteiro): Pegleg currently doesn't dump a table to stdout
-        # for this CLI call so mock out the csv DictWriter to determine output.
-        with mock.patch('pegleg.engine.site.csv.DictWriter') as mock_writer:
+        # Mock out PrettyTable to determine output.
+        with mock.patch('pegleg.engine.site.PrettyTable') as mock_writer:
             result = self.runner.invoke(cli.site, ['-r', repo_url, 'list'])
 
-        assert result.exit_code == 0
         m_writer = mock_writer.return_value
-        m_writer.writerow.assert_called_once_with({
-            'site_type': 'foundry',
-            'site_name': self.site_name
-        })
+        m_writer.add_row.assert_called_with([self.site_name,
+                                                  'foundry'])
 
     def test_list_sites_using_local_path(self):
         """Validates list action using local repo path."""
@@ -231,17 +227,13 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         repo_path = self.treasuremap_path
 
-        # NOTE(felipemonteiro): Pegleg currently doesn't dump a table to stdout
-        # for this CLI call so mock out the csv DictWriter to determine output.
-        with mock.patch('pegleg.engine.site.csv.DictWriter') as mock_writer:
+        # Mock out PrettyTable to determine output.
+        with mock.patch('pegleg.engine.site.PrettyTable') as mock_writer:
             result = self.runner.invoke(cli.site, ['-r', repo_path, 'list'])
 
-        assert result.exit_code == 0
         m_writer = mock_writer.return_value
-        m_writer.writerow.assert_called_once_with({
-            'site_type': 'foundry',
-            'site_name': self.site_name
-        })
+        m_writer.add_row.assert_called_with([self.site_name,
+                                                  'foundry'])
 
     ### Show tests ###
 
@@ -254,18 +246,15 @@ class TestSiteCliActions(BaseCLIActionTest):
         repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
 
-        with mock.patch('pegleg.engine.site.json') as mock_json:
+        with mock.patch('pegleg.engine.site.PrettyTable') as mock_writer:
             result = self.runner.invoke(
                 cli.site, ['-r', repo_url, 'show', self.site_name])
 
-        assert result.exit_code == 0
-        assert mock_json.dump.called
-        mock_calls = mock_json.dump.mock_calls
-        assert mock_calls[0][1][0] == {
-            'files': mock.ANY,
-            'site_type': 'foundry',
-            'site_name': self.site_name
-        }
+        m_writer = mock_writer.return_value
+        m_writer.add_row.assert_called_with(['',
+                                             self.site_name,
+                                             'foundry',
+                                             mock.ANY])
 
     def test_show_site_using_local_path(self):
         """Validates show action using local repo path."""
@@ -274,18 +263,15 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 1) Show site (should skip clone repo)
 
         repo_path = self.treasuremap_path
-        with mock.patch('pegleg.engine.site.json') as mock_json:
+        with mock.patch('pegleg.engine.site.PrettyTable') as mock_writer:
             result = self.runner.invoke(
                 cli.site, ['-r', repo_path, 'show', self.site_name])
 
-        assert result.exit_code == 0
-        assert mock_json.dump.called
-        mock_calls = mock_json.dump.mock_calls
-        assert mock_calls[0][1][0] == {
-            'files': mock.ANY,
-            'site_type': 'foundry',
-            'site_name': self.site_name
-        }
+        m_writer = mock_writer.return_value
+        m_writer.add_row.assert_called_with(['',
+                                             self.site_name,
+                                             'foundry',
+                                             mock.ANY])
 
     ### Render tests ###
 
@@ -398,14 +384,12 @@ class TestTypeCliActions(BaseCLIActionTest):
         repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
 
-        # NOTE(felipemonteiro): Pegleg currently doesn't dump a table to stdout
-        # for this CLI call so mock out the csv DictWriter to determine output.
-        with mock.patch('pegleg.engine.type.csv.DictWriter') as mock_writer:
+        # Mock out PrettyTable to determine output.
+        with mock.patch('pegleg.engine.type.PrettyTable') as mock_writer:
             result = self.runner.invoke(cli.type, ['-r', repo_url, 'list'])
 
-        assert result.exit_code == 0
         m_writer = mock_writer.return_value
-        m_writer.writerow.assert_any_call({'type_name': 'foundry'})
+        m_writer.add_row.assert_called_with(['foundry'])
 
     def test_list_types_using_local_repo_path(self):
         """Validates list types action using local repo path."""
@@ -415,11 +399,9 @@ class TestTypeCliActions(BaseCLIActionTest):
 
         repo_path = self.treasuremap_path
 
-        # NOTE(felipemonteiro): Pegleg currently doesn't dump a table to stdout
-        # for this CLI call so mock out the csv DictWriter to determine output.
-        with mock.patch('pegleg.engine.type.csv.DictWriter') as mock_writer:
+        # Mock out PrettyTable to determine output.
+        with mock.patch('pegleg.engine.type.PrettyTable') as mock_writer:
             result = self.runner.invoke(cli.type, ['-r', repo_path, 'list'])
 
-        assert result.exit_code == 0
         m_writer = mock_writer.return_value
-        m_writer.writerow.assert_any_call({'type_name': 'foundry'})
+        m_writer.add_row.assert_called_with(['foundry'])

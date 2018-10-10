@@ -110,7 +110,7 @@ def main(*, verbose):
     if verbose:
         log_level = logging.DEBUG
     else:
-        log_level = logging.INFO
+        log_level = logging.ERROR
     logging.basicConfig(format=LOG_FORMAT, level=log_level)
 
 

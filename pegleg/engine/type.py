@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import csv
 import logging
+
+from prettytable import PrettyTable
 
 from pegleg.engine import util
 
@@ -25,10 +26,10 @@ LOG = logging.getLogger(__name__)
 def list_types(output_stream):
     """List type names for a given repository."""
 
-    # TODO(felipemonteiro): This should output a formatted table, not rows of
-    # data without delimited columns.
-    fieldnames = ['type_name']
-    writer = csv.DictWriter(
-        output_stream, fieldnames=fieldnames, delimiter=' ')
+    # Create a table to output site types for a given repo
+    type_table = PrettyTable()
+    type_table.field_names = ['type_name']
     for type_name in util.files.list_types():
-        writer.writerow({'type_name': type_name})
+        type_table.add_row([type_name])
+    # Write table to specified output_stream
+    output_stream.write(type_table.get_string() + "\n")
