@@ -56,3 +56,8 @@ Git Exceptions
    :members:
    :show-inheritance:
    :undoc-members:
+
+.. autoexception:: pegleg.engine.exceptions.GitInvalidRepoException
+   :members:
+   :show-inheritance:
+   :undoc-members:
