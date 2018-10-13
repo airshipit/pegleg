@@ -36,6 +36,9 @@ class BaseCLIActionTest(object):
     repo URL and as many other tests that are required that use a local repo
     path for runtime optimization.
 
+    All tests should validate that the ``exit_code`` from the CLI is 0 (for
+    positive tests).
+
     """
 
     # TODO(felipemonteiro): Need tests that validate repository overrides. Also
@@ -47,6 +50,8 @@ class BaseCLIActionTest(object):
 
         # Pin so we know that airship-seaworthy is a valid site.
         cls.site_name = "airship-seaworthy"
+        cls.site_type = "foundry"
+
         cls.repo_rev = '6b183e148b9bb7ba6f75c98dd13451088255c60b'
         cls.repo_name = "airship-treasuremap"
         repo_url = "https://github.com/openstack/%s.git" % cls.repo_name
@@ -67,20 +72,12 @@ class TestSiteCliActions(BaseCLIActionTest):
 
     ### Collect tests ###
 
-    def test_collect_using_remote_repo_url(self):
-        """Validates collect action using a remote URL."""
-        # Scenario:
-        #
-        # 1) Create temporary save location
-        # 2) Collect into save location (should clone repo automatically)
-        # 3) Check that expected file name is there
-
+    def _validate_collect_site_action(self, repo_path_or_url):
         save_location = tempfile.mkdtemp()
-        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
-                                                           self.repo_rev)
-        result = self.runner.invoke(
-            cli.site,
-            ['-r', repo_url, 'collect', self.site_name, '-s', save_location])
+        result = self.runner.invoke(cli.site, [
+            '-r', repo_path_or_url, 'collect', self.site_name, '-s',
+            save_location
+        ])
 
         collected_files = os.listdir(save_location)
 
@@ -90,6 +87,18 @@ class TestSiteCliActions(BaseCLIActionTest):
         # are written out to sensibly named files like airship-treasuremap.yaml
         assert collected_files[0] == ("%s.yaml" % self.repo_name)
 
+    def test_collect_using_remote_repo_url(self):
+        """Validates collect action using a remote URL."""
+        # Scenario:
+        #
+        # 1) Create temporary save location
+        # 2) Collect into save location (should clone repo automatically)
+        # 3) Check that expected file name is there
+
+        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+                                                           self.repo_rev)
+        self._validate_collect_site_action(repo_url)
+
     def test_collect_using_remote_repo_url_ending_with_dot_git(self):
         """Validates collect action using a remote URL ending in .git."""
         # Scenario:
@@ -98,18 +107,9 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 2) Collect into save location (should clone repo automatically)
         # 3) Check that expected file name is there
 
-        save_location = tempfile.mkdtemp()
         repo_url = 'https://github.com/openstack/%s@%s.git' % (self.repo_name,
                                                                self.repo_rev)
-        result = self.runner.invoke(
-            cli.site,
-            ['-r', repo_url, 'collect', self.site_name, '-s', save_location])
-
-        collected_files = os.listdir(save_location)
-
-        assert result.exit_code == 0
-        assert len(collected_files) == 1
-        assert collected_files[0] == ("%s.yaml" % self.repo_name)
+        self._validate_collect_site_action(repo_url)
 
     def test_collect_using_local_path(self):
         """Validates collect action using a path to a local repo."""
@@ -119,20 +119,33 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 2) Collect into save location (should skip clone repo)
         # 3) Check that expected file name is there
 
-        save_location = tempfile.mkdtemp()
         repo_path = self.treasuremap_path
-
-        result = self.runner.invoke(
-            cli.site,
-            ['-r', repo_path, 'collect', self.site_name, '-s', save_location])
-
-        collected_files = os.listdir(save_location)
-
-        assert result.exit_code == 0, result.output
-        assert len(collected_files) == 1
-        assert collected_files[0] == ("%s.yaml" % self.repo_name)
+        self._validate_collect_site_action(repo_path)
 
     ### Lint tests ###
+
+    def _test_lint_site_action(self, repo_path_or_url, exclude=True):
+        flag = '-x' if exclude else '-w'
+
+        lint_command = ['-r', repo_path_or_url, 'lint', self.site_name]
+        exclude_lint_command = [
+            flag, errorcodes.SCHEMA_STORAGE_POLICY_MISMATCH_FLAG, flag,
+            errorcodes.SECRET_NOT_ENCRYPTED_POLICY
+        ]
+
+        with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
+            mock_deckhand.deckhand_render.return_value = ([], [])
+            result = self.runner.invoke(cli.site,
+                                        lint_command + exclude_lint_command)
+
+        assert result.exit_code == 0, result.output
+
+        if exclude:
+            # A successful result (while setting lint checks to exclude) should
+            # output nothing.
+            assert not result.output
+        else:
+            assert result.output
 
     def test_lint_site_using_remote_repo_url_with_exclude(self):
         """Validates site lint action using remote repo URL."""
@@ -143,22 +156,7 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
-
-        lint_command = ['-r', repo_url, 'lint', self.site_name]
-        exclude_lint_command = [
-            '-x', errorcodes.SCHEMA_STORAGE_POLICY_MISMATCH_FLAG, '-x',
-            errorcodes.SECRET_NOT_ENCRYPTED_POLICY
-        ]
-
-        with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
-            mock_deckhand.deckhand_render.return_value = ([], [])
-            result = self.runner.invoke(cli.site,
-                                        lint_command + exclude_lint_command)
-
-        assert result.exit_code == 0, result.output
-        # A successful result (while setting lint checks to exclude) should
-        # output nothing.
-        assert not result.output
+        self._test_lint_site_action(repo_url, exclude=True)
 
     def test_lint_site_using_local_path_with_exclude(self):
         """Validates site lint action using local repo path."""
@@ -168,21 +166,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 2) Lint site with exclude flags (should skip clone repo)
 
         repo_path = self.treasuremap_path
-        lint_command = ['-r', repo_path, 'lint', self.site_name]
-        exclude_lint_command = [
-            '-x', errorcodes.SCHEMA_STORAGE_POLICY_MISMATCH_FLAG, '-x',
-            errorcodes.SECRET_NOT_ENCRYPTED_POLICY
-        ]
-
-        with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
-            mock_deckhand.deckhand_render.return_value = ([], [])
-            result = self.runner.invoke(cli.site,
-                                        lint_command + exclude_lint_command)
-
-        assert result.exit_code == 0, result.output
-        # A successful result (while setting lint checks to exclude) should
-        # output nothing.
-        assert not result.output
+        self._test_lint_site_action(repo_path, exclude=True)
 
     def test_lint_site_using_local_path_with_warn(self):
         """Validates site lint action using local repo path."""
@@ -192,23 +176,19 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 2) Lint site with warn flags (should skip clone repo)
 
         repo_path = self.treasuremap_path
-        lint_command = ['-r', repo_path, 'lint', self.site_name]
-        warn_lint_command = [
-            '-w', errorcodes.SCHEMA_STORAGE_POLICY_MISMATCH_FLAG, '-w',
-            errorcodes.SECRET_NOT_ENCRYPTED_POLICY
-        ]
-
-        with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
-            mock_deckhand.deckhand_render.return_value = ([], [])
-            result = self.runner.invoke(cli.site,
-                                        lint_command + warn_lint_command)
-
-        assert result.exit_code == 0, result.output
-        # A successful result (while setting lint checks to warns) should
-        # output warnings.
-        assert result.output
+        self._test_lint_site_action(repo_path, exclude=False)
 
     ### List tests ###
+
+    def _validate_list_site_action(self, repo_path_or_url):
+        mock_output = mock.Mock()
+        result = self.runner.invoke(
+            cli.site, ['-r', repo_path_or_url, 'list', '-o', mock_output])
+
+        assert result.exit_code == 0, result.output
+        table_output = mock_output.write.mock_calls[0][1][0]
+        assert self.site_name in table_output
+        assert self.site_type in table_output
 
     def test_list_sites_using_remote_repo_url(self):
         """Validates list action using remote repo URL."""
@@ -219,12 +199,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
 
-        # Mock out PrettyTable to determine output.
-        with mock.patch('pegleg.engine.site.PrettyTable') as mock_writer:
-            result = self.runner.invoke(cli.site, ['-r', repo_url, 'list'])
-
-        m_writer = mock_writer.return_value
-        m_writer.add_row.assert_called_with([self.site_name, 'foundry'])
+        self._validate_list_site_action(repo_url)
 
     def test_list_sites_using_local_path(self):
         """Validates list action using local repo path."""
@@ -233,15 +208,19 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 1) List sites (should skip clone repo)
 
         repo_path = self.treasuremap_path
-
-        # Mock out PrettyTable to determine output.
-        with mock.patch('pegleg.engine.site.PrettyTable') as mock_writer:
-            result = self.runner.invoke(cli.site, ['-r', repo_path, 'list'])
-
-        m_writer = mock_writer.return_value
-        m_writer.add_row.assert_called_with([self.site_name, 'foundry'])
+        self._validate_list_site_action(repo_path)
 
     ### Show tests ###
+
+    def _validate_site_show_action(self, repo_path_or_url):
+        mock_output = mock.Mock()
+        result = self.runner.invoke(cli.site, [
+            '-r', repo_path_or_url, 'show', self.site_name, '-o', mock_output
+        ])
+
+        assert result.exit_code == 0, result.output
+        table_output = mock_output.write.mock_calls[0][1][0]
+        assert self.site_name in table_output
 
     def test_show_site_using_remote_repo_url(self):
         """Validates show action using remote repo URL."""
@@ -251,14 +230,7 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
-
-        with mock.patch('pegleg.engine.site.PrettyTable') as mock_writer:
-            result = self.runner.invoke(
-                cli.site, ['-r', repo_url, 'show', self.site_name])
-
-        m_writer = mock_writer.return_value
-        m_writer.add_row.assert_called_with(
-            ['', self.site_name, 'foundry', mock.ANY])
+        self._validate_site_show_action(repo_url)
 
     def test_show_site_using_local_path(self):
         """Validates show action using local repo path."""
@@ -267,15 +239,21 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 1) Show site (should skip clone repo)
 
         repo_path = self.treasuremap_path
-        with mock.patch('pegleg.engine.site.PrettyTable') as mock_writer:
-            result = self.runner.invoke(
-                cli.site, ['-r', repo_path, 'show', self.site_name])
-
-        m_writer = mock_writer.return_value
-        m_writer.add_row.assert_called_with(
-            ['', self.site_name, 'foundry', mock.ANY])
+        self._validate_site_show_action(repo_path)
 
     ### Render tests ###
+
+    def _validate_render_site_action(self, repo_path_or_url):
+        render_command = ['-r', repo_path_or_url, 'render', self.site_name]
+
+        with mock.patch('pegleg.engine.site.yaml') as mock_yaml:
+            with mock.patch(
+                    'pegleg.engine.site.util.deckhand') as mock_deckhand:
+                mock_deckhand.deckhand_render.return_value = ([], [])
+                result = self.runner.invoke(cli.site, render_command)
+
+        assert result.exit_code == 0
+        mock_yaml.dump_all.assert_called_once()
 
     def test_render_site_using_remote_repo_url(self):
         """Validates render action using remote repo URL."""
@@ -286,17 +264,7 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
-
-        render_command = ['-r', repo_url, 'render', self.site_name]
-
-        with mock.patch('pegleg.engine.site.yaml') as mock_yaml:
-            with mock.patch(
-                    'pegleg.engine.site.util.deckhand') as mock_deckhand:
-                mock_deckhand.deckhand_render.return_value = ([], [])
-                result = self.runner.invoke(cli.site, render_command)
-
-        assert result.exit_code == 0
-        mock_yaml.dump_all.assert_called_once()
+        self._validate_render_site_action(repo_url)
 
     def test_render_site_using_local_path(self):
         """Validates render action using local repo path."""
@@ -306,16 +274,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 2) Render site (should skip clone repo)
 
         repo_path = self.treasuremap_path
-        render_command = ['-r', repo_path, 'render', self.site_name]
-
-        with mock.patch('pegleg.engine.site.yaml') as mock_yaml:
-            with mock.patch(
-                    'pegleg.engine.site.util.deckhand') as mock_deckhand:
-                mock_deckhand.deckhand_render.return_value = ([], [])
-                result = self.runner.invoke(cli.site, render_command)
-
-        assert result.exit_code == 0
-        mock_yaml.dump_all.assert_called_once()
+        self._validate_render_site_action(repo_path)
 
 
 class TestRepoCliActions(BaseCLIActionTest):
@@ -381,9 +340,9 @@ class TestTypeCliActions(BaseCLIActionTest):
         self.expected_types = ['foundry']
 
     def _assert_table_has_expected_sites(self, mock_output):
-        output_table = mock_output.write.mock_calls[0][1][0]
+        table_output = mock_output.write.mock_calls[0][1][0]
         for expected_type in self.expected_types:
-            assert expected_type in output_table
+            assert expected_type in table_output
 
     def _validate_type_list_action(self, repo_path_or_url):
         mock_output = mock.Mock()
@@ -420,11 +379,11 @@ class TestSiteCliActionsWithSubdirectory(BaseCLIActionTest):
         self.expected_sites = ['demo', 'gate-multinode', 'dev', 'dev-proxy']
 
     def _assert_table_has_expected_sites(self, mock_output):
-        output_table = mock_output.write.mock_calls[0][1][0]
+        table_output = mock_output.write.mock_calls[0][1][0]
         for expected_site in self.expected_sites:
-            assert expected_site in output_table
+            assert expected_site in table_output
 
-    def _validate_site_action(self, repo_path_or_url):
+    def _validate_list_site_action(self, repo_path_or_url):
         mock_output = mock.Mock()
         result = self.runner.invoke(
             cli.site, ['-r', repo_path_or_url, 'list', '-o', mock_output])
@@ -445,7 +404,7 @@ class TestSiteCliActionsWithSubdirectory(BaseCLIActionTest):
         repo_url = 'https://github.com/openstack/%s/deployment_files@%s' % (
             repo_name, repo_rev)
 
-        self._validate_site_action(repo_url)
+        self._validate_list_site_action(repo_url)
 
     def test_site_action_with_subpath_in_local_repo_path(self):
         """Validates list action with subpath in local repo path."""
@@ -461,4 +420,4 @@ class TestSiteCliActionsWithSubdirectory(BaseCLIActionTest):
         _repo_path = git.git_handler(repo_url, ref=repo_rev)
         repo_path = os.path.join(_repo_path, 'deployment_files')
 
-        self._validate_site_action(repo_path)
+        self._validate_list_site_action(repo_path)
