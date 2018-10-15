@@ -291,6 +291,8 @@ def _extract_repo_url_and_revision(repo_path_or_url):
             # extract revision from repo URL or path
             repo_url_or_path, revision = repo_path_or_url.rsplit('@', 1)
             revision = revision[:-1] if revision.endswith('/') else revision
+            if revision.endswith(".git"):
+                revision = revision[:-4]
         else:
             repo_url_or_path = repo_path_or_url
     except Exception:
