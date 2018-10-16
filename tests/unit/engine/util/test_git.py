@@ -540,8 +540,30 @@ def test_is_repository_negative():
 
 @pytest.mark.skipif(
     not is_connected(), reason='git clone requires network connectivity.')
-def test_repo_name():
+def test_repo_name_ending_in_git():
+    url = "http://github.com/openstack/airship-pegleg.git"
+    git_dir = git.git_handler(url, ref="master")
+    _validate_git_clone(git_dir)
+
+    name = git.repo_name(git_dir)
+    expected = "airship-pegleg"
+    assert name == expected
+
+@pytest.mark.skipif(
+    not is_connected(), reason='git clone requires network connectivity.')
+def test_repo_name_not_ending_in_git_and_no_fwd_slash_at_end():
     url = "http://github.com/openstack/airship-pegleg"
+    git_dir = git.git_handler(url, ref="master")
+    _validate_git_clone(git_dir)
+
+    name = git.repo_name(git_dir)
+    expected = "airship-pegleg"
+    assert name == expected
+
+@pytest.mark.skipif(
+    not is_connected(), reason='git clone requires network connectivity.')
+def test_repo_name_not_ending_in_git_with_fwd_slash_at_end():
+    url = "http://github.com/openstack/airship-pegleg/"
     git_dir = git.git_handler(url, ref="master")
     _validate_git_clone(git_dir)
 
