@@ -12,8 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import yaml
+
 # flake8: noqa
-from . import lint
-from . import repository
-from . import site
-from . import type
+from pegleg.engine import lint
+from pegleg.engine import repository
+from pegleg.engine import site
+from pegleg.engine import type
+
+
+def __represent_multiline_yaml_str():
+    """Compel ``yaml`` library to use block style literals for multi-line
+    strings to prevent unwanted multiple newlines.
+
+    """
+
+    yaml.SafeDumper.org_represent_str = yaml.SafeDumper.represent_str
+
+    def repr_str(dumper, data):
+        if '\n' in data:
+            return dumper.represent_scalar(
+                'tag:yaml.org,2002:str', data, style='|')
+        return dumper.org_represent_str(data)
+
+    yaml.add_representer(str, repr_str, Dumper=yaml.SafeDumper)
+
+
+__represent_multiline_yaml_str()
