@@ -20,7 +20,7 @@ import random
 import uuid
 
 
-def rand_name(name='', prefix='armada'):
+def rand_name(name='', prefix='pegleg'):
     """Generate a random name that includes a random number
 
     :param str name: The name that you want to include
