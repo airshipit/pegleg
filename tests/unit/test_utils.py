@@ -55,11 +55,14 @@ def is_connected():
 
     :returns: True if connected else False.
     """
-    try:
-        r = requests.get("http://www.github.com/", proxies={}, timeout=3)
-        return r.ok
-    except requests.exceptions.RequestException:
-        return False
+    for _ in range(3):
+        try:
+            r = requests.get("http://www.github.com/", proxies={}, timeout=3)
+            r.raise_for_status()
+            return True
+        except requests.exceptions.RequestException:
+            pass
+    return False
 
 
 def is_connected_behind_proxy():
@@ -67,9 +70,12 @@ def is_connected_behind_proxy():
 
     :returns: True if connected else False.
     """
-    try:
-        r = requests.get(
-            "http://www.github.com/", proxies=_PROXY_SERVERS, timeout=3)
-        return r.ok
-    except requests.exceptions.RequestException:
-        return False
+    for _ in range(3):
+        try:
+            r = requests.get(
+                "http://www.github.com/", proxies=_PROXY_SERVERS, timeout=3)
+            r.raise_for_status()
+            return True
+        except requests.exceptions.RequestException:
+            pass
+    return False
