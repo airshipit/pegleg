@@ -124,6 +124,17 @@ All Pegleg tests are nested under ``tests``.
 Pegleg comes equipped with a number of `tox`_ targets for running unit tests,
 as well as `pep8`_ and `Bandit`_ checks.
 
+Unit Tests
+----------
+
+To run all unit tests, execute::
+
+  $ tox -epy35
+
+To run unit tests using a regex, execute::
+
+  $ tox -epy35 -- <regex>
+
 .. _Airship: https://airshipit.readthedocs.io
 .. _Deckhand: https://airship-deckhand.readthedocs.io/
 .. _Airship coding conventions: https://airshipit.readthedocs.io/en/latest/conventions.html
