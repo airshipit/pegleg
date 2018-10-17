@@ -376,7 +376,14 @@ def repo_name(repo_url_or_path):
     if config_reader.has_section(section):
         repo_url = config_reader.get_value(section, option)
         try:
-            return repo_url.split('/')[-1].split('.git')[0]
+            # Support repos that end with or without '.git'
+            if repo_url.endswith('.git'):
+                return repo_url.split('/')[-1].split('.git')[0]
+            else:
+                if repo_url.endswith('/'):
+                    return repo_url.split('/')[-2]
+                else:
+                    return repo_url.split('/')[-1]
         except Exception:
             raise exceptions.GitConfigException(repo_url=repo_url_or_path)
 
