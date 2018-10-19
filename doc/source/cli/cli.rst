@@ -181,10 +181,10 @@ Example usage:
 
 ::
 
-  ./pegleg.sh site -r /opt/aic-clcp-site-manifests/ \
+  ./pegleg.sh site -r /opt/site-manifests/ \
     -u <AUTH_USER> \
-    -k /opt/.ssh/gerrit.pub \
-    -e global=ssh://REPO_USERNAME@<GERRIT URL>:29418/aic-clcp-manifests.git@master \
+    -k /opt/.ssh/git.pub \
+    -e global=ssh://REPO_USERNAME@<GIT URL>:29418/global-manifests.git@master \
     <command> <options>
 
 Collect
@@ -230,16 +230,16 @@ Example without validation:
 
 ::
 
-    ./pegleg.sh site -r /opt/aic-clcp-site-manifests \
-      -e global=/opt/aic-clcp-manifests \
+    ./pegleg.sh site -r /opt/site-manifests \
+      -e global=/opt/manifests \
       collect <site_name> -s /workspace
 
 Example with validation:
 
 ::
 
-    ./pegleg.sh site -r /opt/aic-clcp-site-manifests \
-      -e global=/opt/aic-clcp-manifests \
+    ./pegleg.sh site -r /opt/site-manifests \
+      -e global=/opt/manifests \
       collect <site_name> -s /workspace -x P004 --validate
 
 List
@@ -264,7 +264,7 @@ Example:
 
 ::
 
-  ./pegleg site -r /opt/aic-clcp-site-manifests list -o /workspace
+  ./pegleg site -r /opt/site-manifests list -o /workspace
 
 Show
 ----
@@ -292,7 +292,7 @@ Example:
 
 ::
 
-  ./pegleg site -r /opt/aic-clcp-site-manifests show site_name -o /workspace
+  ./pegleg site -r /opt/site-manifests show site_name -o /workspace
 
 Render
 ------
@@ -320,7 +320,7 @@ Example:
 
 ::
 
-  ./pegleg site -r /opt/aic-clcp-site-manifests render site_name -o output
+  ./pegleg site -r /opt/site-manifests render site_name -o output
 
 .. _cli-site-lint:
 
@@ -356,8 +356,8 @@ A more complex example involves excluding certain linting checks:
 
 ::
 
-  ./pegleg.sh site -r /opt/aic-clcp-site-manifests \
-    -e global=/opt/aic-clcp-manifests \
+  ./pegleg.sh site -r /opt/site-manifests \
+    -e global=/opt/manifests \
     lint <site_name> \
     -x P001 -x P002 -w P003
 
@@ -385,8 +385,8 @@ Where:
       recommended
     * url (fully qualified) - must have following formats:
 
-      * ssh - <PROTOCOL>://<REPO_USERNAME>@<GERRIT URL>:<PORT>/<REPO_NAME>.git
-      * http|https - <PROTOCOL>://<GERRIT URL>/<REPO_NAME>.git
+      * ssh - <PROTOCOL>://<REPO_USERNAME>@<GIT URL>:<PORT>/<REPO_NAME>.git
+      * http|https - <PROTOCOL>://<GIT URL>/<REPO_NAME>.git
 
     Where:
 
@@ -395,11 +395,11 @@ Where:
         This value will replace the literal string REPO_USERNAME in the
         corresponding entry under the ``repositories`` field in the relevant
         :file:`site-definition.yaml` using ``-u`` CLI flag
-      * <GERRIT_URL> must be a valid Gerrit URL
+      * <GIT_URL> must be a valid Git URL
       * <PORT> must be a valid authentication port for SSH
       * <REVISION> must be a valid :ref:`git-reference`
       * <REPO_NAME> must be a valid Git repository name,
-        e.g. aic-clcp-site-manifests
+        e.g. site-manifests
 
 .. _self-contained-repo:
 
