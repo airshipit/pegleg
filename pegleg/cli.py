@@ -69,8 +69,7 @@ REPOSITORY_CLONE_PATH_OPTION = click.option(
     '-p',
     '--clone-path',
     'clone_path',
-    help=
-    'The path where the repo will be cloned. By default the repo will be '
+    help='The path where the repo will be cloned. By default the repo will be '
     'cloned to the /tmp path. If this option is included and the repo already '
     'exists, then the repo will not be cloned again and the user must specify '
     'a new clone path or pass in the local copy of the repository as the site '
@@ -188,8 +187,8 @@ def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
 @EXTRA_REPOSITORY_OPTION
 @REPOSITORY_USERNAME_OPTION
 @REPOSITORY_KEY_OPTION
-def site(*, site_repository, clone_path, extra_repositories,
-         repo_key, repo_username):
+def site(*, site_repository, clone_path, extra_repositories, repo_key,
+         repo_username):
     """Group for site-level actions, which include:
 
     * list: list available sites in a manifests repo
@@ -201,7 +200,7 @@ def site(*, site_repository, clone_path, extra_repositories,
 
     config.set_site_repo(site_repository)
     config.set_clone_path(clone_path)
-    config.set_extra_repo_store(extra_repositories or [])
+    config.set_extra_repo_overrides(extra_repositories or [])
     config.set_repo_key(repo_key)
     config.set_repo_username(repo_username)
 
@@ -324,8 +323,8 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
 @EXTRA_REPOSITORY_OPTION
 @REPOSITORY_USERNAME_OPTION
 @REPOSITORY_KEY_OPTION
-def type(*, site_repository, clone_path, extra_repositories,
-         repo_key, repo_username):
+def type(*, site_repository, clone_path, extra_repositories, repo_key,
+         repo_username):
     """Group for repo-level actions, which include:
 
     * list: list all types across the repository
@@ -333,7 +332,7 @@ def type(*, site_repository, clone_path, extra_repositories,
     """
     config.set_site_repo(site_repository)
     config.set_clone_path(clone_path)
-    config.set_extra_repo_store(extra_repositories or [])
+    config.set_extra_repo_overrides(extra_repositories or [])
     config.set_repo_key(repo_key)
     config.set_repo_username(repo_username)
 

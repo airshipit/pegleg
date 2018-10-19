@@ -26,6 +26,7 @@ from pegleg.engine.util import git
 from tests.unit import test_utils
 from tests.unit.fixtures import temp_clone_path
 
+
 @pytest.mark.skipif(
     not test_utils.is_connected(),
     reason='git clone requires network connectivity.')
@@ -59,8 +60,7 @@ class TestSiteCLIOptions(BaseCLIActionTest):
     ### clone_path tests ###
 
     def test_list_sites_using_remote_repo_and_clone_path_option(
-        self,
-        temp_clone_path):
+            self, temp_clone_path):
         """Validates clone_path (-p) option is working properly with site list
         action when using remote repo. Verify that the repo was cloned in the
         clone_path
@@ -74,18 +74,16 @@ class TestSiteCLIOptions(BaseCLIActionTest):
                                                            self.repo_rev)
 
         # Note that the -p option is used to specify the clone_folder
-        site_list = self.runner.invoke(cli.site, ['-p', temp_clone_path,
-                                                  '-r', repo_url, 'list'])
+        site_list = self.runner.invoke(
+            cli.site, ['-p', temp_clone_path, '-r', repo_url, 'list'])
 
         assert site_list.exit_code == 0
         # Verify that the repo was cloned into the clone_path
-        assert os.path.exists(os.path.join(temp_clone_path,
-            self.repo_name))
-        assert git.is_repository(os.path.join(temp_clone_path,
-            self.repo_name))
+        assert os.path.exists(os.path.join(temp_clone_path, self.repo_name))
+        assert git.is_repository(os.path.join(temp_clone_path, self.repo_name))
 
-    def test_list_sites_using_local_repo_and_clone_path_option(self,
-        temp_clone_path):
+    def test_list_sites_using_local_repo_and_clone_path_option(
+            self, temp_clone_path):
         """Validates clone_path (-p) option is working properly with site list
         action when using a local repo. Verify that the clone_path has NO
         effect when using a local repo
@@ -98,12 +96,13 @@ class TestSiteCLIOptions(BaseCLIActionTest):
         repo_path = self.treasuremap_path
 
         # Note that the -p option is used to specify the clone_folder
-        site_list = self.runner.invoke(cli.site, ['-p', temp_clone_path,
-                                                  '-r', repo_path, 'list'])
+        site_list = self.runner.invoke(
+            cli.site, ['-p', temp_clone_path, '-r', repo_path, 'list'])
 
         assert site_list.exit_code == 0
         # Verify that passing in clone_path when using local repo has no effect
-        assert not os.path.exists(os.path.join(temp_clone_path, self.repo_name))
+        assert not os.path.exists(
+            os.path.join(temp_clone_path, self.repo_name))
 
 
 class TestSiteCLIOptionsNegative(BaseCLIActionTest):
@@ -111,8 +110,8 @@ class TestSiteCLIOptionsNegative(BaseCLIActionTest):
 
     ### Negative clone_path tests ###
 
-    def test_list_sites_using_remote_repo_and_reuse_clone_path_option(self,
-        temp_clone_path):
+    def test_list_sites_using_remote_repo_and_reuse_clone_path_option(
+            self, temp_clone_path):
         """Validates clone_path (-p) option is working properly with site list
         action when using remote repo. Verify that the same repo can't be
         cloned in the same clone_path if it already exists
@@ -126,16 +125,15 @@ class TestSiteCLIOptionsNegative(BaseCLIActionTest):
                                                            self.repo_rev)
 
         # Note that the -p option is used to specify the clone_folder
-        site_list = self.runner.invoke(cli.site, ['-p', temp_clone_path,
-                                                  '-r', repo_url, 'list'])
+        site_list = self.runner.invoke(
+            cli.site, ['-p', temp_clone_path, '-r', repo_url, 'list'])
 
-        assert git.is_repository(os.path.join(temp_clone_path,
-            self.repo_name))
+        assert git.is_repository(os.path.join(temp_clone_path, self.repo_name))
 
         # Run site list for a second time to validate that the repo can't be
         # cloned twice in the same clone_path
-        site_list = self.runner.invoke(cli.site, ['-p', temp_clone_path,
-                                                  '-r', repo_url, 'list'])
+        site_list = self.runner.invoke(
+            cli.site, ['-p', temp_clone_path, '-r', repo_url, 'list'])
 
         assert site_list.exit_code == 1
         msg = "The repository already exists in the given path. Either " \

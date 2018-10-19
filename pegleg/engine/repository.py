@@ -234,7 +234,7 @@ def _process_repository_overrides(site_def_repos):
     """
 
     # Extra repositories to process.
-    provided_repo_overrides = config.get_extra_repo_store()
+    provided_repo_overrides = config.get_extra_repo_overrides()
     # Map repository names to the associated URL/revision for cloning.
     repo_overrides = {}
 
@@ -312,8 +312,8 @@ def _handle_repository(repo_url_or_path, *args, **kwargs):
     clone_path = config.get_clone_path()
 
     try:
-        return util.git.git_handler(repo_url_or_path, clone_path=clone_path,
-                                    *args, **kwargs)
+        return util.git.git_handler(
+            repo_url_or_path, clone_path=clone_path, *args, **kwargs)
     except exceptions.GitException as e:
         raise click.ClickException(e)
     except Exception as e:

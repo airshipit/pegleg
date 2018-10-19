@@ -183,7 +183,7 @@ def _test_process_repositories(site_repo=None,
     elif repo_overrides:
         with mock.patch.object(
                 config,
-                'get_extra_repo_store',
+                'get_extra_repo_overrides',
                 autospec=True,
                 return_value=list(repo_overrides.values())):
             do_test()
@@ -301,7 +301,7 @@ def test_process_repositiories_extraneous_user_repo_value(m_log, *_):
         # Get rid of REPO_USERNAME through an override.
         with mock.patch.object(
                 config,
-                'get_extra_repo_store',
+                'get_extra_repo_overrides',
                 autospec=True,
                 return_value=repo_overrides):
             _test_process_repositories_inner(
@@ -355,7 +355,7 @@ def test_process_repositiories_no_site_def_repos_with_extraneous_overrides(
     # Provide repo overrides.
     with mock.patch.object(
             config,
-            'get_extra_repo_store',
+            'get_extra_repo_overrides',
             autospec=True,
             return_value=repo_overrides):
         _test_process_repositories_inner(
@@ -395,12 +395,12 @@ def test_process_repositories_without_repositories_key_in_site_definition(
     autospec=True,
     return_value=TEST_REPOSITORIES)
 @mock.patch.object(util.git, 'is_repository', autospec=True, return_value=True)
-@mock.patch.object(config, 'get_extra_repo_store', autospec=True)
+@mock.patch.object(config, 'get_extra_repo_overrides', autospec=True)
 def test_process_extra_repositories_malformed_format_raises_exception(
-        m_get_extra_repo_store, *_):
+        m_get_extra_repo_overrides, *_):
     # Will fail since it doesn't contain "=".
     broken_repo_url = 'broken_url'
-    m_get_extra_repo_store.return_value = [broken_repo_url]
+    m_get_extra_repo_overrides.return_value = [broken_repo_url]
     error = ("The repository %s must be in the form of "
              "name=repoUrl[@revision]" % broken_repo_url)
 
