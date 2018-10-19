@@ -143,11 +143,11 @@ def show(site_name, output_stream):
     site_table.field_names = ['revision', 'site_name', 'site_type', 'files']
     if 'revision' in data.keys():
         for file in data['files']:
-            site_table.add_row([data['revision'], data['site_name'],
-                                data['site_type'], file])
+            site_table.add_row(
+                [data['revision'], data['site_name'], data['site_type'], file])
     else:
         for file in data['files']:
-            site_table.add_row(["", data['site_name'],
-                               data['site_type'], file])
+            site_table.add_row(
+                ["", data['site_name'], data['site_type'], file])
     # Write tables to specified output_stream
     output_stream.write(site_table.get_string() + "\n")

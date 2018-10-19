@@ -45,8 +45,8 @@ def git_handler(repo_url, ref=None, proxy_server=None, auth_key=None):
 
     :param repo_url: URL of remote Git repo or path to local Git repo. If no
         local copy exists, clone it. Afterward, check out ``ref`` in the repo.
-    :param ref: branch, commit or reference in the repo to clone. None causes
-        the currently checked out reference to be used (if repo exists).
+    :param ref: branch, commit or ref in the repo to checkout. None causes the
+        currently checked out reference to be used (if repo exists).
     :param proxy_server: optional, HTTP proxy to use while cloning the repo.
     :param auth_key: If supplied results in using SSH to clone the repository
         with the specified key.  If the value is None, SSH is not used.
@@ -311,20 +311,28 @@ def _create_local_ref(g, branches, ref, newref, reftype=None):
             branches.append(newref)
 
 
-def is_repository(path, *args, **kwargs):
-    """Checks whether the directory ``path`` is a Git repository.
+def is_repository(repo_url_or_path, *args, **kwargs):
+    """Checks whether the directory ``repo_url_or_path`` is a Git repository.
 
-    :param str path: Directory path to check.
-    :returns: True if ``path`` is a repo, else False.
+    :param repo_url_or_path: URL of remote Git repo or path to local Git repo.
+    :returns: True if ``repo_url_or_path`` is a repo, else False.
     :rtype: boolean
 
     """
 
-    try:
-        Repo(path, *args, **kwargs).git_dir
-        return True
-    except git_exc.InvalidGitRepositoryError:
-        return False
+    if os.path.exists(repo_url_or_path):
+        try:
+            Repo(repo_url_or_path, *args, **kwargs).git_dir
+            return True
+        except git_exc.GitError:
+            return False
+    else:
+        try:
+            g = Git()
+            g.ls_remote(repo_url_or_path)
+            return True
+        except git_exc.CommandError:
+            return False
 
 
 def is_equal(first_repo, other_repo):
@@ -342,6 +350,7 @@ def is_equal(first_repo, other_repo):
     if not is_repository(first_repo) or not is_repository(other_repo):
         return False
 
+    # TODO(felipemonteiro): Support this for remote URLs too?
     try:
         # Compare whether the first reference from each repository is the
         # same: by doing so we know the repositories are the same.
@@ -354,21 +363,21 @@ def is_equal(first_repo, other_repo):
         return False
 
 
-def repo_name(repo_url_or_path):
-    """Get the repository name for the local or remote repo at
-    ``repo_url_or_path``.
+def repo_name(repo_path):
+    """Get the repository name for local repo at ``repo_path``.
 
-    :param repo_url: URL of remote Git repo or path to local Git repo.
+    :param repo_path: Path to local Git repo.
     :returns: Corresponding repo name.
     :rtype: str
     :raises GitConfigException: If the path is not a valid Git repo.
 
     """
 
-    if not is_repository(repo_url_or_path):
-        raise exceptions.GitConfigException(repo_url=repo_url_or_path)
+    if not is_repository(normalize_repo_path(repo_path)[0]):
+        raise exceptions.GitConfigException(repo_url=repo_path)
 
-    repo = Repo(repo_url_or_path, search_parent_directories=True)
+    # TODO(felipemonteiro): Support this for remote URLs too?
+    repo = Repo(repo_path, search_parent_directories=True)
     config_reader = repo.config_reader()
     section = 'remote "origin"'
     option = 'url'
@@ -385,12 +394,12 @@ def repo_name(repo_url_or_path):
                 else:
                     return repo_url.split('/')[-1]
         except Exception:
-            raise exceptions.GitConfigException(repo_url=repo_url_or_path)
+            raise exceptions.GitConfigException(repo_url=repo_path)
 
-    raise exceptions.GitConfigException(repo_url=repo_url_or_path)
+    raise exceptions.GitConfigException(repo_url=repo_path)
 
 
-def normalize_repo_path(repo_path):
+def normalize_repo_path(repo_url_or_path):
     """A utility function for retrieving the root repo path when the site
     repository path contains subfolders.
 
@@ -403,24 +412,36 @@ def normalize_repo_path(repo_path):
     :func:`util.definition.site_files_by_repo` for discovering the
     site-definition.yaml.
 
+    :param repo_url_or_path: URL of remote Git repo or path to local Git repo.
+    :returns: Tuple of root Git path or URL, additional subpath included (e.g.
+        "deployment_files")
+    :rtype: tuple
+
     """
 
-    orig_repo_path = repo_path
+    repo_url_or_path = repo_url_or_path.rstrip('/')
+    orig_repo_path = repo_url_or_path
     sub_path = ""
+    is_local_repo = os.path.exists(repo_url_or_path)
 
-    # Only resolve the root path if it's not a URL and exists.
-    if os.path.exists(repo_path):
-        repo_path = os.path.abspath(repo_path)
-        while (repo_path and os.path.exists(repo_path)
-               and not is_repository(repo_path)):
-            paths = repo_path.rsplit("/", 1)
-            if not all(paths):
-                break
-            repo_path = os.path.abspath(paths[0])
-            sub_path = os.path.join(sub_path, paths[1])
-        if not repo_path or not is_repository(repo_path):
-            raise click.ClickException(
-                "Specified site repo path=%s exists but isn't a Git "
-                "repository" % orig_repo_path)
+    def not_repository(path):
+        if is_local_repo:
+            return path and os.path.exists(path) and not is_repository(path)
+        else:
+            return path and not is_repository(path)
 
-    return repo_path, sub_path
+    while not_repository(repo_url_or_path):
+        paths = repo_url_or_path.rsplit("/", 1)
+        if len(paths) != 2 or not all(paths):
+            break
+        repo_url_or_path = paths[0]
+        sub_path = os.path.join(sub_path, paths[1])
+        if is_local_repo:
+            repo_url_or_path = os.path.abspath(repo_url_or_path)
+
+    if not repo_url_or_path or not is_repository(repo_url_or_path):
+        raise click.ClickException(
+            "Specified site repo path=%s exists but is not a valid Git "
+            "repository" % orig_repo_path)
+
+    return repo_url_or_path, sub_path

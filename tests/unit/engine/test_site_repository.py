@@ -14,6 +14,7 @@
 
 import copy
 import mock
+import os
 import yaml
 
 import click
@@ -48,13 +49,17 @@ def clean_temp_folders():
 
 
 @pytest.fixture(autouse=True)
-def stub_out_copy_functionality():
+def stub_out_misc_functionality():
     try:
+        # Stub out copy functionality.
+        mock.patch(
+            'pegleg.engine.repository.shutil.copytree', autospec=True).start()
+        # Stub out problematic Git functions with these unit tests.
         mock.patch.object(
-            repository,
-            '_copy_to_temp_folder',
-            autospec=True,
-            side_effect=lambda x, *a, **k: x).start()
+            util.git,
+            'repo_name',
+            side_effect=lambda *a, **k: 'test',
+            autospec=True).start()
         yield
     finally:
         mock.patch.stopall()
@@ -222,7 +227,7 @@ def test_process_repositories_with_local_site_path_exists_not_repo(*_):
     with pytest.raises(click.ClickException) as exc:
         _test_process_repositories_inner(
             expected_extra_repos=TEST_REPOSITORIES)
-    assert "is not a valid Git repo" in str(exc.value)
+    assert "is not a valid Git repository" in str(exc.value)
 
 
 def test_process_repositories_with_repo_username():
@@ -374,7 +379,8 @@ def test_process_repositories_without_repositories_key_in_site_definition(
         m_log, *_):
     # Stub this out since default config site repo is '.' and local repo might
     # be dirty.
-    with mock.patch.object(repository, '_handle_repository', autospec=True):
+    with mock.patch.object(
+            repository, '_handle_repository', autospec=True, return_value=''):
         _test_process_repositories_inner(
             site_name=mock.sentinel.site, expected_extra_repos={})
     msg = ("The repository for site_name: %s does not contain a "
@@ -400,13 +406,15 @@ def test_process_extra_repositories_malformed_format_raises_exception(
 
     # Stub this out since default config site repo is '.' and local repo might
     # be dirty.
-    with mock.patch.object(repository, '_handle_repository', autospec=True):
+    with mock.patch.object(
+            repository, '_handle_repository', autospec=True, return_value=''):
         with pytest.raises(click.ClickException) as exc:
             repository.process_repositories(mock.sentinel.site)
         assert error == str(exc.value)
 
 
-def test_process_site_repository():
+@mock.patch.object(util.git, 'is_repository', autospec=True, return_value=True)
+def test_process_site_repository(_):
     def _do_test(site_repo):
         expected = site_repo.rsplit('@', 1)[0]
 
@@ -418,7 +426,7 @@ def test_process_site_repository():
                 autospec=True,
                 return_value=expected):
             result = repository.process_site_repository()
-        assert expected == result
+        assert os.path.normpath(expected) == os.path.normpath(result)
 
     # Ensure that the reference is always pruned.
     _do_test('http://github.com/openstack/treasuremap@master')

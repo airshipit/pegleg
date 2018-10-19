@@ -16,8 +16,19 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import os
 import random
+import requests
 import uuid
+
+_PROXY_SERVERS = {
+    'http':
+    os.getenv('HTTP_PROXY',
+              os.getenv('http_proxy', 'http://one.proxy.att.com:8888')),
+    'https':
+    os.getenv('HTTPS_PROXY',
+              os.getenv('https_proxy', 'https://one.proxy.att.com:8888'))
+}
 
 
 def rand_name(name='', prefix='pegleg'):
@@ -37,3 +48,28 @@ def rand_name(name='', prefix='pegleg'):
     if prefix:
         rand_name = prefix + '-' + rand_name
     return rand_name
+
+
+def is_connected():
+    """Verifies whether network connectivity is up.
+
+    :returns: True if connected else False.
+    """
+    try:
+        r = requests.get("http://www.github.com/", proxies={}, timeout=3)
+        return r.ok
+    except requests.exceptions.RequestException:
+        return False
+
+
+def is_connected_behind_proxy():
+    """Verifies whether network connectivity is up behind given proxy.
+
+    :returns: True if connected else False.
+    """
+    try:
+        r = requests.get(
+            "http://www.github.com/", proxies=_PROXY_SERVERS, timeout=3)
+        return r.ok
+    except requests.exceptions.RequestException:
+        return False
