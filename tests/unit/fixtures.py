@@ -15,6 +15,7 @@
 from __future__ import absolute_import
 import copy
 import os
+import shutil
 import tempfile
 
 import pytest
@@ -154,3 +155,13 @@ schema: pegleg/SiteDefinition/v1
         files._create_tree(cicd_path, tree=test_structure)
 
     yield
+
+
+@pytest.fixture()
+def temp_clone_path():
+    temp_folder = tempfile.mkdtemp()
+    try:
+        yield temp_folder
+    finally:
+        if os.path.exists(temp_folder):
+            shutil.rmtree(temp_folder, ignore_errors=True)

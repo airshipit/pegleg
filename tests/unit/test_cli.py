@@ -24,7 +24,7 @@ from pegleg import cli
 from pegleg.engine import errorcodes
 from pegleg.engine.util import git
 from tests.unit import test_utils
-
+from tests.unit.fixtures import temp_clone_path
 
 @pytest.mark.skipif(
     not test_utils.is_connected(),
@@ -51,6 +51,97 @@ class BaseCLIActionTest(object):
         cls.repo_name = "airship-treasuremap"
         repo_url = "https://github.com/openstack/%s.git" % cls.repo_name
         cls.treasuremap_path = git.git_handler(repo_url, ref=cls.repo_rev)
+
+
+class TestSiteCLIOptions(BaseCLIActionTest):
+    """Tests site-level CLI options."""
+
+    ### clone_path tests ###
+
+    def test_list_sites_using_remote_repo_and_clone_path_option(
+        self,
+        temp_clone_path):
+        """Validates clone_path (-p) option is working properly with site list
+        action when using remote repo. Verify that the repo was cloned in the
+        clone_path
+        """
+        # Scenario:
+        #
+        # 1) List sites (should clone repo automatically to `clone_path`
+        #    location if `clone_path` is set)
+
+        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+                                                           self.repo_rev)
+
+        # Note that the -p option is used to specify the clone_folder
+        site_list = self.runner.invoke(cli.site, ['-p', temp_clone_path,
+                                                  '-r', repo_url, 'list'])
+
+        assert site_list.exit_code == 0
+        # Verify that the repo was cloned into the clone_path
+        assert os.path.exists(os.path.join(temp_clone_path,
+            self.repo_name))
+        assert git.is_repository(os.path.join(temp_clone_path,
+            self.repo_name))
+
+    def test_list_sites_using_local_repo_and_clone_path_option(self,
+        temp_clone_path):
+        """Validates clone_path (-p) option is working properly with site list
+        action when using a local repo. Verify that the clone_path has NO
+        effect when using a local repo
+        """
+        # Scenario:
+        #
+        # 1) List sites (when using local repo there should be not cloning
+        # even if the clone_path is passed in)
+
+        repo_path = self.treasuremap_path
+
+        # Note that the -p option is used to specify the clone_folder
+        site_list = self.runner.invoke(cli.site, ['-p', temp_clone_path,
+                                                  '-r', repo_path, 'list'])
+
+        assert site_list.exit_code == 0
+        # Verify that passing in clone_path when using local repo has no effect
+        assert not os.path.exists(os.path.join(temp_clone_path, self.repo_name))
+
+
+class TestSiteCLIOptionsNegative(BaseCLIActionTest):
+    """Negative Tests for site-level CLI options."""
+
+    ### Negative clone_path tests ###
+
+    def test_list_sites_using_remote_repo_and_reuse_clone_path_option(self,
+        temp_clone_path):
+        """Validates clone_path (-p) option is working properly with site list
+        action when using remote repo. Verify that the same repo can't be
+        cloned in the same clone_path if it already exists
+        """
+        # Scenario:
+        #
+        # 1) List sites (should clone repo automatically to `clone_path`
+        #    location if `clone_path` is set)
+
+        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+                                                           self.repo_rev)
+
+        # Note that the -p option is used to specify the clone_folder
+        site_list = self.runner.invoke(cli.site, ['-p', temp_clone_path,
+                                                  '-r', repo_url, 'list'])
+
+        assert git.is_repository(os.path.join(temp_clone_path,
+            self.repo_name))
+
+        # Run site list for a second time to validate that the repo can't be
+        # cloned twice in the same clone_path
+        site_list = self.runner.invoke(cli.site, ['-p', temp_clone_path,
+                                                  '-r', repo_url, 'list'])
+
+        assert site_list.exit_code == 1
+        msg = "The repository already exists in the given path. Either " \
+              "provide a new clone path or pass in the path of the local " \
+              "repository as the site repository (-r)."
+        assert msg in site_list.output
 
     @classmethod
     def teardown_class(cls):

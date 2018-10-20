@@ -29,7 +29,8 @@ LOG = logging.getLogger(__name__)
 __all__ = ('git_handler', )
 
 
-def git_handler(repo_url, ref=None, proxy_server=None, auth_key=None):
+def git_handler(repo_url, ref=None, proxy_server=None,
+                auth_key=None, clone_path=None):
     """Handle directories that are Git repositories.
 
     If ``repo_url`` is a valid URL for which a local repository doesn't
@@ -50,6 +51,8 @@ def git_handler(repo_url, ref=None, proxy_server=None, auth_key=None):
     :param proxy_server: optional, HTTP proxy to use while cloning the repo.
     :param auth_key: If supplied results in using SSH to clone the repository
         with the specified key.  If the value is None, SSH is not used.
+    :param clone_path: The path where the repo will be cloned. By default the
+        repo will be cloned to the /tmp path.
     :returns: Path to the cloned repo if a repo was cloned, else absolute
         path to ``repo_url``.
     :raises ValueError: If ``repo_url`` isn't a valid URL or doesn't begin
@@ -72,7 +75,8 @@ def git_handler(repo_url, ref=None, proxy_server=None, auth_key=None):
         # we need to clone the repo_url first since it doesn't exist and then
         # checkout the appropriate reference - and return the tmpdir
         if parsed_url.scheme in supported_clone_protocols:
-            return _try_git_clone(repo_url, ref, proxy_server, auth_key)
+            return _try_git_clone(repo_url, ref, proxy_server,
+                                  auth_key, clone_path)
         else:
             raise ValueError('repo_url=%s must use one of the following '
                              'protocols: %s' %
@@ -138,7 +142,8 @@ def _get_current_ref(repo_url):
         return None
 
 
-def _try_git_clone(repo_url, ref=None, proxy_server=None, auth_key=None):
+def _try_git_clone(repo_url, ref=None, proxy_server=None,
+                   auth_key=None, clone_path=None):
     """Try cloning Git repo from ``repo_url`` using the reference ``ref``.
 
     :param repo_url: URL of remote Git repo or path to local Git repo.
@@ -146,6 +151,8 @@ def _try_git_clone(repo_url, ref=None, proxy_server=None, auth_key=None):
     :param proxy_server: optional, HTTP proxy to use while cloning the repo.
     :param auth_key: If supplied results in using SSH to clone the repository
         with the specified key.  If the value is None, SSH is not used.
+    :param clone_path: The path where the repo will be cloned. By default the
+        repo will be cloned to the /tmp path.
     :returns: Path to the cloned repo.
     :rtype: str
     :raises GitException: If ``repo_url`` is invalid or could not be found.
@@ -155,12 +162,20 @@ def _try_git_clone(repo_url, ref=None, proxy_server=None, auth_key=None):
 
     """
 
+    if clone_path is None:
+        clone_path = tempfile.mkdtemp()
     # the name here is important as it bubbles back up to the output filename
     # and ensure we handle url/foo.git/ cases. prefix is 'tmp' by default.
-    root_temp_dir = tempfile.mkdtemp()
     repo_name = repo_url.rstrip('/').split('/')[-1]
-    temp_dir = os.path.join(root_temp_dir, repo_name)
-    os.makedirs(temp_dir)
+    temp_dir = os.path.join(clone_path, repo_name)
+    try:
+        os.makedirs(temp_dir)
+    except FileExistsError:
+        msg = "The repository already exists in the given path. Either " \
+              "provide a new clone path or pass in the path of the local " \
+              "repository as the site repository (-r)."
+        LOG.error(msg)
+        raise
 
     env_vars = _get_clone_env_vars(repo_url, ref, auth_key)
     ssh_cmd = env_vars.get('GIT_SSH_COMMAND')

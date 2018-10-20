@@ -65,6 +65,20 @@ REPOSITORY_USERNAME_OPTION = click.option(
     'specified in the site-definition file. Any occurrences of REPO_USERNAME '
     'will be replaced with this value.')
 
+REPOSITORY_CLONE_PATH_OPTION = click.option(
+    '-p',
+    '--clone-path',
+    'clone_path',
+    help=
+    'The path where the repo will be cloned. By default the repo will be '
+    'cloned to the /tmp path. If this option is included and the repo already '
+    'exists, then the repo will not be cloned again and the user must specify '
+    'a new clone path or pass in the local copy of the repository as the site '
+    'repository. Suppose the repo name is airship-treasuremap and the clone '
+    'path is /tmp/mypath then the following directory is created '
+    '/tmp/mypath/airship-treasuremap which will contain the contents of the '
+    'repo')
+
 ALLOW_MISSING_SUBSTITUTIONS_OPTION = click.option(
     '-f',
     '--fail-on-missing-sub-src',
@@ -116,11 +130,12 @@ def main(*, verbose):
 
 @main.group(help='Commands related to repositories')
 @MAIN_REPOSITORY_OPTION
+@REPOSITORY_CLONE_PATH_OPTION
 # TODO(felipemonteiro): Support EXTRA_REPOSITORY_OPTION as well to be
 # able to lint multiple repos together.
 @REPOSITORY_USERNAME_OPTION
 @REPOSITORY_KEY_OPTION
-def repo(*, site_repository, repo_key, repo_username):
+def repo(*, site_repository, clone_path, repo_key, repo_username):
     """Group for repo-level actions, which include:
 
     * lint: lint all sites across the repository
@@ -128,6 +143,7 @@ def repo(*, site_repository, repo_key, repo_username):
     """
 
     config.set_site_repo(site_repository)
+    config.set_clone_path(clone_path)
     config.set_repo_key(repo_key)
     config.set_repo_username(repo_username)
 
@@ -168,10 +184,12 @@ def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
 
 @main.group(help='Commands related to sites')
 @MAIN_REPOSITORY_OPTION
+@REPOSITORY_CLONE_PATH_OPTION
 @EXTRA_REPOSITORY_OPTION
 @REPOSITORY_USERNAME_OPTION
 @REPOSITORY_KEY_OPTION
-def site(*, site_repository, extra_repositories, repo_key, repo_username):
+def site(*, site_repository, clone_path, extra_repositories,
+         repo_key, repo_username):
     """Group for site-level actions, which include:
 
     * list: list available sites in a manifests repo
@@ -182,6 +200,7 @@ def site(*, site_repository, extra_repositories, repo_key, repo_username):
     """
 
     config.set_site_repo(site_repository)
+    config.set_clone_path(clone_path)
     config.set_extra_repo_store(extra_repositories or [])
     config.set_repo_key(repo_key)
     config.set_repo_username(repo_username)
@@ -301,16 +320,19 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
 
 @main.group(help='Commands related to types')
 @MAIN_REPOSITORY_OPTION
+@REPOSITORY_CLONE_PATH_OPTION
 @EXTRA_REPOSITORY_OPTION
 @REPOSITORY_USERNAME_OPTION
 @REPOSITORY_KEY_OPTION
-def type(*, site_repository, extra_repositories, repo_key, repo_username):
+def type(*, site_repository, clone_path, extra_repositories,
+         repo_key, repo_username):
     """Group for repo-level actions, which include:
 
     * list: list all types across the repository
 
     """
     config.set_site_repo(site_repository)
+    config.set_clone_path(clone_path)
     config.set_extra_repo_store(extra_repositories or [])
     config.set_repo_key(repo_key)
     config.set_repo_username(repo_username)

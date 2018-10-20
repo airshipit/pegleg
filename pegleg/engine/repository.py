@@ -152,7 +152,9 @@ def _process_repository(repo_url_or_path, repo_revision):
 
     if os.path.exists(repo_url_or_path):
         repo_name = util.git.repo_name(repo_url_or_path)
-        new_temp_path = os.path.join(tempfile.mkdtemp(), repo_name)
+        parent_temp_path = tempfile.mkdtemp()
+        __REPO_FOLDERS.setdefault(repo_name, parent_temp_path)
+        new_temp_path = os.path.join(parent_temp_path, repo_name)
         norm_path, sub_path = util.git.normalize_repo_path(repo_url_or_path)
         shutil.copytree(src=norm_path, dst=new_temp_path, symlinks=True)
         __REPO_FOLDERS.setdefault(repo_name, new_temp_path)
@@ -169,7 +171,7 @@ def _process_site_repository(repo_url_or_path, repo_revision):
 
     Also validate that the provided ``repo_url_or_path`` is a valid Git
     repository. If ``repo_url_or_path`` doesn't already exist, clone it.
-    If it does, extra the appropriate revision and check it out.
+    If it does, extract the appropriate revision and check it out.
 
     :param repo_url_or_path: Repo path or URL and associated auth information.
         If URL, examples include:
@@ -306,9 +308,12 @@ def _handle_repository(repo_url_or_path, *args, **kwargs):
     checkout specified reference .
 
     """
+    # Retrieve the clone path where the repo will be cloned
+    clone_path = config.get_clone_path()
 
     try:
-        return util.git.git_handler(repo_url_or_path, *args, **kwargs)
+        return util.git.git_handler(repo_url_or_path, clone_path=clone_path,
+                                    *args, **kwargs)
     except exceptions.GitException as e:
         raise click.ClickException(e)
     except Exception as e:

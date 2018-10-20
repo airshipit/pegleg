@@ -14,7 +14,10 @@
 
 import copy
 
+import os
 import pytest
+import shutil
+import tempfile
 
 from pegleg import config
 """Fixtures that are applied to all unit tests."""
@@ -30,3 +33,25 @@ def restore_config():
         yield
     finally:
         config.GLOBAL_CONTEXT = original_global_context
+
+
+@pytest.fixture(scope="class", autouse=True)
+def clean_temporary_git_repos():
+    """Iterates through all temporarily created directories and deletes each
+    one that was created for testing.
+
+    """
+
+    def temporary_git_repos():
+        root_tempdir = tempfile.gettempdir()
+        tempdirs = os.listdir(root_tempdir)
+        for tempdir in tempdirs:
+            path = os.path.join(root_tempdir, tempdir)
+            if os.path.isdir(path) and os.access(path, os.R_OK):
+                if any(p.startswith('airship') for p in os.listdir(path)):
+                    yield path
+    try:
+        yield
+    finally:
+        for tempdir in temporary_git_repos():
+            shutil.rmtree(tempdir, ignore_errors=True)

@@ -103,6 +103,20 @@ The revision can also be specified via (for example):
 
   -r /opt/aic-site-clcp-manifests@revision
 
+**-p / --clone-path** (Optional).
+
+The path where the repo will be cloned. By default the repo will be cloned to
+the /tmp path. If this option is included and the repo already exists, then the
+repo will not be cloned again and the user must specify a new clone path or
+pass in the local copy of the repository as the site repository. Suppose the
+repo name is airship-treasuremap and the clone path is /tmp/mypath then the
+following directory is created /tmp/mypath/airship-treasuremap which will
+contain the contents of the repo. Example of using clone path:
+
+::
+
+  -p /tmp/mypath
+
 .. _cli-repo-lint:
 
 Lint
@@ -147,6 +161,20 @@ These should be named per the site-definition file, e.g.:
 ::
 
   -e global=/opt/global -e secrets=/opt/secrets
+
+**-p / --clone-path** (Optional).
+
+The path where the repo will be cloned. By default the repo will be cloned to
+the /tmp path. If this option is included and the repo already exists, then the
+repo will not be cloned again and the user must specify a new clone path or
+pass in the local copy of the repository as the site repository. Suppose the
+repo name is airship-treasuremap and the clone path is /tmp/mypath then the
+following directory is created /tmp/mypath/airship-treasuremap which will
+contain the contents of the repo. Example of using clone path:
+
+::
+
+  -p /tmp/mypath
 
 Repository Overrides
 ^^^^^^^^^^^^^^^^^^^^

@@ -26,20 +26,6 @@ from pegleg.engine.util import git
 from tests.unit import test_utils
 
 
-@pytest.fixture(autouse=True)
-def clean_git_repos():
-    """Iterates through all temporarily created directories and deletes each
-    one that was created for testing.
-
-    """
-
-    root_tempdir = tempfile.gettempdir()
-    for tempdir in os.listdir(root_tempdir):
-        path = os.path.join(root_tempdir, tempdir)
-        if git.is_repository(path):
-            shutil.rmtree(path, ignore_errors=True)
-
-
 def _validate_git_clone(repo_dir, fetched_ref=None, checked_out_ref=None):
     """Validate that git clone/checkout work.
 
@@ -121,7 +107,7 @@ def test_git_clone_behind_proxy(mock_log):
     url = 'https://github.com/openstack/airship-armada'
     commit = 'cba78d1d03e4910f6ab1691bae633c5bddce893d'
 
-    for proxy_server in _PROXY_SERVERS.values():
+    for proxy_server in test_utils._PROXY_SERVERS.values():
         git_dir = git.git_handler(url, commit, proxy_server=proxy_server)
         _validate_git_clone(git_dir, commit)
 

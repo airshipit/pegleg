@@ -19,6 +19,7 @@ except NameError:
     GLOBAL_CONTEXT = {
         'site_repo': './',
         'extra_repos': [],
+        'clone_path': None,
         'site_path': 'site',
         'type_path': 'type'
     }
@@ -30,6 +31,14 @@ def get_site_repo():
 
 def set_site_repo(r):
     GLOBAL_CONTEXT['site_repo'] = r.rstrip('/') + '/'
+
+
+def get_clone_path():
+    return GLOBAL_CONTEXT['clone_path']
+
+
+def set_clone_path(p):
+    GLOBAL_CONTEXT['clone_path'] = p
 
 
 def get_extra_repo_store():
