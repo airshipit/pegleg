@@ -29,6 +29,18 @@ CONTEXT_SETTINGS = {
     'help_option_names': ['-h', '--help'],
 }
 
+
+def _process_repositories_callback(ctx, param, value):
+    """Convenient callback for ``@click.argument(site_name)``.
+
+    Automatically processes repository information for the specified site. This
+    entails cloning all requires repositories and checking out specified
+    references for each repository.
+    """
+    engine.repository.process_repositories(value)
+    return value
+
+
 MAIN_REPOSITORY_OPTION = click.option(
     '-r',
     '--site-repository',
@@ -69,8 +81,7 @@ REPOSITORY_CLONE_PATH_OPTION = click.option(
     '-p',
     '--clone-path',
     'clone_path',
-    help=
-    'The path where the repo will be cloned. By default the repo will be '
+    help='The path where the repo will be cloned. By default the repo will be '
     'cloned to the /tmp path. If this option is included and the repo already '
     'exists, then the repo will not be cloned again and the user must specify '
     'a new clone path or pass in the local copy of the repository as the site '
@@ -103,6 +114,9 @@ WARN_LINT_OPTION = click.option(
     'warn_lint',
     multiple=True,
     help='Warn if linting check fails. -w takes priority over -x.')
+
+SITE_REPOSITORY_ARGUMENT = click.argument(
+    'site_name', callback=_process_repositories_callback)
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -188,8 +202,8 @@ def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
 @EXTRA_REPOSITORY_OPTION
 @REPOSITORY_USERNAME_OPTION
 @REPOSITORY_KEY_OPTION
-def site(*, site_repository, clone_path, extra_repositories,
-         repo_key, repo_username):
+def site(*, site_repository, clone_path, extra_repositories, repo_key,
+         repo_username):
     """Group for site-level actions, which include:
 
     * list: list available sites in a manifests repo
@@ -235,7 +249,7 @@ def site(*, site_repository, clone_path, extra_repositories,
     'warn_lint',
     multiple=True,
     help='Warn if linting check fails. -w takes priority over -x.')
-@click.argument('site_name')
+@SITE_REPOSITORY_ARGUMENT
 def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     """Collects documents into a single site-definition.yaml file, which
     defines the entire site definition and contains all documents required
@@ -247,9 +261,6 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     Collect can lint documents prior to collection if the ``--validate``
     flag is optionally included.
     """
-
-    engine.repository.process_repositories(site_name)
-
     if validate:
         # Lint the primary repo prior to document collection.
         _lint_helper(
@@ -268,7 +279,7 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     type=click.File(mode='w'),
     default=sys.stdout,
     help='Where to output. Defaults to sys.stdout.')
-def list_(*, output_stream):
+def list_sites(*, output_stream):
     engine.repository.process_site_repository(update_config=True)
     engine.site.list_(output_stream)
 
@@ -281,9 +292,8 @@ def list_(*, output_stream):
     type=click.File(mode='w'),
     default=sys.stdout,
     help='Where to output. Defaults to sys.stdout.')
-@click.argument('site_name')
+@SITE_REPOSITORY_ARGUMENT
 def show(*, output_stream, site_name):
-    engine.repository.process_repositories(site_name)
     engine.site.show(site_name, output_stream)
 
 
@@ -295,9 +305,8 @@ def show(*, output_stream, site_name):
     type=click.File(mode='w'),
     default=sys.stdout,
     help='Where to output. Defaults to sys.stdout.')
-@click.argument('site_name')
+@SITE_REPOSITORY_ARGUMENT
 def render(*, output_stream, site_name):
-    engine.repository.process_repositories(site_name)
     engine.site.render(site_name, output_stream)
 
 
@@ -305,12 +314,11 @@ def render(*, output_stream, site_name):
 @ALLOW_MISSING_SUBSTITUTIONS_OPTION
 @EXCLUDE_LINT_OPTION
 @WARN_LINT_OPTION
-@click.argument('site_name')
+@SITE_REPOSITORY_ARGUMENT
 def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
     """Lint a given site using checks defined in
     :mod:`pegleg.engine.errorcodes`.
     """
-    engine.repository.process_repositories(site_name)
     _lint_helper(
         site_name=site_name,
         fail_on_missing_sub_src=fail_on_missing_sub_src,
@@ -324,8 +332,8 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
 @EXTRA_REPOSITORY_OPTION
 @REPOSITORY_USERNAME_OPTION
 @REPOSITORY_KEY_OPTION
-def type(*, site_repository, clone_path, extra_repositories,
-         repo_key, repo_username):
+def type(*, site_repository, clone_path, extra_repositories, repo_key,
+         repo_username):
     """Group for repo-level actions, which include:
 
     * list: list all types across the repository

@@ -29,8 +29,11 @@ LOG = logging.getLogger(__name__)
 __all__ = ('git_handler', )
 
 
-def git_handler(repo_url, ref=None, proxy_server=None,
-                auth_key=None, clone_path=None):
+def git_handler(repo_url,
+                ref=None,
+                proxy_server=None,
+                auth_key=None,
+                clone_path=None):
     """Handle directories that are Git repositories.
 
     If ``repo_url`` is a valid URL for which a local repository doesn't
@@ -75,8 +78,8 @@ def git_handler(repo_url, ref=None, proxy_server=None,
         # we need to clone the repo_url first since it doesn't exist and then
         # checkout the appropriate reference - and return the tmpdir
         if parsed_url.scheme in supported_clone_protocols:
-            return _try_git_clone(repo_url, ref, proxy_server,
-                                  auth_key, clone_path)
+            return _try_git_clone(repo_url, ref, proxy_server, auth_key,
+                                  clone_path)
         else:
             raise ValueError('repo_url=%s must use one of the following '
                              'protocols: %s' %
@@ -142,8 +145,11 @@ def _get_current_ref(repo_url):
         return None
 
 
-def _try_git_clone(repo_url, ref=None, proxy_server=None,
-                   auth_key=None, clone_path=None):
+def _try_git_clone(repo_url,
+                   ref=None,
+                   proxy_server=None,
+                   auth_key=None,
+                   clone_path=None):
     """Try cloning Git repo from ``repo_url`` using the reference ``ref``.
 
     :param repo_url: URL of remote Git repo or path to local Git repo.
@@ -168,6 +174,7 @@ def _try_git_clone(repo_url, ref=None, proxy_server=None,
     # and ensure we handle url/foo.git/ cases. prefix is 'tmp' by default.
     repo_name = repo_url.rstrip('/').split('/')[-1]
     temp_dir = os.path.join(clone_path, repo_name)
+
     try:
         os.makedirs(temp_dir)
     except FileExistsError:

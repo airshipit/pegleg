@@ -312,8 +312,8 @@ def _handle_repository(repo_url_or_path, *args, **kwargs):
     clone_path = config.get_clone_path()
 
     try:
-        return util.git.git_handler(repo_url_or_path, clone_path=clone_path,
-                                    *args, **kwargs)
+        return util.git.git_handler(
+            repo_url_or_path, clone_path=clone_path, *args, **kwargs)
     except exceptions.GitException as e:
         raise click.ClickException(e)
     except Exception as e:
