@@ -117,20 +117,12 @@ def list_(output_stream):
 
     # Create a table to output site information for all sites for a given repo
     site_table = PrettyTable()
-    site_table.field_names = ['site_name', 'site_type']
+    field_names = ['site_name', 'site_type']
+    site_table.field_names = field_names
 
     for site_name in util.files.list_sites():
-        params = util.definition.load_as_params(site_name)
-        # TODO(felipemonteiro): This is a temporary hack around legacy manifest
-        # repositories containing the name of a directory that symbolizes a
-        # repository. Once all these manifest repositories migrate over to Git
-        # references instead, remove this hack.
-        # NOTE(felipemonteiro): The 'revision' information can instead be
-        # computed using :func:`process_site_repository` and storing into
-        # a configuration via a "set_site_revision" function, for example.
-        if 'revision' in params:
-            params.pop('revision')
-        site_table.add_row([params['site_name'], params['site_type']])
+        params = util.definition.load_as_params(site_name, *field_names)
+        site_table.add_row(list(map(lambda k: params[k], field_names)))
     # Write table to specified output_stream
     output_stream.write(site_table.get_string() + "\n")
 
@@ -141,6 +133,8 @@ def show(site_name, output_stream):
     # Create a table to output site information for specific site
     site_table = PrettyTable()
     site_table.field_names = ['revision', 'site_name', 'site_type', 'files']
+    # TODO(felipemonteiro): Drop support for 'revision' once manifest
+    # repositories have removed it altogether.
     if 'revision' in data.keys():
         for file in data['files']:
             site_table.add_row(

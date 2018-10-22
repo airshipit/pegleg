@@ -30,18 +30,25 @@ def load(site, primary_repo_base=None):
     return files.slurp(path(site, primary_repo_base))
 
 
-def load_as_params(site_name, primary_repo_base=None):
+def load_as_params(site_name, *fields, primary_repo_base=None):
+    """Load site definition for given ``site_name`` and return data as params.
+
+    :param str site_name: Name of the site.
+    :param iterable fields: List of parameter fields to return. Defaults to
+        ``('site_name', 'site_type')``.
+    :param str primary_repo_base: Path to primary repository.
+    :returns: key-value pairs of parameters, whose keys are a subset of those
+        specified by ``fields``.
+    :rtype: dict
+    """
+    if not fields:
+        # Default legacy fields.
+        fields = ('site_name', 'site_type')
+
     definition = load(site_name, primary_repo_base)
-    # TODO(felipemonteiro): Currently we are filtering out "revision" from
-    # the params that are returned by this function because it is no longer
-    # supported. This is a workaround. As soon as the site definition repos
-    # switch to real repository format, then we can drop that workaround.
-    # Ideally, we should:
-    # 1) validate the site-definition.yaml format using lint module
-    # 2) extract only the required params here
     params = definition.get('data', {})
     params['site_name'] = site_name
-    return params
+    return {k: v for k, v in params.items() if k in fields}
 
 
 def path(site_name, primary_repo_base=None):
@@ -63,17 +70,14 @@ def pluck(site_definition, key):
 
 def site_files(site_name):
     params = load_as_params(site_name)
-    for filename in files.search(
-            files.directories_for(
-                site_name=params['site_name'], site_type=params['site_type'])):
+    for filename in files.search(files.directories_for(**params)):
         yield filename
 
 
 def site_files_by_repo(site_name):
     """Yield tuples of repo_base, file_name."""
     params = load_as_params(site_name)
-    dir_map = files.directories_for_each_repo(
-        site_name=params['site_name'], site_type=params['site_type'])
+    dir_map = files.directories_for_each_repo(**params)
     for repo, dl in dir_map.items():
         for filename in files.search(dl):
             yield (repo, filename)
@@ -93,8 +97,7 @@ def documents_for_each_site():
 
     for sitename in sitenames:
         params = load_as_params(sitename)
-        paths = files.directories_for(
-            site_name=params['site_name'], site_type=params['site_type'])
+        paths = files.directories_for(**params)
         filenames = set(files.search(paths))
         for filename in filenames:
             with open(filename) as f:
@@ -116,8 +119,7 @@ def documents_for_site(sitename):
     documents = []
 
     params = load_as_params(sitename)
-    paths = files.directories_for(
-        site_name=params['site_name'], site_type=params['site_type'])
+    paths = files.directories_for(**params)
     filenames = set(files.search(paths))
     for filename in filenames:
         with open(filename) as f:
