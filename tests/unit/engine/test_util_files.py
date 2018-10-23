@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import tempfile
-
 from pegleg import config
 from pegleg.engine.util import files
 from tests.unit.fixtures import create_tmp_deployment_files

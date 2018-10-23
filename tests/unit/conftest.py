@@ -35,7 +35,7 @@ def restore_config():
         config.GLOBAL_CONTEXT = original_global_context
 
 
-@pytest.fixture(scope="class", autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 def clean_temporary_git_repos():
     """Iterates through all temporarily created directories and deletes each
     one that was created for testing.

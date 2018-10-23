@@ -14,7 +14,6 @@
 
 import os
 import shutil
-import tempfile
 
 from click.testing import CliRunner
 import mock
@@ -24,7 +23,7 @@ from pegleg import cli
 from pegleg.engine import errorcodes
 from pegleg.engine.util import git
 from tests.unit import test_utils
-from tests.unit.fixtures import temp_clone_path
+from tests.unit.fixtures import temp_path
 
 
 @pytest.mark.skipif(
@@ -65,7 +64,7 @@ class TestSiteCLIOptions(BaseCLIActionTest):
     ### clone_path tests ###
 
     def test_list_sites_using_remote_repo_and_clone_path_option(
-            self, temp_clone_path):
+            self, temp_path):
         """Validates clone_path (-p) option is working properly with site list
         action when using remote repo. Verify that the repo was cloned in the
         clone_path
@@ -80,15 +79,15 @@ class TestSiteCLIOptions(BaseCLIActionTest):
 
         # Note that the -p option is used to specify the clone_folder
         site_list = self.runner.invoke(
-            cli.site, ['-p', temp_clone_path, '-r', repo_url, 'list'])
+            cli.site, ['-p', temp_path, '-r', repo_url, 'list'])
 
         assert site_list.exit_code == 0
         # Verify that the repo was cloned into the clone_path
-        assert os.path.exists(os.path.join(temp_clone_path, self.repo_name))
-        assert git.is_repository(os.path.join(temp_clone_path, self.repo_name))
+        assert os.path.exists(os.path.join(temp_path, self.repo_name))
+        assert git.is_repository(os.path.join(temp_path, self.repo_name))
 
     def test_list_sites_using_local_repo_and_clone_path_option(
-            self, temp_clone_path):
+            self, temp_path):
         """Validates clone_path (-p) option is working properly with site list
         action when using a local repo. Verify that the clone_path has NO
         effect when using a local repo
@@ -102,12 +101,11 @@ class TestSiteCLIOptions(BaseCLIActionTest):
 
         # Note that the -p option is used to specify the clone_folder
         site_list = self.runner.invoke(
-            cli.site, ['-p', temp_clone_path, '-r', repo_path, 'list'])
+            cli.site, ['-p', temp_path, '-r', repo_path, 'list'])
 
         assert site_list.exit_code == 0
         # Verify that passing in clone_path when using local repo has no effect
-        assert not os.path.exists(
-            os.path.join(temp_clone_path, self.repo_name))
+        assert not os.path.exists(os.path.join(temp_path, self.repo_name))
 
 
 class TestSiteCLIOptionsNegative(BaseCLIActionTest):
@@ -116,7 +114,7 @@ class TestSiteCLIOptionsNegative(BaseCLIActionTest):
     ### Negative clone_path tests ###
 
     def test_list_sites_using_remote_repo_and_reuse_clone_path_option(
-            self, temp_clone_path):
+            self, temp_path):
         """Validates clone_path (-p) option is working properly with site list
         action when using remote repo. Verify that the same repo can't be
         cloned in the same clone_path if it already exists
@@ -131,14 +129,14 @@ class TestSiteCLIOptionsNegative(BaseCLIActionTest):
 
         # Note that the -p option is used to specify the clone_folder
         site_list = self.runner.invoke(
-            cli.site, ['-p', temp_clone_path, '-r', repo_url, 'list'])
+            cli.site, ['-p', temp_path, '-r', repo_url, 'list'])
 
-        assert git.is_repository(os.path.join(temp_clone_path, self.repo_name))
+        assert git.is_repository(os.path.join(temp_path, self.repo_name))
 
         # Run site list for a second time to validate that the repo can't be
         # cloned twice in the same clone_path
         site_list = self.runner.invoke(
-            cli.site, ['-p', temp_clone_path, '-r', repo_url, 'list'])
+            cli.site, ['-p', temp_path, '-r', repo_url, 'list'])
 
         assert site_list.exit_code == 1
         msg = "The repository already exists in the given path. Either " \
@@ -146,23 +144,13 @@ class TestSiteCLIOptionsNegative(BaseCLIActionTest):
               "repository as the site repository (-r)."
         assert msg in site_list.output
 
-    @classmethod
-    def teardown_class(cls):
-        # Cleanup temporary Git repos.
-        root_tempdir = tempfile.gettempdir()
-        for tempdir in os.listdir(root_tempdir):
-            path = os.path.join(root_tempdir, tempdir)
-            if git.is_repository(path):
-                shutil.rmtree(path, ignore_errors=True)
-
 
 class TestSiteCliActions(BaseCLIActionTest):
     """Tests site-level CLI actions."""
 
     ### Collect tests ###
 
-    def _validate_collect_site_action(self, repo_path_or_url):
-        save_location = tempfile.mkdtemp()
+    def _validate_collect_site_action(self, repo_path_or_url, save_location):
         result = self.runner.invoke(cli.site, [
             '-r', repo_path_or_url, 'collect', self.site_name, '-s',
             save_location
@@ -176,7 +164,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         # are written out to sensibly named files like airship-treasuremap.yaml
         assert collected_files[0] == ("%s.yaml" % self.repo_name)
 
-    def test_collect_using_remote_repo_url(self):
+    def test_collect_using_remote_repo_url(self, temp_path):
         """Validates collect action using a remote URL."""
         # Scenario:
         #
@@ -186,9 +174,10 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
-        self._validate_collect_site_action(repo_url)
+        self._validate_collect_site_action(repo_url, temp_path)
 
-    def test_collect_using_remote_repo_url_ending_with_dot_git(self):
+    def test_collect_using_remote_repo_url_ending_with_dot_git(
+            self, temp_path):
         """Validates collect action using a remote URL ending in .git."""
         # Scenario:
         #
@@ -198,9 +187,9 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         repo_url = 'https://github.com/openstack/%s@%s.git' % (self.repo_name,
                                                                self.repo_rev)
-        self._validate_collect_site_action(repo_url)
+        self._validate_collect_site_action(repo_url, temp_path)
 
-    def test_collect_using_local_path(self):
+    def test_collect_using_local_path(self, temp_path):
         """Validates collect action using a path to a local repo."""
         # Scenario:
         #
@@ -209,7 +198,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 3) Check that expected file name is there
 
         repo_path = self.treasuremap_path
-        self._validate_collect_site_action(repo_path)
+        self._validate_collect_site_action(repo_path, temp_path)
 
     ### Lint tests ###
 
