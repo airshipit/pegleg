@@ -22,7 +22,9 @@ PROXY             ?= http://proxy.foo.com:8000
 NO_PROXY          ?= localhost,127.0.0.1,.svc.cluster.local
 USE_PROXY         ?= false
 PUSH_IMAGE        ?= false
-COMMIT            ?= commit-id
+# use this variable for image labels added in internal build process
+LABEL             ?= com.internal
+COMMIT            ?= $(shell git rev-parse HEAD)
 IMAGE             ?= $(DOCKER_REGISTRY)/$(IMAGE_PREFIX)/$(IMAGE_NAME):$(IMAGE_TAG)
 PYTHON_BASE_IMAGE ?= python:3.6
 export
@@ -63,7 +65,7 @@ format: py_format
 .PHONY: build_pegleg
 build_pegleg:
 ifeq ($(USE_PROXY), true)
-	docker build -t $(IMAGE) --network=host \
+	docker build -t $(IMAGE) --network=host --label $(LABEL) \
 		--label "org.opencontainers.image.revision=$(COMMIT)" \
 		--label "org.opencontainers.image.created=$(shell date --rfc-3339=seconds --utc)" \
 		--label "org.opencontainers.image.title=$(IMAGE_NAME)" \
@@ -77,7 +79,7 @@ ifeq ($(USE_PROXY), true)
 		--build-arg NO_PROXY=$(NO_PROXY) \
 		--build-arg ctx_base=$(PEGLEG_BUILD_CTX) .
 else
-	docker build -t $(IMAGE) --network=host \
+	docker build -t $(IMAGE) --network=host --label $(LABEL) \
 		--label "org.opencontainers.image.revision=$(COMMIT)" \
 		--label "org.opencontainers.image.created=$(shell date --rfc-3339=seconds --utc)" \
 		--label "org.opencontainers.image.title=$(IMAGE_NAME)" \
