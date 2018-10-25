@@ -19,6 +19,7 @@ import re
 import click
 import yaml
 
+from pegleg import config
 from pegleg.engine.util.encryption import decrypt
 from pegleg.engine.util.encryption import encrypt
 from pegleg.engine.util import files
@@ -47,10 +48,11 @@ class PeglegSecretManagement(object):
             raise ValueError('Either `file_path` or `docs` must be '
                              'specified.')
 
-        if generated and not (author and catalog):
+        if generated and not (catalog and author):
             raise ValueError("If the document is generated, author and "
                              "catalog must be specified.")
-        self.__check_environment()
+
+        self.check_environment()
         self.file_path = file_path
         self.documents = list()
         self._generated = generated
@@ -68,8 +70,17 @@ class PeglegSecretManagement(object):
 
         self._author = author
 
-        self.passphrase = os.environ.get(ENV_PASSPHRASE).encode()
-        self.salt = os.environ.get(ENV_SALT).encode()
+        if config.get_passphrase() and config.get_salt():
+            self.passphrase = config.get_passphrase()
+            self.salt = config.get_salt()
+        elif config.get_passphrase() or config.get_salt():
+            raise ValueError("ERROR: Pegleg configuration must either have "
+                             "both a passphrase and a salt or neither.")
+        else:
+            self.passphrase = os.environ.get(ENV_PASSPHRASE).encode()
+            self.salt = os.environ.get(ENV_SALT).encode()
+            config.set_passphrase(self.passphrase)
+            config.set_salt(self.salt)
 
     def __iter__(self):
         """
@@ -79,7 +90,7 @@ class PeglegSecretManagement(object):
         return (doc.pegleg_document for doc in self.documents)
 
     @staticmethod
-    def __check_environment():
+    def check_environment():
         """
         Validate required environment variables for encryption or decryption.
 

@@ -9,3 +9,4 @@ python-dateutil==2.7.3
 rstr==2.2.6
 git+https://github.com/openstack/airship-deckhand.git@49ad9f38842f7f1ecb86d907d86d332f8186eb8c
 git+https://github.com/openstack/airship-shipyard.git@44f7022df6438de541501c2fdd5c46df198b82bf#egg=shipyard_client&subdirectory=src/bin/shipyard_client
+git+https://github.com/openstack/airship-promenade.git@a6e8fdbe22bd153c78a008b92cd5d1c245bc63e3

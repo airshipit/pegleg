@@ -14,13 +14,16 @@
 
 import functools
 import logging
+import os
 import sys
 
 import click
 
 from pegleg import config
 from pegleg import engine
+from pegleg.engine import bundle
 from pegleg.engine import catalog
+from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 from pegleg.engine.util.shipyard_helper import ShipyardHelper
 
 LOG = logging.getLogger(__name__)
@@ -410,6 +413,54 @@ def generate_pki(site_name, author):
     output_paths = pkigenerator.generate()
 
     click.echo("Generated PKI files written to:\n%s" % '\n'.join(output_paths))
+
+
+@site.command(
+    'genesis_bundle',
+    help='Construct the genesis deployment bundle.')
+@click.option(
+    '-b',
+    '--build-dir',
+    'build_dir',
+    type=click.Path(file_okay=False, dir_okay=True, resolve_path=True),
+    required=True,
+    help='Destination directory to store the genesis bundle.')
+@click.option(
+    '--include-validators',
+    'validators',
+    is_flag=True,
+    default=False,
+    help='A flag to request generate genesis validation scripts in addition '
+         'to genesis.sh script.')
+@SITE_REPOSITORY_ARGUMENT
+def genesis_bundle(*, build_dir, validators, site_name):
+    prom_encryption_key = os.environ.get("PROMENADE_ENCRYPTION_KEY")
+    peg_encryption_key = os.environ.get("PEGLEG_PASSPHRASE")
+    encryption_key = None
+    if (prom_encryption_key and len(prom_encryption_key) > 24 and
+            peg_encryption_key and len(peg_encryption_key) > 24):
+        click.echo("WARNING: PROMENADE_ENCRYPTION_KEY is deprecated, "
+                   "using PEGLEG_PASSPHRASE instead", err=True)
+        config.set_passphrase(peg_encryption_key)
+        encryption_key = peg_encryption_key
+    elif prom_encryption_key and len(prom_encryption_key) > 24:
+        click.echo("ERROR: PROMENADE_ENCRYPTION_KEY is deprecated, "
+                   "use PEGLEG_PASSPHRASE instead", err=True)
+        raise click.ClickException("ERROR: PEGLEG_PASSPHRASE must be set "
+                                   "and at least 24 characters long.")
+    elif peg_encryption_key and len(peg_encryption_key) > 24:
+        config.set_passphrase(peg_encryption_key)
+        encryption_key = peg_encryption_key
+    else:
+        raise click.ClickException("ERROR: PEGLEG_PASSPHRASE must be set "
+                                   "and at least 24 characters long.")
+
+    PeglegSecretManagement.check_environment()
+    bundle.build_genesis(build_dir,
+                         encryption_key,
+                         validators,
+                         logging.DEBUG == LOG.getEffectiveLevel(),
+                         site_name)
 
 
 @main.group(help='Commands related to types')

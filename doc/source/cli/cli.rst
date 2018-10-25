@@ -612,6 +612,42 @@ Example:
       secrets decrypt site1 -f \
       /opt/security-manifests/site/site1/passwords/password1.yaml
 
+genesis_bundle
+--------------
+
+Constructs genesis bundle based on a site configuration.
+
+.. note::
+  This command requires the environment variable PEGLEG_PASSPHRASE
+  to be set and at least 24 characters long, to be used for encrypting
+  genesis bundle data. PEGLEG_SALT must be set as well. There are no
+  constraints on its length, but at least 24 characters is recommended.
+
+
+**-b / --build-dir** (Required).
+
+Destination directory for the genesis bundle.
+
+**--include-validators** (Optional). False by default.
+
+A flag to request build genesis validation scripts as well.
+
+Usage:
+
+::
+    ./pegleg.sh site <options> genesis_bundle <site_name> \
+      -b <build_locaton> -k <encryption_passphrase/key> --validators
+
+Examples
+^^^^^^^^
+
+::
+
+    ./pegleg.sh site -r  ./site-manifests \
+      genesis_bundle site1 \
+      -b ../../site1_build \
+      -k yourEncryptionPassphrase \
+      --validators
 
 generate
 ^^^^^^^^
@@ -803,8 +839,9 @@ Where mandatory encrypted schema type is one of:
 P002 - Deckhand rendering is expected to complete without errors.
 P003 - All repos contain expected directories.
 
-.. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/rendering.html
-.. _Deckhand Validations: https://airship-deckhand.readthedocs.io/en/latest/validation.html
+
+.. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/users/rendering.html
+.. _Deckhand Validations: https://airship-deckhand.readthedocs.io/en/latest/overview.html#validation
 .. _Pegleg Managed Documents: https://airship-specs.readthedocs.io/en/latest/specs/approved/pegleg-secrets.html#peglegmanageddocument
 .. _Shipyard: https://github.com/openstack/airship-shipyard
 .. _CLI documentation: https://airship-shipyard.readthedocs.io/en/latest/CLI.html#openstack-keystone-authorization-environment-variables

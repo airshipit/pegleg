@@ -86,3 +86,19 @@ class PassphraseCatalogNotFoundException(PeglegBaseException):
     """Failed to find Catalog for Passphrases generation."""
     message = ('Could not find the Passphrase Catalog to generate '
                'the site Passphrases!')
+
+
+class GenesisBundleEncryptionException(PeglegBaseException):
+    """Exception raised when encryption of the genesis bundle fails."""
+
+    message = 'Encryption is required for genesis bundle, but no encryption ' \
+              'policy or key is specified.'
+
+
+class GenesisBundleGenerateException(PeglegBaseException):
+    """
+    Exception raised when pormenade engine fails to build the genesis
+    bundle.
+    """
+
+    message = 'Bundle generation failed on deckhand validation.'

@@ -26,7 +26,9 @@ except NameError:
         'clone_path': None,
         'site_path': 'site',
         'site_rev': None,
-        'type_path': 'type'
+        'type_path': 'type',
+        'passphrase': None,
+        'salt': None
     }
 
 
@@ -147,3 +149,23 @@ def set_rel_type_path(p):
     """Set the relative type path name."""
     p = p or 'type'
     GLOBAL_CONTEXT['type_path'] = p
+
+
+def set_passphrase(p):
+    """Set the passphrase for encryption and decryption."""
+    GLOBAL_CONTEXT['passphrase'] = p
+
+
+def get_passphrase():
+    """Get the passphrase for encryption and decryption."""
+    return GLOBAL_CONTEXT['passphrase']
+
+
+def set_salt(p):
+    """Set the salt for encryption and decryption."""
+    GLOBAL_CONTEXT['salt'] = p
+
+
+def get_salt():
+    """Get the salt for encryption and decryption."""
+    return GLOBAL_CONTEXT['salt']

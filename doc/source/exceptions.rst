@@ -68,9 +68,18 @@ PKI Exceptions
 --------------
 
 .. autoexception:: pegleg.engine.exceptions.IncompletePKIPairError
+
+Genesis Bundle Exceptions
+-------------------------
+
+.. autoexception:: pegleg.engine.exceptions.GenesisBundleEncryptionException
    :members:
    :show-inheritance:
    :undoc-members:
+
+.. autoexception:: pegleg.engine.exceptions.GenesisBundleGenerateException
+   :members:
+   :show-inheritance:
 
 Passphrase Exceptions
 ---------------------
