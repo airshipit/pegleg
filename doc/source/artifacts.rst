@@ -71,10 +71,10 @@ to meet requirements.::
       repositories:  # Optional field.
         global:
           revision: 47676764d3935e4934624bf9593e9115984fe668
-          url: ssh://REPO_USERNAME@gerrit:29418/aic-clcp-manifests.git
+          url: ssh://REPO_USERNAME@<git_url>:29418/global-manifests.git
         secrets:
           revision: master
-          url: ssh://REPO_USERNAME@gerrit:29418/aic-clcp-security-manifests.git
+          url: ssh://REPO_USERNAME@<git_url>:29418/security-manifests.git
 
 The ``repositories`` field (optional) maps default authentication information
 for each of the manifests repositories supported, for example:
@@ -94,7 +94,7 @@ Each of the above fields must have 2 pieces of information:
   * REPO_USERNAME - must be included for ssh only. Can be overridden with the
     CLI via :ref:`command-line-repository-overrides`.
   * port - e.g. 29418 - must be included for ssh only.
-  * repository name - e.g. aic-clcp-manifests
+  * repository name
 
 Self-Contained Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^

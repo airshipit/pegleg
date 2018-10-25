@@ -176,9 +176,9 @@ def _process_site_repository(repo_url_or_path, repo_revision):
     :param repo_url_or_path: Repo path or URL and associated auth information.
         If URL, examples include:
 
-        * ssh://REPO_USERNAME@<GERRIT_URL>:29418/aic-clcp-manifests.git@<ref>
-        * https://<GERRIT_URL>/aic-clcp-manifests.git@<ref>
-        * http://<GERRIT_URL>/aic-clcp-manifests.git@<ref>
+        * ssh://REPO_USERNAME@<GIT_URL>:29418/global-manifests.git@<ref>
+        * https://<GIT_URL>/global-manifests.git@<ref>
+        * http://<GIT_URL>/global-manifests.git@<ref>
         * <LOCAL_REPO_PATH>@<ref>
         * same values as above without @<ref>
     :param str repo_revision: branch, commit or ref in the repo to checkout.
@@ -276,9 +276,9 @@ def _extract_repo_url_and_revision(repo_url_or_path):
 
     :param repo_url_or_path: Repo URL and associated auth information. E.g.:
 
-        * ssh://REPO_USERNAME@<GERRIT_URL>:29418/aic-clcp-manifests.git@<ref>
-        * https://<GERRIT_URL>/aic-clcp-manifests.git@<ref>
-        * http://<GERRIT_URL>/aic-clcp-manifests.git@<ref>
+        * ssh://REPO_USERNAME@<GIT_URL>:29418/global-manifests.git@<ref>
+        * https://<GIT_URL>/global-manifests.git@<ref>
+        * http://<GIT_URL>/global-manifests.git@<ref>
         * <LOCAL_REPO_PATH>@<ref>
         * same values as above without @<ref>
 
