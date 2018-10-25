@@ -15,6 +15,7 @@
 import atexit
 import logging
 import os
+import re
 import shutil
 import tempfile
 
@@ -87,15 +88,7 @@ def process_repositories(site_name):
             repo_url_or_path = site_def_repos[repo_alias]['url']
             repo_revision = site_def_repos[repo_alias]['revision']
 
-        # If a repo user is provided, do the necessary replacements.
-        if repo_user:
-            if "REPO_USERNAME" not in repo_url_or_path:
-                LOG.warning(
-                    "A repository username was specified but no REPO_USERNAME "
-                    "string found in repository url %s", repo_url_or_path)
-            else:
-                repo_url_or_path = repo_url_or_path.replace(
-                    'REPO_USERNAME', repo_user)
+        repo_url_or_path = _format_url_with_repo_username(repo_url_or_path)
 
         LOG.info("Processing repository %s with url=%s, repo_key=%s, "
                  "repo_username=%s, revision=%s", repo_alias, repo_url_or_path,
@@ -129,6 +122,7 @@ def process_site_repository(update_config=False):
 
     repo_url_or_path, repo_revision = _extract_repo_url_and_revision(
         site_repo_or_path)
+    repo_url_or_path = _format_url_with_repo_username(repo_url_or_path)
     new_repo_path = _process_repository(repo_url_or_path, repo_revision)
 
     if update_config:
@@ -284,16 +278,27 @@ def _extract_repo_url_and_revision(repo_url_or_path):
 
     """
 
+    ssh_username_pattern = re.compile('ssh:\/\/.+@.+\/.+')
+
+    def has_revision(repo_url_or_path):
+        if repo_url_or_path.lower().startswith('ssh'):
+            if ssh_username_pattern.match(repo_url_or_path):
+                return repo_url_or_path.count('@') == 2
+            return repo_url_or_path.count('@') == 1
+        else:
+            return '@' in repo_url_or_path
+
     # they've forced a revision using @revision - careful not to confuse
     # this with auth
     revision = None
     try:
-        if '@' in repo_url_or_path:
-            # extract revision from repo URL or path
+        if has_revision(repo_url_or_path):
             repo_url_or_path, revision = repo_url_or_path.rsplit('@', 1)
-            revision = revision[:-1] if revision.endswith('/') else revision
+            revision = revision.rstrip('/')
             if revision.endswith(".git"):
                 revision = revision[:-4]
+            if repo_url_or_path.endswith(".git"):
+                repo_url_or_path = repo_url_or_path[:-4]
         else:
             repo_url_or_path = repo_url_or_path
     except Exception:
@@ -301,6 +306,20 @@ def _extract_repo_url_and_revision(repo_url_or_path):
         raise click.ClickException(_INVALID_FORMAT_MSG % repo_url_or_path)
 
     return repo_url_or_path, revision
+
+
+def _format_url_with_repo_username(repo_url_or_path):
+    # If a repo user is provided, do the necessary replacements.
+    repo_user = config.get_repo_username()
+    if repo_user:
+        if "REPO_USERNAME" not in repo_url_or_path:
+            LOG.warning(
+                "A repository username was specified but no REPO_USERNAME "
+                "string found in repository url %s", repo_url_or_path)
+        else:
+            repo_url_or_path = repo_url_or_path.replace(
+                'REPO_USERNAME', repo_user)
+    return repo_url_or_path
 
 
 def _handle_repository(repo_url_or_path, *args, **kwargs):
@@ -312,8 +331,8 @@ def _handle_repository(repo_url_or_path, *args, **kwargs):
     clone_path = config.get_clone_path()
 
     try:
-        return util.git.git_handler(repo_url_or_path, clone_path=clone_path,
-                                    *args, **kwargs)
+        return util.git.git_handler(
+            repo_url_or_path, clone_path=clone_path, *args, **kwargs)
     except exceptions.GitException as e:
         raise click.ClickException(e)
     except Exception as e:

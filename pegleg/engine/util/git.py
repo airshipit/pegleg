@@ -22,6 +22,7 @@ from git import exc as git_exc
 from git import Git
 from git import Repo
 
+from pegleg import config
 from pegleg.engine import exceptions
 
 LOG = logging.getLogger(__name__)
@@ -29,8 +30,11 @@ LOG = logging.getLogger(__name__)
 __all__ = ('git_handler', )
 
 
-def git_handler(repo_url, ref=None, proxy_server=None,
-                auth_key=None, clone_path=None):
+def git_handler(repo_url,
+                ref=None,
+                proxy_server=None,
+                auth_key=None,
+                clone_path=None):
     """Handle directories that are Git repositories.
 
     If ``repo_url`` is a valid URL for which a local repository doesn't
@@ -75,8 +79,8 @@ def git_handler(repo_url, ref=None, proxy_server=None,
         # we need to clone the repo_url first since it doesn't exist and then
         # checkout the appropriate reference - and return the tmpdir
         if parsed_url.scheme in supported_clone_protocols:
-            return _try_git_clone(repo_url, ref, proxy_server,
-                                  auth_key, clone_path)
+            return _try_git_clone(repo_url, ref, proxy_server, auth_key,
+                                  clone_path)
         else:
             raise ValueError('repo_url=%s must use one of the following '
                              'protocols: %s' %
@@ -142,8 +146,11 @@ def _get_current_ref(repo_url):
         return None
 
 
-def _try_git_clone(repo_url, ref=None, proxy_server=None,
-                   auth_key=None, clone_path=None):
+def _try_git_clone(repo_url,
+                   ref=None,
+                   proxy_server=None,
+                   auth_key=None,
+                   clone_path=None):
     """Try cloning Git repo from ``repo_url`` using the reference ``ref``.
 
     :param repo_url: URL of remote Git repo or path to local Git repo.
@@ -177,7 +184,7 @@ def _try_git_clone(repo_url, ref=None, proxy_server=None,
         LOG.error(msg)
         raise
 
-    env_vars = _get_clone_env_vars(repo_url, ref, auth_key)
+    env_vars = _get_remote_env_vars(auth_key)
     ssh_cmd = env_vars.get('GIT_SSH_COMMAND')
 
     try:
@@ -213,11 +220,9 @@ def _try_git_clone(repo_url, ref=None, proxy_server=None,
     return temp_dir
 
 
-def _get_clone_env_vars(repo_url, ref, auth_key):
+def _get_remote_env_vars(auth_key=None):
     """Generate environment variables include SSH command for Git clone.
 
-    :param repo_url: URL of remote Git repo or path to local Git repo.
-    :param ref: branch, commit or reference in the repo to clone.
     :param auth_key: If supplied results in using SSH to clone the repository
         with the specified key.  If the value is None, SSH is not used.
     :returns: Dictionary of key-value pairs for Git clone.
@@ -226,13 +231,11 @@ def _get_clone_env_vars(repo_url, ref, auth_key):
         could not be found and ``auth_method`` is "SSH".
 
     """
-    ssh_cmd = None
+    auth_key = auth_key or config.get_repo_key()
     env_vars = {'GIT_TERMINAL_PROMPT': '0'}
 
     if auth_key:
         if os.path.exists(auth_key):
-            LOG.debug('Attempting to clone the repo at %s using reference %s '
-                      'with SSH authentication.', repo_url, ref)
             # Ensure that host checking is ignored, to avoid unnecessary
             # required CLI input.
             ssh_cmd = (
@@ -326,6 +329,7 @@ def _create_local_ref(g, branches, ref, newref, reftype=None):
             branches.append(newref)
 
 
+# TODO(felipemonteiro): Memoize this using beaker.
 def is_repository(repo_url_or_path, *args, **kwargs):
     """Checks whether the directory ``repo_url_or_path`` is a Git repository.
 
@@ -344,7 +348,7 @@ def is_repository(repo_url_or_path, *args, **kwargs):
     else:
         try:
             g = Git()
-            g.ls_remote(repo_url_or_path)
+            g.ls_remote(repo_url_or_path, env=_get_remote_env_vars())
             return True
         except git_exc.CommandError:
             return False

@@ -86,7 +86,10 @@ def _test_process_repositories_inner(site_name="test_site",
 
 def _test_process_repositories(site_repo=None,
                                repo_username=None,
-                               repo_overrides=None):
+                               repo_overrides=None,
+                               expected_repo_url=None,
+                               expected_repo_revision=None,
+                               expected_repo_overrides=None):
     """Validate :func:`repository.process_repositories`.
 
     :param site_repo: Primary site repository.
@@ -117,14 +120,11 @@ def _test_process_repositories(site_repo=None,
         if site_repo:
             # Validate that the primary site repository is cloned, in addition
             # to the extra repositories.
-            repo_revision = None
-            repo_url = site_repo.rsplit('@', 1)
-            if len(repo_url) == 1:  # Case: local repo path.
-                repo_url = repo_url[0]
-            elif len(repo_url) == 2:  # Case: remote repo URL.
-                repo_url, repo_revision = repo_url
             mock_calls = [
-                mock.call(repo_url, ref=repo_revision, auth_key=None)
+                mock.call(
+                    expected_repo_url,
+                    ref=expected_repo_revision,
+                    auth_key=None)
             ]
             mock_calls.extend([
                 mock.call(r['url'], ref=r['revision'], auth_key=None)
@@ -148,15 +148,12 @@ def _test_process_repositories(site_repo=None,
             assert (expected_call_count == m_clone_repo.call_count)
 
             for x, r in TEST_REPOSITORIES['repositories'].items():
-                if x in repo_overrides:
-                    ref = None
-                    repo_url = repo_overrides[x].rsplit('@', 1)
-                    if len(repo_url) == 1:  # Case: local repo path.
-                        repo_url = repo_url[0]
-                    elif len(repo_url) == 2:  # Case: remote repo URL.
-                        repo_url, ref = repo_url
-                    repo_url = repo_url.split('=')[-1]
+                if x in expected_repo_overrides:
+                    repo_url = expected_repo_overrides[x]['url']
+                    ref = expected_repo_overrides[x]['revision']
                 else:
+                    # Handles default values in TEST_REPOSITORIES -- which
+                    # represents defaults in site-definition.yaml.
                     repo_url = r['url']
                     ref = r['revision']
                 m_clone_repo.assert_any_call(repo_url, ref=ref, auth_key=None)
@@ -197,19 +194,36 @@ def test_process_repositories():
 
 def test_process_repositories_with_site_repo_url():
     """Test process_repository when site repo is a remote URL."""
+    # With REPO_USERNAME.
     site_repo = (
         'ssh://REPO_USERNAME@gerrit:29418/aic-clcp-site-manifests.git@333')
-    _test_process_repositories(site_repo=site_repo)
+    _test_process_repositories(
+        site_repo=site_repo,
+        expected_repo_url=(
+            "ssh://REPO_USERNAME@gerrit:29418/aic-clcp-site-manifests"),
+        expected_repo_revision="333")
+    # Without REPO_USERNAME.
+    site_repo = 'ssh://gerrit:29418/aic-clcp-site-manifests.git@333'
+    _test_process_repositories(
+        site_repo=site_repo,
+        expected_repo_url="ssh://gerrit:29418/aic-clcp-site-manifests",
+        expected_repo_revision="333")
 
 
 def test_process_repositories_handles_local_site_repo_path():
     site_repo = '/opt/aic-clcp-site-manifests'
-    _test_process_repositories(site_repo=site_repo)
+    _test_process_repositories(
+        site_repo=site_repo,
+        expected_repo_url='/opt/aic-clcp-site-manifests',
+        expected_repo_revision=None)
 
 
 def test_process_repositories_handles_local_site_repo_path_with_revision():
     site_repo = '/opt/aic-clcp-site-manifests@333'
-    _test_process_repositories(site_repo=site_repo)
+    _test_process_repositories(
+        site_repo=site_repo,
+        expected_repo_url="/opt/aic-clcp-site-manifests",
+        expected_repo_revision="333")
 
 
 @mock.patch.object(
@@ -240,33 +254,77 @@ def test_process_repositories_with_repo_overrides_remote_urls():
         'global':
         'global=ssh://REPO_USERNAME@gerrit:29418/aic-clcp-manifests.git@12345'
     }
-    _test_process_repositories(repo_overrides=overrides)
+    expected_repo_overrides = {
+        'global': {
+            'url': 'ssh://REPO_USERNAME@gerrit:29418/aic-clcp-manifests',
+            'revision': '12345'
+        },
+    }
+    _test_process_repositories(
+        repo_overrides=overrides,
+        expected_repo_overrides=expected_repo_overrides)
 
     # Different URL, different revision (than TEST_REPOSITORIES).
     overrides = {
         'global': 'global=https://gerrit/aic-clcp-manifests.git@12345'
     }
-    _test_process_repositories(repo_overrides=overrides)
+    expected_repo_overrides = {
+        'global': {
+            'url': 'https://gerrit/aic-clcp-manifests',
+            'revision': '12345'
+        },
+    }
+    _test_process_repositories(
+        repo_overrides=overrides,
+        expected_repo_overrides=expected_repo_overrides)
 
 
 def test_process_repositories_with_repo_overrides_local_paths():
     # Local path without revision.
     overrides = {'global': 'global=/opt/aic-clcp-manifests'}
-    _test_process_repositories(repo_overrides=overrides)
+    expected_repo_overrides = {
+        'global': {
+            'url': '/opt/aic-clcp-manifests',
+            'revision': None
+        },
+    }
+    _test_process_repositories(
+        repo_overrides=overrides,
+        expected_repo_overrides=expected_repo_overrides)
 
     # Local path with revision.
     overrides = {'global': 'global=/opt/aic-clcp-manifests@12345'}
-    _test_process_repositories(repo_overrides=overrides)
+    expected_repo_overrides = {
+        'global': {
+            'url': '/opt/aic-clcp-manifests',
+            'revision': '12345'
+        },
+    }
+    _test_process_repositories(
+        repo_overrides=overrides,
+        expected_repo_overrides=expected_repo_overrides)
 
 
 def test_process_repositories_with_multiple_repo_overrides_remote_urls():
     overrides = {
         'global':
-        'global=ssh://errit:29418/aic-clcp-manifests.git@12345',
+        'global=ssh://gerrit:29418/aic-clcp-manifests.git@12345',
         'secrets':
         'secrets=ssh://gerrit:29418/aic-clcp-security-manifests.git@54321'
     }
-    _test_process_repositories(repo_overrides=overrides)
+    expected_repo_overrides = {
+        'global': {
+            'url': 'ssh://gerrit:29418/aic-clcp-manifests',
+            'revision': '12345'
+        },
+        'secrets': {
+            'url': 'ssh://gerrit:29418/aic-clcp-security-manifests',
+            'revision': '54321'
+        },
+    }
+    _test_process_repositories(
+        repo_overrides=overrides,
+        expected_repo_overrides=expected_repo_overrides)
 
 
 def test_process_repositories_with_multiple_repo_overrides_local_paths():
@@ -274,7 +332,19 @@ def test_process_repositories_with_multiple_repo_overrides_local_paths():
         'global': 'global=/opt/aic-clcp-manifests@12345',
         'secrets': 'secrets=/opt/aic-clcp-security-manifests.git@54321'
     }
-    _test_process_repositories(repo_overrides=overrides)
+    expected_repo_overrides = {
+        'global': {
+            'url': '/opt/aic-clcp-manifests',
+            'revision': '12345'
+        },
+        'secrets': {
+            'url': '/opt/aic-clcp-security-manifests',
+            'revision': '54321'
+        },
+    }
+    _test_process_repositories(
+        repo_overrides=overrides,
+        expected_repo_overrides=expected_repo_overrides)
 
 
 @mock.patch.object(
@@ -415,23 +485,33 @@ def test_process_extra_repositories_malformed_format_raises_exception(
 
 @mock.patch.object(util.git, 'is_repository', autospec=True, return_value=True)
 def test_process_site_repository(_):
-    def _do_test(site_repo):
-        expected = site_repo.rsplit('@', 1)[0]
-
+    def _do_test(site_repo, expected):
         config.set_site_repo(site_repo)
 
         with mock.patch.object(
                 repository,
                 '_handle_repository',
                 autospec=True,
-                return_value=expected):
+                side_effect=lambda x, *a, **k: x):
             result = repository.process_site_repository()
         assert os.path.normpath(expected) == os.path.normpath(result)
 
     # Ensure that the reference is always pruned.
-    _do_test('http://github.com/openstack/treasuremap@master')
-    _do_test('http://github.com/openstack/treasuremap')
-    _do_test('https://github.com/openstack/treasuremap@master')
-    _do_test('https://github.com/openstack/treasuremap')
-    _do_test('ssh://foo@github.com/openstack/treasuremap:12345@master')
-    _do_test('ssh://foo@github.com/openstack/treasuremap:12345')
+    _do_test(
+        'http://github.com/openstack/treasuremap@master',
+        expected='http://github.com/openstack/treasuremap')
+    _do_test(
+        'http://github.com/openstack/treasuremap',
+        expected='http://github.com/openstack/treasuremap')
+    _do_test(
+        'https://github.com/openstack/treasuremap@master',
+        expected='https://github.com/openstack/treasuremap')
+    _do_test(
+        'https://github.com/openstack/treasuremap',
+        expected='https://github.com/openstack/treasuremap')
+    _do_test(
+        'ssh://foo@github.com/openstack/treasuremap:12345@master',
+        expected='ssh://foo@github.com/openstack/treasuremap:12345')
+    _do_test(
+        'ssh://foo@github.com/openstack/treasuremap:12345',
+        expected='ssh://foo@github.com/openstack/treasuremap:12345')

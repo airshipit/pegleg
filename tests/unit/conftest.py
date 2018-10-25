@@ -50,6 +50,7 @@ def clean_temporary_git_repos():
             if os.path.isdir(path) and os.access(path, os.R_OK):
                 if any(p.startswith('airship') for p in os.listdir(path)):
                     yield path
+
     try:
         yield
     finally:
