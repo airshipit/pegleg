@@ -17,7 +17,6 @@ import os
 import tempfile
 from urllib.parse import urlparse
 
-import click
 from git import exc as git_exc
 from git import Git
 from git import Repo
@@ -61,7 +60,6 @@ def git_handler(repo_url,
         path to ``repo_url``.
     :raises ValueError: If ``repo_url`` isn't a valid URL or doesn't begin
         with a valid protocol (http, https or ssh) for cloning.
-    :raises NotADirectoryError: If ``repo_url`` isn't a valid directory path.
 
     """
 
@@ -91,13 +89,9 @@ def git_handler(repo_url,
     else:
         LOG.debug('Treating repo_url=%s as an already-cloned repository. '
                   'Attempting to checkout ref=%s', repo_url, ref)
-        try:
-            # get absolute path of what is probably a directory
-            repo_url, _ = normalize_repo_path(repo_url)
-        except Exception:
-            msg = "The repo_url=%s is not a valid Git repo" % repo_url
-            LOG.error(msg)
-            raise NotADirectoryError(msg)
+
+        # Normalize the repo path.
+        repo_url, _ = normalize_repo_path(repo_url)
 
         repo = Repo(repo_url, search_parent_directories=True)
         if repo.is_dirty(untracked_files=True):
@@ -434,7 +428,8 @@ def normalize_repo_path(repo_url_or_path):
     :param repo_url_or_path: URL of remote Git repo or path to local Git repo.
     :returns: Tuple of root Git path or URL, additional subpath included (e.g.
         "deployment_files")
-    :rtype: tuple
+    :rtype: tuple[str, str]
+    :raises GitInvalidRepoException: If the repo is invalid.
 
     """
 
@@ -459,8 +454,8 @@ def normalize_repo_path(repo_url_or_path):
             repo_url_or_path = os.path.abspath(repo_url_or_path)
 
     if not repo_url_or_path or not is_repository(repo_url_or_path):
-        raise click.ClickException(
-            "Specified site repo path=%s exists but is not a valid Git "
-            "repository" % orig_repo_path)
+        msg = "The repo_path=%s is not a valid Git repo" % (orig_repo_path)
+        LOG.error(msg)
+        raise exceptions.GitInvalidRepoException(repo_path=repo_url_or_path)
 
     return repo_url_or_path, sub_path

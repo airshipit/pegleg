@@ -81,4 +81,9 @@ class GitSSHException(BaseGitException):
 
 class GitConfigException(BaseGitException):
     """Exception that occurs when reading Git repo config fails."""
-    message = ("Failed to read Git config file for repo_url=%(repo_url)s")
+    message = ("Failed to read Git config file for repo path: %(repo_path)s")
+
+
+class GitInvalidRepoException(BaseGitException):
+    """Exception raised when an invalid repository is detected."""
+    message = ("The repository path or URL is invalid: %(repo_path)s")

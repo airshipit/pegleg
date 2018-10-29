@@ -400,9 +400,11 @@ def test_git_clone_invalid_url_type_raises_value_error():
 @pytest.mark.skipif(
     not test_utils.is_connected(),
     reason='git clone requires network connectivity.')
-def test_git_clone_invalid_local_repo_url_raises_notadirectory_error():
-    url = False
-    with pytest.raises(NotADirectoryError):
+@mock.patch.object(git, 'is_repository', autospec=True, return_value=False)
+@mock.patch('os.path.exists', return_value=True, autospec=True)
+def test_git_clone_invalid_local_repo_url_raises_invalid_repo_exc(*args):
+    url = 'blah'
+    with pytest.raises(exceptions.GitInvalidRepoException):
         git.git_handler(url, ref='master')
 
 

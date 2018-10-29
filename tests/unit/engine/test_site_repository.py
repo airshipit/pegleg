@@ -21,6 +21,7 @@ import click
 import pytest
 
 from pegleg import config
+from pegleg.engine import exceptions
 from pegleg.engine import repository
 from pegleg.engine import util
 
@@ -238,10 +239,10 @@ def test_process_repositories_with_local_site_path_exists_not_repo(*_):
     """Validate that when the site repo already exists but isn't a repository
     that an error is raised.
     """
-    with pytest.raises(click.ClickException) as exc:
+    with pytest.raises(exceptions.GitInvalidRepoException) as exc:
         _test_process_repositories_inner(
             expected_extra_repos=TEST_REPOSITORIES)
-    assert "is not a valid Git repository" in str(exc.value)
+    assert "The repository path or URL is invalid" in str(exc.value)
 
 
 def test_process_repositories_with_repo_username():
