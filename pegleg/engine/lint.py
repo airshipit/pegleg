@@ -183,9 +183,7 @@ def _verify_no_unexpected_files(*, sitenames=None):
     expected_directories = set()
     for site_name in sitenames:
         params = util.definition.load_as_params(site_name)
-        expected_directories.update(
-            util.files.directories_for(
-                site_name=params['site_name'], site_type=params['site_type']))
+        expected_directories.update(util.files.directories_for(**params))
     LOG.debug('expected_directories: %s', expected_directories)
     found_directories = util.files.existing_directories()
     LOG.debug('found_directories: %s', found_directories)
