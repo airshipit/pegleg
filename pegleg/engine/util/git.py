@@ -169,6 +169,7 @@ def _try_git_clone(repo_url,
     # and ensure we handle url/foo.git/ cases. prefix is 'tmp' by default.
     repo_name = repo_url.rstrip('/').split('/')[-1]
     temp_dir = os.path.join(clone_path, repo_name)
+
     try:
         os.makedirs(temp_dir)
     except FileExistsError:

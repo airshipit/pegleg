@@ -29,6 +29,18 @@ CONTEXT_SETTINGS = {
     'help_option_names': ['-h', '--help'],
 }
 
+
+def _process_repositories_callback(ctx, param, value):
+    """Convenient callback for ``@click.argument(site_name)``.
+
+    Automatically processes repository information for the specified site. This
+    entails cloning all requires repositories and checking out specified
+    references for each repository.
+    """
+    engine.repository.process_repositories(value)
+    return value
+
+
 MAIN_REPOSITORY_OPTION = click.option(
     '-r',
     '--site-repository',
@@ -102,6 +114,9 @@ WARN_LINT_OPTION = click.option(
     'warn_lint',
     multiple=True,
     help='Warn if linting check fails. -w takes priority over -x.')
+
+SITE_REPOSITORY_ARGUMENT = click.argument(
+    'site_name', callback=_process_repositories_callback)
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -234,7 +249,7 @@ def site(*, site_repository, clone_path, extra_repositories, repo_key,
     'warn_lint',
     multiple=True,
     help='Warn if linting check fails. -w takes priority over -x.')
-@click.argument('site_name')
+@SITE_REPOSITORY_ARGUMENT
 def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     """Collects documents into a single site-definition.yaml file, which
     defines the entire site definition and contains all documents required
@@ -246,9 +261,6 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     Collect can lint documents prior to collection if the ``--validate``
     flag is optionally included.
     """
-
-    engine.repository.process_repositories(site_name)
-
     if validate:
         # Lint the primary repo prior to document collection.
         _lint_helper(
@@ -267,7 +279,7 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     type=click.File(mode='w'),
     default=sys.stdout,
     help='Where to output. Defaults to sys.stdout.')
-def list_(*, output_stream):
+def list_sites(*, output_stream):
     engine.repository.process_site_repository(update_config=True)
     engine.site.list_(output_stream)
 
@@ -280,9 +292,8 @@ def list_(*, output_stream):
     type=click.File(mode='w'),
     default=sys.stdout,
     help='Where to output. Defaults to sys.stdout.')
-@click.argument('site_name')
+@SITE_REPOSITORY_ARGUMENT
 def show(*, output_stream, site_name):
-    engine.repository.process_repositories(site_name)
     engine.site.show(site_name, output_stream)
 
 
@@ -294,9 +305,8 @@ def show(*, output_stream, site_name):
     type=click.File(mode='w'),
     default=sys.stdout,
     help='Where to output. Defaults to sys.stdout.')
-@click.argument('site_name')
+@SITE_REPOSITORY_ARGUMENT
 def render(*, output_stream, site_name):
-    engine.repository.process_repositories(site_name)
     engine.site.render(site_name, output_stream)
 
 
@@ -304,12 +314,11 @@ def render(*, output_stream, site_name):
 @ALLOW_MISSING_SUBSTITUTIONS_OPTION
 @EXCLUDE_LINT_OPTION
 @WARN_LINT_OPTION
-@click.argument('site_name')
+@SITE_REPOSITORY_ARGUMENT
 def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
     """Lint a given site using checks defined in
     :mod:`pegleg.engine.errorcodes`.
     """
-    engine.repository.process_repositories(site_name)
     _lint_helper(
         site_name=site_name,
         fail_on_missing_sub_src=fail_on_missing_sub_src,
