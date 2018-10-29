@@ -48,17 +48,6 @@ class TestSelectableLinting(object):
                 assert msg_1 in expected_exc
                 assert msg_2 in expected_exc
 
-    @mock.patch.object(lint, '_verify_no_unexpected_files', return_value=[])
-    def test_lint_excludes_P002(*args):
-        exclude_lint = ['P002']
-        config.set_site_repo('../pegleg/site_yamls/')
-        with mock.patch.object(
-                lint,
-                '_verify_deckhand_render',
-                return_value=[('P002', 'test message')]) as mock_method:
-            lint.full(False, exclude_lint, [])
-        mock_method.assert_called()
-
     @pytest.mark.skip(reason=_SKIP_P003_REASON)
     @mock.patch.object(lint, '_verify_deckhand_render', return_value=[])
     def test_lint_excludes_P003(*args):
@@ -89,15 +78,6 @@ class TestSelectableLinting(object):
                 lint.full(False, [], warn_lint)
                 assert msg_1 not in expected_exc
                 assert msg_2 in expected_exc
-
-    @mock.patch.object(lint, '_verify_no_unexpected_files', return_value=[])
-    def test_lint_warns_P002(*args):
-        warn_lint = ['P002']
-        config.set_site_repo('../pegleg/site_yamls/')
-
-        with mock.patch.object(lint, '_verify_deckhand_render') as mock_method:
-            lint.full(False, [], warn_lint)
-        mock_method.assert_called()
 
     @pytest.mark.skip(reason=_SKIP_P003_REASON)
     @mock.patch.object(lint, '_verify_deckhand_render', return_value=[])
