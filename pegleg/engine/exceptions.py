@@ -14,12 +14,8 @@
 
 import logging
 
-__all__ = ('PeglegBaseException',
-           'GitException',
-           'GitAuthException',
-           'GitProxyException',
-           'GitSSHException',
-           'GitConfigException',
+__all__ = ('PeglegBaseException', 'GitException', 'GitAuthException',
+           'GitProxyException', 'GitSSHException', 'GitConfigException',
            'GitInvalidRepoException')
 
 LOG = logging.getLogger(__name__)

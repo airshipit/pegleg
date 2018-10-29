@@ -97,8 +97,7 @@ ALLOW_MISSING_SUBSTITUTIONS_OPTION = click.option(
     type=click.BOOL,
     default=True,
     help=("Raise Deckhand exception on missing substition sources. "
-          "Defaults to True.")
-)
+          "Defaults to True."))
 
 EXCLUDE_LINT_OPTION = click.option(
     '-x',
