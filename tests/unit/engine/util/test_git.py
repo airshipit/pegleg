@@ -14,15 +14,14 @@
 
 import os
 import shutil
-import tempfile
 
-import fixtures
 from git import Repo
 import mock
 import pytest
 
 from pegleg.engine import exceptions
 from pegleg.engine.util import git
+from tests.unit.fixtures import temp_path
 from tests.unit import test_utils
 
 
@@ -511,8 +510,8 @@ def test_is_repository():
         subpath='deployment_files/site')
 
 
-def test_is_repository_negative():
-    assert not git.is_repository(tempfile.mkdtemp())
+def test_is_repository_negative(temp_path):
+    assert not git.is_repository(temp_path)
 
 
 @pytest.mark.skipif(

@@ -158,7 +158,7 @@ schema: pegleg/SiteDefinition/v1
 
 
 @pytest.fixture()
-def temp_clone_path():
+def temp_path():
     temp_folder = tempfile.mkdtemp()
     try:
         yield temp_folder
