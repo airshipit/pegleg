@@ -215,7 +215,7 @@ def site(*, site_repository, clone_path, extra_repositories, repo_key,
 
     config.set_site_repo(site_repository)
     config.set_clone_path(clone_path)
-    config.set_extra_repo_store(extra_repositories or [])
+    config.set_extra_repo_overrides(extra_repositories or [])
     config.set_repo_key(repo_key)
     config.set_repo_username(repo_username)
 
@@ -341,7 +341,7 @@ def type(*, site_repository, clone_path, extra_repositories, repo_key,
     """
     config.set_site_repo(site_repository)
     config.set_clone_path(clone_path)
-    config.set_extra_repo_store(extra_repositories or [])
+    config.set_extra_repo_overrides(extra_repositories or [])
     config.set_repo_key(repo_key)
     config.set_repo_username(repo_username)
 

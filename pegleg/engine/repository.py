@@ -228,7 +228,7 @@ def _process_repository_overrides(site_def_repos):
     """
 
     # Extra repositories to process.
-    provided_repo_overrides = config.get_extra_repo_store()
+    provided_repo_overrides = config.get_extra_repo_overrides()
     # Map repository names to the associated URL/revision for cloning.
     repo_overrides = {}
 
