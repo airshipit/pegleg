@@ -358,3 +358,50 @@ def list_types(*, output_stream):
     """List type names for a given repository."""
     engine.repository.process_site_repository(update_config=True)
     engine.type.list_types(output_stream)
+
+
+@site.group(name='secrets', help='Commands to manage site secrets documents')
+def secrets():
+    pass
+
+
+@secrets.command(
+    'encrypt',
+    help='Command to encrypt and wrap site secrets '
+    'documents with metadata.storagePolicy set '
+    'to encrypted, in pegleg managed documents.')
+@click.option(
+    '-s',
+    '--save-location',
+    'save_location',
+    default=None,
+    help='Directory to output the encrypted site secrets files. Created '
+    'automatically if it does not already exist. '
+    'If save_location is not provided, the output encrypted files will '
+    'overwrite the original input files (default behavior)')
+@click.option(
+    '-a',
+    '--author',
+    'author',
+    required=True,
+    help='Identifier for the program or person who is encrypting the secrets '
+         'documents')
+@click.argument('site_name')
+def encrypt(*, save_location, author, site_name):
+    engine.repository.process_repositories(site_name)
+    engine.secrets.encrypt(save_location, author, site_name)
+
+
+@secrets.command(
+    'decrypt',
+    help='Command to unwrap and decrypt one site '
+    'secrets document and print it to stdout.')
+@click.option(
+    '-f',
+    '--filename',
+    'file_name',
+    help='The file name to decrypt and print out to stdout')
+@click.argument('site_name')
+def decrypt(*, file_name, site_name):
+    engine.repository.process_repositories(site_name)
+    engine.secrets.decrypt(file_name, site_name)

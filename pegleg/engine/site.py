@@ -21,6 +21,7 @@ import yaml
 from prettytable import PrettyTable
 
 from pegleg.engine import util
+from pegleg.engine.util import files
 
 __all__ = ('collect', 'list_', 'show', 'render')
 
@@ -55,14 +56,8 @@ def _collect_to_file(site_name, save_location):
     """Collects all documents related to ``site_name`` and outputs them to
     the file denoted by ``save_location``.
     """
-    if not os.path.exists(save_location):
-        LOG.debug("Collection save location %s does not exist. Creating "
-                  "automatically.", save_location)
-        os.makedirs(save_location)
-    # In case save_location already exists and isn't a directory.
-    if not os.path.isdir(save_location):
-        raise click.ClickException('save_location %s already exists, but must '
-                                   'be a directory' % save_location)
+
+    files.check_file_save_location(save_location)
 
     save_files = dict()
     try:

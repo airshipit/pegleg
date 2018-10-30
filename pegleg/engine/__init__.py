@@ -19,6 +19,7 @@ from pegleg.engine import lint
 from pegleg.engine import repository
 from pegleg.engine import site
 from pegleg.engine import type
+from pegleg.engine import secrets
 
 
 def __represent_multiline_yaml_str():
