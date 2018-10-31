@@ -52,7 +52,7 @@ security:
 # Run all unit tests under pegleg
 .PHONY: run_tests
 run_tests:
-	tox -e py35
+	tox -e py36
 
 # Perform Linting
 .PHONY: lint
