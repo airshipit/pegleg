@@ -34,17 +34,29 @@ ENV_SALT = 'PEGLEG_SALT'
 class PeglegSecretManagement():
     """An object to handle operations on of a pegleg managed file."""
 
-    def __init__(self, file_path):
+    def __init__(self, file_path=None, docs=None):
         """
         Read the source file and the environment data needed to wrap and
         process the file documents as pegleg managed document.
+        Either of the ``file_path`` or ``docs`` must be
+        provided.
         """
+
+        if all([file_path, docs]) or \
+            not any([file_path, docs]):
+            raise ValueError(
+                'Either `file_path` or `docs` must be specified.')
 
         self.__check_environment()
         self.file_path = file_path
         self.documents = list()
-        for doc in files.read(file_path):
-            self.documents.append(PeglegManagedSecret(doc))
+        if docs:
+            for doc in docs:
+                self.documents.append(PeglegManagedSecret(doc))
+        else:
+            self.file_path = file_path
+            for doc in files.read(file_path):
+                self.documents.append(PeglegManagedSecret(doc))
 
         self.passphrase = os.environ.get(ENV_PASSPHRASE).encode()
         self.salt = os.environ.get(ENV_SALT).encode()
@@ -119,9 +131,27 @@ class PeglegSecretManagement():
         included in a site secrets file, and print the result to the standard
         out."""
 
+        yaml.safe_dump_all(
+            self.get_decrypted_secrets(),
+            sys.stdout,
+            explicit_start=True,
+            explicit_end=True,
+            default_flow_style=False)
+
+    def get_decrypted_secrets(self):
+        """
+        Unwrap and decrypt all the pegleg managed documents in a secrets
+        file, and return the result as a list of documents.
+
+        The method is idempotent. If the method is called on not
+        encrypted files, or documents inside the file, it will return
+        the original unwrapped and unencrypted documents.
+
+        """
+
         doc_list = []
         for doc in self.documents:
-            # only decrypt an encrypted document
+            # do not decrypt already decrypted data
             if doc.is_encrypted():
                 doc.set_secret(
                     decrypt(doc.get_secret(),
@@ -129,9 +159,4 @@ class PeglegSecretManagement():
                             self.salt).decode())
                 doc.set_decrypted()
             doc_list.append(doc.embedded_document)
-        yaml.safe_dump_all(
-            doc_list,
-            sys.stdout,
-            explicit_start=True,
-            explicit_end=True,
-            default_flow_style=False)
+        return doc_list

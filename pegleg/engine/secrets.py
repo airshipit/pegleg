@@ -74,7 +74,7 @@ def decrypt(file_path, site_name):
     :param file_path: Path to the file to be unwrapped and decrypted.
     :type file_path: string
     :param site_name: The name of the site to search for the file.
-    :type site_name: string providing the site name
+    :type site_name: string
     """
 
     LOG.info('Started decrypting...')
