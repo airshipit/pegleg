@@ -44,8 +44,7 @@ class PeglegSecretManagement():
 
         if all([file_path, docs]) or \
             not any([file_path, docs]):
-            raise ValueError(
-                'Either `file_path` or `docs` must be specified.')
+            raise ValueError('Either `file_path` or `docs` must be specified.')
 
         self.__check_environment()
         self.file_path = file_path
@@ -73,7 +72,7 @@ class PeglegSecretManagement():
         # Verify that passphrase environment variable is defined and is longer
         # than 24 characters.
         if not os.environ.get(ENV_PASSPHRASE) or not re.match(
-            PASSPHRASE_PATTERN, os.environ.get(ENV_PASSPHRASE)):
+                PASSPHRASE_PATTERN, os.environ.get(ENV_PASSPHRASE)):
             raise click.ClickException(
                 'Environment variable {} is not defined or '
                 'is not at least 24-character long.'.format(ENV_PASSPHRASE))
@@ -154,8 +153,7 @@ class PeglegSecretManagement():
             # do not decrypt already decrypted data
             if doc.is_encrypted():
                 doc.set_secret(
-                    decrypt(doc.get_secret(),
-                            self.passphrase,
+                    decrypt(doc.get_secret(), self.passphrase,
                             self.salt).decode())
                 doc.set_decrypted()
             doc_list.append(doc.embedded_document)

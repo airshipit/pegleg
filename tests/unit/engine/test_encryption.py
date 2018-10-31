@@ -30,7 +30,6 @@ from pegleg.engine.util.pegleg_secret_management import ENV_SALT
 from tests.unit.fixtures import temp_path
 from pegleg.engine.util import files
 
-
 TEST_DATA = """
 ---
 schema: deckhand/Passphrase/v1
@@ -60,22 +59,24 @@ def test_encrypt_and_decrypt():
 
 
 @mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE:'aShortPassphrase',
-    ENV_SALT: 'MySecretSalt'})
+    ENV_PASSPHRASE: 'aShortPassphrase',
+    ENV_SALT: 'MySecretSalt'
+})
 def test_short_passphrase():
-    with pytest.raises(click.ClickException,
-                       match=r'.*is not at least 24-character long.*'):
+    with pytest.raises(
+            click.ClickException,
+            match=r'.*is not at least 24-character long.*'):
         PeglegSecretManagement('file_path')
 
 
-def test_PeglegManagedDocument():
+def test_pegleg_secret_management_constructor():
     test_data = yaml.load(TEST_DATA)
     doc = PeglegManagedSecretsDocument(test_data)
-    assert doc.is_storage_policy_encrypted() is True
-    assert doc.is_encrypted() is False
+    assert doc.is_storage_policy_encrypted()
+    assert not doc.is_encrypted()
 
 
-def test_PeglegSecretManagement():
+def test_pegleg_secret_management_constructor_with_invalid_arguments():
     with pytest.raises(ValueError) as err_info:
         PeglegSecretManagement(file_path=None, docs=None)
     assert 'Either `file_path` or `docs` must be specified.' in str(
@@ -87,40 +88,24 @@ def test_PeglegSecretManagement():
 
 
 @mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE:'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'})
-def test_encrypt_file():
-    # write the test data to temp file
-    test_data = yaml.load(TEST_DATA)
-    dir = tempfile.mkdtemp()
-    file_path = os.path.join(dir, 'secrets_file.yaml')
-    save_path = os.path.join(dir, 'encrypted_secrets_file.yaml')
-    with open(file_path, 'w') as stream:
-        yaml.dump(test_data,
-                  stream,
-                  explicit_start=True,
-                  explicit_end=True,
-                  default_flow_style=False)
-    # read back the secrets data file and encrypt it
-    doc_mgr = PeglegSecretManagement(file_path)
-    doc_mgr.encrypt_secrets(save_path, 'test_author')
-    doc = doc_mgr.documents[0]
-    assert doc.is_encrypted()
-    assert doc.data['encrypted']['by'] == 'test_author'
-
-
-@mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE:'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'})
-def test_encrypt_decrypt_file(temp_path):
+    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    ENV_SALT: 'MySecretSalt'
+})
+def test_encrypt_decrypt_using_file_path(temp_path):
     # write the test data to temp file
     test_data = list(yaml.safe_load_all(TEST_DATA))
     file_path = os.path.join(temp_path, 'secrets_file.yaml')
     files.write(file_path, test_data)
     save_path = os.path.join(temp_path, 'encrypted_secrets_file.yaml')
+
+    # encrypt documents and validate that they were encrypted
     doc_mgr = PeglegSecretManagement(file_path=file_path)
     doc_mgr.encrypt_secrets(save_path, 'test_author')
-    # read back the encrypted file
+    doc = doc_mgr.documents[0]
+    assert doc.is_encrypted()
+    assert doc.data['encrypted']['by'] == 'test_author'
+
+    # decrypt documents and validate that they were decrypted
     doc_mgr = PeglegSecretManagement(save_path)
     decrypted_data = doc_mgr.get_decrypted_secrets()
     assert test_data[0]['data'] == decrypted_data[0]['data']
@@ -128,23 +113,31 @@ def test_encrypt_decrypt_file(temp_path):
 
 
 @mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE:'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'})
-def test_decrypt_document(temp_path):
+    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    ENV_SALT: 'MySecretSalt'
+})
+def test_encrypt_decrypt_using_docs(temp_path):
     # write the test data to temp file
     test_data = list(yaml.safe_load_all(TEST_DATA))
     save_path = os.path.join(temp_path, 'encrypted_secrets_file.yaml')
+
+    # encrypt documents and validate that they were encrypted
     doc_mgr = PeglegSecretManagement(docs=test_data)
     doc_mgr.encrypt_secrets(save_path, 'test_author')
+    doc = doc_mgr.documents[0]
+    assert doc.is_encrypted()
+    assert doc.data['encrypted']['by'] == 'test_author'
+
     # read back the encrypted file
     with open(save_path) as stream:
         encrypted_data = list(yaml.safe_load_all(stream))
-    # this time pass a list of dicts to peglegSecretManager
+
+    # decrypt documents and validate that they were decrypted
     doc_mgr = PeglegSecretManagement(docs=encrypted_data)
     decrypted_data = doc_mgr.get_decrypted_secrets()
     assert test_data[0]['data'] == decrypted_data[0]['data']
     assert test_data[0]['schema'] == decrypted_data[0]['schema']
-    assert test_data[0]['metadata']['name'] == decrypted_data[0][
-        'metadata']['name']
+    assert test_data[0]['metadata']['name'] == decrypted_data[0]['metadata'][
+        'name']
     assert test_data[0]['metadata']['storagePolicy'] == decrypted_data[0][
         'metadata']['storagePolicy']

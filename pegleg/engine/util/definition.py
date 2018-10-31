@@ -15,7 +15,6 @@
 import os
 
 import click
-import yaml
 
 from pegleg import config
 from pegleg.engine.util import files
@@ -52,6 +51,7 @@ def load_as_params(site_name, *fields, primary_repo_base=None):
 
 
 def path(site_name, primary_repo_base=None):
+    """Retrieve path to the site-definition.yaml file for ``site_name``."""
     if not primary_repo_base:
         primary_repo_base = config.get_site_repo()
     return os.path.join(primary_repo_base, 'site', site_name,
@@ -100,8 +100,7 @@ def documents_for_each_site():
         paths = files.directories_for(**params)
         filenames = set(files.search(paths))
         for filename in filenames:
-            with open(filename) as f:
-                documents[sitename].extend(list(yaml.safe_load_all(f)))
+            documents[sitename].extend(files.read(filename))
 
     return documents
 
@@ -122,7 +121,6 @@ def documents_for_site(sitename):
     paths = files.directories_for(**params)
     filenames = set(files.search(paths))
     for filename in filenames:
-        with open(filename) as f:
-            documents.extend(list(yaml.safe_load_all(f)))
+        documents.extend(files.read(filename))
 
     return documents

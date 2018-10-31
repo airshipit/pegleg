@@ -125,23 +125,6 @@ def test_verify_deckhand_render_site_documents_separately(
                     'storagePolicy': 'cleartext'
                 },
                 'schema': 'deckhand/Passphrase/v1'
-            }, {
-                'data': {
-                    'site_type': sitename,
-                    'repositories': {
-                        'global': mock.ANY
-                    }
-                },
-                'metadata': {
-                    'layeringDefinition': {
-                        'abstract': False,
-                        'layer': 'site'
-                    },
-                    'name': sitename,
-                    'schema': 'metadata/Document/v1',
-                    'storagePolicy': 'cleartext'
-                },
-                'schema': 'pegleg/SiteDefinition/v1'
             }]
             expected_documents.extend(documents)
 

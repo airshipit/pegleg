@@ -18,7 +18,6 @@ import os
 import pkg_resources
 import shutil
 import textwrap
-import yaml
 
 from prettytable import PrettyTable
 
@@ -223,16 +222,16 @@ def _verify_single_file(filename, schemas):
             errors.append((FILE_MISSING_YAML_DOCUMENT_HEADER,
                            '%s does not begin with YAML beginning of document '
                            'marker "---".' % filename))
-        f.seek(0)
-        documents = []
-        try:
-            documents = list(yaml.safe_load_all(f))
-        except Exception as e:
-            errors.append((FILE_CONTAINS_INVALID_YAML,
-                           '%s is not valid yaml: %s' % (filename, e)))
 
-        for document in documents:
-            errors.extend(_verify_document(document, schemas, filename))
+    documents = []
+    try:
+        documents = util.files.read(filename)
+    except Exception as e:
+        errors.append((FILE_CONTAINS_INVALID_YAML,
+                       '%s is not valid yaml: %s' % (filename, e)))
+
+    for document in documents:
+        errors.extend(_verify_document(document, schemas, filename))
 
     return errors
 

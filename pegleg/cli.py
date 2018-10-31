@@ -385,7 +385,7 @@ def secrets():
     'author',
     required=True,
     help='Identifier for the program or person who is encrypting the secrets '
-         'documents')
+    'documents')
 @click.argument('site_name')
 def encrypt(*, save_location, author, site_name):
     engine.repository.process_repositories(site_name)

@@ -18,6 +18,7 @@ import yaml
 import logging
 
 from pegleg import config
+from pegleg.engine.util import pegleg_managed_document as md
 
 LOG = logging.getLogger(__name__)
 
@@ -248,9 +249,35 @@ def read(path):
             '{} not found. Pegleg must be run from the root of a '
             'configuration repository.'.format(path))
 
+    def is_deckhand_document(document):
+        # Deckhand documents only consist of control and application
+        # documents.
+        valid_schemas = ('metadata/Control', 'metadata/Document')
+        if isinstance(document, dict):
+            schema = document.get('metadata', {}).get('schema', '')
+            # NOTE(felipemonteiro): The Pegleg site-definition.yaml is a
+            # Deckhand-formatted document currently but probably shouldn't
+            # be, because it has no business being in Deckhand. As such,
+            # treat it as a special case.
+            if "SiteDefinition" in document.get('schema', ''):
+                return False
+            if any(schema.startswith(x) for x in valid_schemas):
+                return True
+            else:
+                LOG.debug('Document with schema=%s is not a valid Deckhand '
+                          'schema. Ignoring it.', schema)
+        return False
+
+    def is_pegleg_managed_document(document):
+        return md.PeglegManagedSecretsDocument.is_pegleg_managed_secret(
+            document)
+
     with open(path) as stream:
         try:
-            return list(yaml.safe_load_all(stream))
+            return [
+                d for d in yaml.safe_load_all(stream)
+                if is_deckhand_document(d) or is_pegleg_managed_document(d)
+            ]
         except yaml.YAMLError as e:
             raise click.ClickException('Failed to parse %s:\n%s' % (path, e))
 
@@ -296,10 +323,25 @@ def _recurse_subdirs(search_path, depth):
 
 
 def search(search_paths):
+    if not isinstance(search_paths, (list, tuple)):
+        search_paths = [search_paths]
+
     for search_path in search_paths:
         LOG.debug("Recursively collecting YAMLs from %s" % search_path)
-        for root, _dirs, filenames in os.walk(search_path):
+        for root, _, filenames in os.walk(search_path):
+
+            # Ignore hidden folders like .tox or .git for faster processing.
+            if os.path.basename(root).startswith("."):
+                continue
+            # Skip over anything in tools/ because it will never contain valid
+            # Pegleg-owned manifest documents.
+            if "tools" in root.split("/"):
+                continue
+
             for filename in filenames:
+                # Ignore files like .zuul.yaml.
+                if filename.startswith("."):
+                    continue
                 if filename.endswith(".yaml"):
                     yield os.path.join(root, filename)
 
