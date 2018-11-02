@@ -57,7 +57,7 @@ def process_repositories(site_name):
 
     # Retrieve extra repo data from site-definition.yaml files.
     site_data = util.definition.load_as_params(
-        site_name, primary_repo_base=site_repo)
+        site_name, 'site_type', 'repositories', primary_repo_base=site_repo)
     site_def_repos = _get_and_validate_site_repositories(site_name, site_data)
 
     # Dict mapping repository names to associated URL/revision info for clone.
