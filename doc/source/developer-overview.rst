@@ -72,8 +72,7 @@ Pegleg strives to conform to the `Airship coding conventions`_.
 Python
 ------
 
-The Pegleg code base lives under ``pegleg``. Pegleg supports py35 and py36
-interpreters.
+The Pegleg code base lives under ``pegleg``. Pegleg supports py36 interpreter.
 
 Docker
 ------
@@ -103,8 +102,8 @@ directory):
 
   # Quick way of building a venv and installing all required dependencies into
   # it.
-  tox -e py35 --notest
-  source .tox/py35/bin/activate
+  tox -e py36 --notest
+  source .tox/py36/bin/activate
   pip install -e .
 
   # Now is it possible to run the Pegleg CLI to test local changes:
@@ -129,11 +128,11 @@ Unit Tests
 
 To run all unit tests, execute::
 
-  $ tox -epy35
+  $ tox -epy36
 
 To run unit tests using a regex, execute::
 
-  $ tox -epy35 -- <regex>
+  $ tox -epy36 -- <regex>
 
 .. _Airship: https://airshipit.readthedocs.io
 .. _Deckhand: https://airship-deckhand.readthedocs.io/
