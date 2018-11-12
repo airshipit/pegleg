@@ -101,7 +101,7 @@ def decrypt(encrypted_data,
 def _generate_key(passphrase, salt, key_length, iterations):
     """
     Use the passphrase and salt and PBKDF2HMAC key derivation algorithm,
-    to generate and and return a Fernet key to be used for encryption and
+    to generate and return a Fernet key to be used for encryption and
     decryption of secret data.
 
     :param passphrase: Passphrase to use to generate decryption key. Must be
