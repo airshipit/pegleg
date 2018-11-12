@@ -17,13 +17,11 @@
     check:
       jobs:
         - openstack-tox-pep8
-        - airship-pegleg-linter
         - airship-pegleg-doc-build
         - airship-pegleg-docker-build-gate
     gate:
       jobs:
         - openstack-tox-pep8
-        - airship-pegleg-linter
         - airship-pegleg-doc-build
         - airship-pegleg-docker-build-gate
     post:
@@ -35,13 +33,6 @@
     nodes:
       - name: primary
         label: ubuntu-xenial
-
-- job:
-    name: airship-pegleg-linter
-    description: |
-      Lints all files by checking them for whitespace.
-    run: tools/gate/playbooks/zuul-linter.yaml
-    nodeset: airship-pegleg-single-node
 
 - job:
     name: airship-pegleg-doc-build
