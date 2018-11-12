@@ -42,8 +42,7 @@ class PeglegSecretManagement():
         provided.
         """
 
-        if all([file_path, docs]) or \
-            not any([file_path, docs]):
+        if all([file_path, docs]) or not any([file_path, docs]):
             raise ValueError('Either `file_path` or `docs` must be specified.')
 
         self.__check_environment()

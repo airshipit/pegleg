@@ -198,8 +198,8 @@ def _try_git_clone(repo_url,
     except git_exc.GitCommandError as e:
         LOG.exception('Failed to clone repo_url=%s using ref=%s.', repo_url,
                       ref)
-        if (ssh_cmd and ssh_cmd in e.stderr
-                or 'permission denied' in e.stderr.lower()):
+        if (ssh_cmd and ssh_cmd in e.stderr or
+                'permission denied' in e.stderr.lower()):
             raise exceptions.GitAuthException(
                 repo_url=repo_url, ssh_key_path=auth_key)
         elif 'could not resolve proxy' in e.stderr.lower():

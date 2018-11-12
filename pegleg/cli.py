@@ -46,9 +46,8 @@ MAIN_REPOSITORY_OPTION = click.option(
     '--site-repository',
     'site_repository',
     required=True,
-    help=
-    'Path or URL to the primary repository (containing site_definition.yaml) '
-    'repo.')
+    help=('Path or URL to the primary repository (containing '
+          'site_definition.yaml) repo.'))
 
 EXTRA_REPOSITORY_OPTION = click.option(
     '-e',
@@ -72,10 +71,10 @@ REPOSITORY_USERNAME_OPTION = click.option(
     '-u',
     '--repo-username',
     'repo_username',
-    help=
-    'The SSH username to use when cloning remote authenticated repositories '
-    'specified in the site-definition file. Any occurrences of REPO_USERNAME '
-    'will be replaced with this value.')
+    help=('The SSH username to use when cloning remote authenticated '
+          'repositories specified in the site-definition file. Any '
+          'occurrences of REPO_USERNAME will be replaced with this '
+          'value.'))
 
 REPOSITORY_CLONE_PATH_OPTION = click.option(
     '-p',
@@ -96,8 +95,8 @@ ALLOW_MISSING_SUBSTITUTIONS_OPTION = click.option(
     required=False,
     type=click.BOOL,
     default=True,
-    help=
-    "Raise Deckhand exception on missing substition sources. Defaults to True."
+    help=("Raise Deckhand exception on missing substition sources. "
+          "Defaults to True.")
 )
 
 EXCLUDE_LINT_OPTION = click.option(

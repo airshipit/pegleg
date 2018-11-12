@@ -78,8 +78,8 @@ def decrypt(file_path, site_name):
     """
 
     LOG.info('Started decrypting...')
-    if os.path.isfile(file_path) \
-        and [s for s in file_path.split(os.path.sep) if s == site_name]:
+    if (os.path.isfile(file_path) and
+            [s for s in file_path.split(os.path.sep) if s == site_name]):
         PeglegSecretManagement(file_path).decrypt_secrets()
     else:
         LOG.info('File: {} was not found. Check your file path and name, '
@@ -101,9 +101,8 @@ def _get_dest_path(repo_base, file_path, save_location):
     :rtype: string
     """
 
-    if save_location \
-        and save_location != os.path.sep \
-        and save_location.endswith(os.path.sep):
+    if (save_location and save_location != os.path.sep and
+            save_location.endswith(os.path.sep)):
         save_location = save_location.rstrip(os.path.sep)
     if repo_base and repo_base.endswith(os.path.sep):
         repo_base = repo_base.rstrip(os.path.sep)
