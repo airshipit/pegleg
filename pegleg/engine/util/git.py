@@ -200,15 +200,16 @@ def _try_git_clone(repo_url,
                       ref)
         if (ssh_cmd and ssh_cmd in e.stderr
                 or 'permission denied' in e.stderr.lower()):
-            raise exceptions.GitAuthException(repo_url, auth_key)
+            raise exceptions.GitAuthException(
+                repo_url=repo_url, ssh_key_path=auth_key)
         elif 'could not resolve proxy' in e.stderr.lower():
-            raise exceptions.GitProxyException(proxy_server)
+            raise exceptions.GitProxyException(location=proxy_server)
         else:
-            raise exceptions.GitException(repo_url, details=e)
+            raise exceptions.GitException(location=repo_url, details=e)
     except Exception as e:
-        msg = 'Encountered unknown Exception during clone of %s' % repo_url
-        LOG.exception(msg)
-        raise exceptions.GitException(repo_url, details=e)
+        LOG.exception('Encountered unknown Exception during clone of %s',
+                      repo_url)
+        raise exceptions.GitException(location=repo_url, details=e)
 
     _try_git_checkout(repo=repo, repo_url=repo_url, ref=ref)
 
@@ -241,7 +242,7 @@ def _get_remote_env_vars(auth_key=None):
         else:
             msg = "The auth_key path '%s' was not found" % auth_key
             LOG.error(msg)
-            raise exceptions.GitSSHException(auth_key)
+            raise exceptions.GitSSHException(ssh_key_path=auth_key)
     return env_vars
 
 
@@ -297,12 +298,11 @@ def _try_git_checkout(repo, repo_url, ref=None, fetch=True):
     except git_exc.GitCommandError as e:
         LOG.exception('Failed to checkout ref=%s from repo_url=%s.', ref,
                       repo_url)
-        raise exceptions.GitException(repo_url, details=e)
+        raise exceptions.GitException(location=repo_url, details=e)
     except Exception as e:
-        msg = ('Encountered unknown Exception during checkout of ref=%s for '
-               'repo_url=%s' % (ref, repo_url))
-        LOG.exception(msg)
-        raise exceptions.GitException(repo_url, details=e)
+        LOG.exception(('Encountered unknown Exception during checkout of '
+                       'ref=%s for repo_url=%s'), ref, repo_url)
+        raise exceptions.GitException(location=repo_url, details=e)
 
 
 def _create_or_checkout_local_ref(g, branches, ref):
@@ -388,7 +388,7 @@ def repo_name(repo_path):
     """
 
     if not is_repository(normalize_repo_path(repo_path)[0]):
-        raise exceptions.GitConfigException(repo_url=repo_path)
+        raise exceptions.GitConfigException(repo_path=repo_path)
 
     # TODO(felipemonteiro): Support this for remote URLs too?
     repo = Repo(repo_path, search_parent_directories=True)
@@ -408,9 +408,9 @@ def repo_name(repo_path):
                 else:
                     return repo_url.split('/')[-1]
         except Exception:
-            raise exceptions.GitConfigException(repo_url=repo_path)
+            raise exceptions.GitConfigException(repo_path=repo_path)
 
-    raise exceptions.GitConfigException(repo_url=repo_path)
+    raise exceptions.GitConfigException(repo_path=repo_path)
 
 
 def normalize_repo_path(repo_url_or_path):

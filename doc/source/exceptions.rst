@@ -27,11 +27,6 @@ Base Exceptions
 Git Exceptions
 --------------
 
-.. autoexception:: pegleg.engine.exceptions.BaseGitException
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
 .. autoexception:: pegleg.engine.exceptions.GitConfigException
    :members:
    :show-inheritance:
