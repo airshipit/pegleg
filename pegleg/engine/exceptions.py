@@ -12,78 +12,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
+__all__ = ('PeglegBaseException',
+           'GitException',
+           'GitAuthException',
+           'GitProxyException',
+           'GitSSHException',
+           'GitConfigException',
+           'GitInvalidRepoException')
+
+LOG = logging.getLogger(__name__)
+
 
 class PeglegBaseException(Exception):
-    """Base class for Pegleg exception and error handling."""
+    """The base Pegleg exception for everything."""
+
+    message = "Base Pegleg exception"
 
     def __init__(self, message=None, **kwargs):
         self.message = message or self.message
-        try:  # nosec
-            self.message = self.message % kwargs
-        except Exception:
-            pass
-        super(PeglegBaseException, self).__init__(self.message)
+        try:
+            self.message = self.message.format(**kwargs)
+        except KeyError:
+            LOG.warning("Missing kwargs")
+        super().__init__(self.message)
 
 
-class BaseGitException(PeglegBaseException):
-    """Base class for Git exceptions and error handling."""
-
-    message = 'An unknown error occurred while accessing a chart source.'
-
-
-class GitException(BaseGitException):
+class GitException(PeglegBaseException):
     """Exception when an error occurs cloning a Git repository."""
-
-    def __init__(self, location, details=None):
-        self._message = ('Git exception occurred: [%s] may not be a valid git '
-                         'repository' % location)
-        if details:
-            self._message += '. Details: %s' % details
-
-        super(GitException, self).__init__(self._message)
+    message = ('Git exception occurred: [%(location)s] may not be a valid '
+               'git repository. Details: %(details)s')
 
 
-class GitAuthException(BaseGitException):
+class GitAuthException(PeglegBaseException):
     """Exception that occurs when authentication fails for cloning a repo."""
-
-    def __init__(self, repo_url, ssh_key_path):
-        self._repo_url = repo_url
-        self._ssh_key_path = ssh_key_path
-
-        self._message = ('Failed to authenticate for repo %s with ssh-key at '
-                         'path %s' % (self._repo_url, self._ssh_key_path))
-
-        super(GitAuthException, self).__init__(self._message)
+    message = ('Failed to authenticate for repo %(repo_url)s with ssh-key '
+               'at path %(ssh_key_path)s')
 
 
-class GitProxyException(BaseGitException):
-    """Exception when an error occurs cloning a Git repository
-       through a proxy."""
-
-    def __init__(self, location):
-        self._location = location
-        self._message = ('Could not resolve proxy [%s]' % self._location)
-
-        super(GitProxyException, self).__init__(self._message)
+class GitProxyException(PeglegBaseException):
+    """Exception when cloning through proxy."""
+    message = 'Could not resolve proxy [%(location)s]'
 
 
-class GitSSHException(BaseGitException):
+class GitSSHException(PeglegBaseException):
     """Exception that occurs when an SSH key could not be found."""
-
-    def __init__(self, ssh_key_path):
-        self._ssh_key_path = ssh_key_path
-
-        self._message = ('Failed to find specified SSH key: %s' %
-                         (self._ssh_key_path))
-
-        super(GitSSHException, self).__init__(self._message)
+    message = 'Failed to find specified SSH key: %(ssh_key_path)s'
 
 
-class GitConfigException(BaseGitException):
+class GitConfigException(PeglegBaseException):
     """Exception that occurs when reading Git repo config fails."""
-    message = ("Failed to read Git config file for repo path: %(repo_path)s")
+    message = 'Failed to read Git config file for repo path: %(repo_path)s'
 
 
-class GitInvalidRepoException(BaseGitException):
+class GitInvalidRepoException(PeglegBaseException):
     """Exception raised when an invalid repository is detected."""
-    message = ("The repository path or URL is invalid: %(repo_path)s")
+    message = 'The repository path or URL is invalid: %(repo_path)s'
