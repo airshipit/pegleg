@@ -64,8 +64,8 @@ def pluck(site_definition, key):
     except Exception as e:
         site_name = site_definition.get('metadata', {}).get('name')
         raise click.ClickException(
-            'failed to get "%s" from site  definition "%s": %s' (key,
-                                                                 site_name, e))
+            'failed to get "%s" from site definition '
+            '"%s": %s' % (key, site_name, e))
 
 
 def site_files(site_name):
