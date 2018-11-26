@@ -67,7 +67,7 @@ def _collect_to_file(site_name, save_location):
             save_file = os.path.join(save_location, repo_name + '.yaml')
             if repo_name not in save_files:
                 save_files[repo_name] = open(save_file, "w")
-            LOG.debug("Collecting file %s to file %s" % (filename, save_file))
+            LOG.debug("Collecting file %s to file %s", filename, save_file)
             save_files[repo_name].writelines(_read_and_format_yaml(filename))
     except Exception as ex:
         raise click.ClickException("Error saving output: %s" % str(ex))

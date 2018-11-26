@@ -18,8 +18,8 @@ import uuid
 
 import yaml
 
-from pegleg.engine.util import files
 from pegleg.engine.exceptions import PeglegBaseException
+from pegleg.engine.util import files
 
 from shipyard_client.api_client.shipyard_api_client import ShipyardClient
 from shipyard_client.api_client.shipyardclient_context import \
@@ -36,7 +36,7 @@ class AuthValuesError(PeglegBaseException):
 
 
 class DocumentUploadError(PeglegBaseException):
-    """ Exception occurs while uploading documents"""
+    """Exception occurs while uploading documents"""
 
     def __init__(self, message):
         self.message = message
@@ -65,18 +65,18 @@ class ShipyardHelper(object):
         self.context_marker = self.ctx.obj['context_marker']
         if self.context_marker is None:
             self.context_marker = str(uuid.uuid4())
-            LOG.debug("context_marker is %s" % self.context_marker)
+            LOG.debug("context_marker is %s", self.context_marker)
         self.site_name = self.ctx.obj['site_name']
         self.client_context = ShipyardClientContext(
             self.auth_vars, self.context_marker)
         self.api_client = ShipyardClient(self.client_context)
 
     def upload_documents(self):
-        """ Uploads documents to Shipyard """
+        """Uploads documents to Shipyard """
 
         collected_documents = files.collect_files_by_repo(self.site_name)
 
-        LOG.info("Uploading %s collection(s) " % len(collected_documents))
+        LOG.info("Uploading %d collection(s) ", len(collected_documents))
         for idx, document in enumerate(collected_documents):
             # Append flag is not required for the first
             # collection being uploaded to Shipyard. It
@@ -129,7 +129,7 @@ class ShipyardHelper(object):
                     raise DocumentUploadError(resp_text)
             else:
                 output = self.formatted_response_handler(resp_text)
-                LOG.info("Uploaded document in buffer %s " % output)
+                LOG.info("Uploaded document in buffer %s ", output)
 
         # Commit in the last iteration of the loop when all the documents
         # have been pushed to Shipyard buffer.
@@ -137,7 +137,7 @@ class ShipyardHelper(object):
             return self.commit_documents()
 
     def commit_documents(self):
-        """ Commit Shipyard buffer documents """
+        """Commit Shipyard buffer documents """
 
         LOG.info("Commiting Shipyard buffer documents")
 

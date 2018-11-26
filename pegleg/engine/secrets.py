@@ -15,9 +15,9 @@
 import logging
 import os
 
-from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
-from pegleg.engine.util import files
 from pegleg.engine.util import definition
+from pegleg.engine.util import files
+from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 
 __all__ = ('encrypt', 'decrypt')
 

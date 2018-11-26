@@ -14,16 +14,17 @@
 
 import logging
 import os
-import yaml
-import sys
 import re
-import click
+import sys
 
-from pegleg.engine.util.encryption import encrypt
+import click
+import yaml
+
 from pegleg.engine.util.encryption import decrypt
+from pegleg.engine.util.encryption import encrypt
+from pegleg.engine.util import files
 from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument as PeglegManagedSecret
-from pegleg.engine.util import files
 
 LOG = logging.getLogger(__name__)
 PASSPHRASE_PATTERN = '^.{24,}$'
@@ -31,7 +32,7 @@ ENV_PASSPHRASE = 'PEGLEG_PASSPHRASE'
 ENV_SALT = 'PEGLEG_SALT'
 
 
-class PeglegSecretManagement():
+class PeglegSecretManagement(object):
     """An object to handle operations on of a pegleg managed file."""
 
     def __init__(self, file_path=None, docs=None):

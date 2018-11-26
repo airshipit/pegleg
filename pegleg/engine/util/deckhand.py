@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pegleg.engine.errorcodes import DECKHAND_DUPLICATE_SCHEMA
-from pegleg.engine.errorcodes import DECKHAND_RENDER_EXCEPTION
+
 from deckhand.engine import layering
 from deckhand import errors as dh_errors
+
+from pegleg.engine.errorcodes import DECKHAND_DUPLICATE_SCHEMA
+from pegleg.engine.errorcodes import DECKHAND_RENDER_EXCEPTION
 
 
 def load_schemas_from_docs(documents):

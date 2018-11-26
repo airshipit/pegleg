@@ -196,7 +196,7 @@ def _get_and_validate_site_repositories(site_name, site_data):
         LOG.info("The repository for site_name: %s does not contain a "
                  "site-definition.yaml with a 'repositories' key. Ensure "
                  "your repository is self-contained and doesn't require "
-                 "extra repositories for correct rendering." % site_name)
+                 "extra repositories for correct rendering.", site_name)
     return site_data.get('repositories', {})
 
 

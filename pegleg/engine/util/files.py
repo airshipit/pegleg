@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
 import collections
-import os
-import yaml
 import logging
+import os
+
+import click
+import yaml
 
 from pegleg import config
 from pegleg.engine import util
@@ -330,7 +331,7 @@ def search(search_paths):
         search_paths = [search_paths]
 
     for search_path in search_paths:
-        LOG.debug("Recursively collecting YAMLs from %s" % search_path)
+        LOG.debug("Recursively collecting YAMLs from %s", search_path)
         for root, _, filenames in os.walk(search_path):
 
             # Ignore hidden folders like .tox or .git for faster processing.
@@ -372,7 +373,7 @@ def check_file_save_location(save_location):
 
 
 def collect_files_by_repo(site_name):
-    """ Collects file by repo name in memory."""
+    """Collects file by repo name in memory."""
 
     collected_files_by_repo = collections.defaultdict(list)
     for repo_base, filename in util.definition.site_files_by_repo(

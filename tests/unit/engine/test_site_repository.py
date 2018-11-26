@@ -455,8 +455,7 @@ def test_process_repositories_without_repositories_key_in_site_definition(
         _test_process_repositories_inner(
             site_name=mock.sentinel.site, expected_extra_repos={})
     msg = ("The repository for site_name: %s does not contain a "
-           "site-definition.yaml with a 'repositories' key" % str(
-               mock.sentinel.site))
+           "site-definition.yaml with a 'repositories' key")
     assert any(msg in x[1][0] for x in m_log.info.mock_calls)
 
 

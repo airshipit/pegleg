@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 from datetime import datetime
+import logging
 
 PEGLEG_MANAGED_SCHEMA = 'pegleg/PeglegManagedDocument/v1'
 ENCRYPTED = 'encrypted'
@@ -22,7 +22,7 @@ METADATA = 'metadata'
 LOG = logging.getLogger(__name__)
 
 
-class PeglegManagedSecretsDocument():
+class PeglegManagedSecretsDocument(object):
     """Object representing one Pegleg managed secret document."""
 
     def __init__(self, secrets_document):
