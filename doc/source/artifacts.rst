@@ -48,7 +48,7 @@ are the layers as listed in the `Deckhand LayeringPolicy`_
 document. The process of choosing the definition libraries
 to compose the actual design for a site is described below.
 
-.. _Deckhand LayeringPolicy: https://airship-deckhand.readthedocs.io/en/latest/layering.html
+.. _Deckhand LayeringPolicy: https://airship-deckhand.readthedocs.io/en/latest/overview.html#layering
 
 site_definition.yaml
 --------------------

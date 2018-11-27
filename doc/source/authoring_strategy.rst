@@ -81,9 +81,9 @@ This catalogue pattern can also be utilized for the ``type`` layer
 if needed.
 
 .. _Deckhand: https://airship-deckhand.readthedocs.io
-.. _layering: https://airship-deckhand.readthedocs.io/en/latest/layering.html
-.. _substitution: https://airship-deckhand.readthedocs.io/en/latest/substitution.html
-.. _types: https://airship-deckhand.readthedocs.io/en/latest/document-types.html#provided-utility-document-kinds
+.. _layering: https://airship-deckhand.readthedocs.io/en/latest/overview.html#layering
+.. _substitution: https://airship-deckhand.readthedocs.io/en/latest/overview.html#substitution
+.. _types: https://airship-deckhand.readthedocs.io/en/latest/users/document-types.html#provided-utility-document-kinds
 
 
 Global Layer

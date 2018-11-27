@@ -638,6 +638,6 @@ Where mandatory encrypted schema type is one of:
 P002 - Deckhand rendering is expected to complete without errors.
 P003 - All repos contain expected directories.
 
-.. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/rendering.html
-.. _Deckhand Validations: https://airship-deckhand.readthedocs.io/en/latest/validation.html
+.. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/users/rendering.html
+.. _Deckhand Validations: https://airship-deckhand.readthedocs.io/en/latest/overview.html#validation
 .. _Pegleg Managed Documents: https://airship-specs.readthedocs.io/en/latest/specs/approved/pegleg-secrets.html#peglegmanageddocument
