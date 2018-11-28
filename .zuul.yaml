@@ -14,6 +14,7 @@
     templates:
       - openstack-python36-jobs
       - openstack-cover-jobs
+      - release-notes-jobs-python3
     check:
       jobs:
         - openstack-tox-pep8
