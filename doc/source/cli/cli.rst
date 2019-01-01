@@ -95,13 +95,13 @@ Options
 
 Path to the root of the site repository (containing site_definition.yaml) repo.
 
-For example: /opt/aic-site-clcp-manifests.
+For example: /opt/airship-treasuremap
 
 The revision can also be specified via (for example):
 
 ::
 
-  -r /opt/aic-site-clcp-manifests@revision
+  -r /opt/airship-treasuremap@revision
 
 **-p / --clone-path** (Optional).
 
@@ -143,13 +143,13 @@ Options
 
 Path to the root of the site repository (containing site_definition.yaml) repo.
 
-For example: /opt/aic-site-clcp-manifests.
+For example: /opt/airship-treasuremap
 
 The revision can also be specified via (for example):
 
 ::
 
-  -r /opt/aic-site-clcp-manifests@revision
+  -r /opt/airship-treasuremap@revision
 
 **-e / --extra-repository** (Optional).
 
