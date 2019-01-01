@@ -50,4 +50,5 @@ Operator's Guide
    :maxdepth: 2
 
    cli/cli
+   lint-codes
    exceptions
