@@ -20,7 +20,7 @@ import string
 import yaml
 
 from pegleg.engine.util.passphrase import Passphrase
-from pegleg.engine.generators.passpharase_generator import PassphraseGenerator
+from pegleg.engine.generators.passphrase_generator import PassphraseGenerator
 from pegleg.engine.util import encryption
 from pegleg.engine import util
 import pegleg

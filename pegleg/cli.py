@@ -528,9 +528,25 @@ def encrypt(*, save_location, author, site_name):
 @click.argument('site_name')
 def decrypt(*, file_name, site_name):
     engine.repository.process_repositories(site_name)
-    try:
-        click.echo(engine.secrets.decrypt(file_name, site_name))
-    except FileNotFoundError:
-        raise click.exceptions.FileError("Couldn't find file %s, "
-                                         "check your arguments and try "
-                                         "again." % file_name)
+
+    engine.secrets.decrypt(file_name, site_name)
+
+
+@main.group(help="Miscellaneous generate commands")
+def generate():
+    pass
+
+
+@generate.command(
+    'passphrase',
+    help='Command to generate a passphrase and print out to stdout')
+@click.option(
+    '-l',
+    '--length',
+    'length',
+    default=24,
+    help='Generate a passphrase of the given length. '
+         'Length is >= 24, default length is 24, no maximum length')
+def generate_passphrase(length):
+    click.echo("Generated Passhprase: {}".format(
+        engine.secrets.generate_passphrase(length)))

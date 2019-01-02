@@ -809,3 +809,40 @@ P003 - All repos contain expected directories.
 .. _Shipyard: https://github.com/openstack/airship-shipyard
 .. _CLI documentation: https://airship-shipyard.readthedocs.io/en/latest/CLI.html#openstack-keystone-authorization-environment-variables
 .. _Pegleg Passphrase Catalog: https://airship-specs.readthedocs.io/en/latest/specs/approved/pegleg-secrets.html#document-generation
+
+
+Generate
+========
+
+Allows you to perform generate operations.
+
+Passphrase
+----------
+
+Generate a passphrase and print to ``stdout``.
+
+**-l / --length** (Optional).
+
+Length of passphrase to generate.  By default length is 24.
+Minimum length is 24.  No maximum length.
+
+Usage:
+
+::
+
+    ./pegleg.sh generate passphrase -l <length>
+
+Examples
+^^^^^^^^
+
+Example without length specified:
+
+::
+
+    ./pegleg.sh generate passphrase
+
+Example with length specified:
+
+::
+
+    ./pegleg.sh generate passphrase -l <length>

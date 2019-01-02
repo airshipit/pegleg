@@ -383,6 +383,13 @@ class TestSiteCliActions(BaseCLIActionTest):
         mock_obj.assert_called_once()
 
 
+class TestGenerateActions(BaseCLIActionTest):
+    def test_generate_passphrase(self):
+        result = self.runner.invoke(cli.generate, ['passphrase'])
+
+        assert result.exit_code == 0, result.output
+
+
 class TestRepoCliActions(BaseCLIActionTest):
     """Tests repo-level CLI actions."""
 

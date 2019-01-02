@@ -64,6 +64,12 @@ def test_encrypt_and_decrypt():
     enc2 = crypt.encrypt(dec1, passphrase, salt)
     dec2 = crypt.decrypt(enc2, passphrase, salt)
     assert data == dec2
+    passphrase2 = test_utils.rand_name("passphrase2", "pegleg").encode()
+    salt2 = test_utils.rand_name("salt2", "pegleg").encode()
+    enc3 = crypt.encrypt(dec2, passphrase2, salt2)
+    dec3 = crypt.decrypt(enc3, passphrase2, salt2)
+    assert data == dec3
+    assert data != enc3
 
 
 @mock.patch.dict(os.environ, {

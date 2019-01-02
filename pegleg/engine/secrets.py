@@ -15,9 +15,10 @@
 import logging
 import os
 
-from pegleg.engine.generators.passpharase_generator import PassphraseGenerator
+from pegleg.engine.generators.passphrase_generator import PassphraseGenerator
 from pegleg.engine.util import definition
 from pegleg.engine.util import files
+from pegleg.engine.util.passphrase import Passphrase
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 
 __all__ = ('encrypt', 'decrypt', 'generate_passphrases')
@@ -129,3 +130,14 @@ def generate_passphrases(site_name, save_location, author, interactive=False):
 
     PassphraseGenerator(site_name, save_location, author).generate(
         interactive=interactive)
+
+
+def generate_passphrase(length):
+    """
+    Create a passphrase.
+
+    :param int length: Length of passphrase.
+    :rtype: string
+    """
+
+    return Passphrase().get_pass(length)
