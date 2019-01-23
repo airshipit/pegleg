@@ -55,5 +55,5 @@ Further Reading
 .. _Deckhand: https://airship-deckhand.readthedocs.io
 .. _Airship: https://www.airshipit.org
 .. _Read the Docs:  https://airship-pegleg.readthedocs.io
-.. _Getting Started: https://airship-pegleg.readthedocs.io/en/latest/getting-started.html
+.. _Getting Started: https://airship-pegleg.readthedocs.io/en/latest/getting_started.html
 .. _Git: https://git-scm.com/
