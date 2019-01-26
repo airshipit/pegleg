@@ -8,6 +8,7 @@ RES=$(find . \
   -not -path "*/htmlcov/*" \
   -not -name "*.tgz" \
   -not -name "*.pyc" \
+  -not -name "*.html" \
   -type f -exec egrep -l " +$" {} \;)
 
 if [[ -n $RES ]]; then

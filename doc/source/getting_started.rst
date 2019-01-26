@@ -21,13 +21,14 @@ Getting Started
 What is Pegleg?
 ---------------
 
-Pegleg is a document aggregator that will aggregate all the documents in a
-repository and pack them into a single YAML file. This allows for operators to
+Pegleg is a document aggregator that aggregates all the documents in a
+repository and packs them into a single YAML file. This allows for operators to
 structure their site definitions in a maintainable directory layout, while
 providing them with the automation and tooling needed to aggregate, lint, and
 render those documents for deployment.
 
-For more information on the documents that Pegleg works on see `Document Fundamentals`_.
+For more information on the documents that Pegleg works on see
+`Document Fundamentals`_.
 
 Basic Usage
 -----------

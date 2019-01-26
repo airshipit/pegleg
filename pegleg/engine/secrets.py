@@ -75,12 +75,13 @@ def decrypt(file_path, site_name):
     :type file_path: string
     :param site_name: The name of the site to search for the file.
     :type site_name: string
+    :return: The decrypted secrets
+    :rtype: list
     """
-
     LOG.info('Started decrypting...')
     if (os.path.isfile(file_path) and
             [s for s in file_path.split(os.path.sep) if s == site_name]):
-        PeglegSecretManagement(file_path).decrypt_secrets()
+        return PeglegSecretManagement(file_path).decrypt_secrets()
     else:
         LOG.info('File: {} was not found. Check your file path and name, '
                  'and try again.'.format(file_path))

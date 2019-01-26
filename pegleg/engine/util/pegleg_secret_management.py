@@ -15,7 +15,6 @@
 import logging
 import os
 import re
-import sys
 
 import click
 import yaml
@@ -130,9 +129,10 @@ class PeglegSecretManagement(object):
         included in a site secrets file, and print the result to the standard
         out."""
 
-        yaml.safe_dump_all(
-            self.get_decrypted_secrets(),
-            sys.stdout,
+        secrets = self.get_decrypted_secrets()
+
+        return yaml.safe_dump_all(
+            secrets,
             explicit_start=True,
             explicit_end=True,
             default_flow_style=False)
