@@ -15,8 +15,7 @@
 import base64
 import logging
 
-from cryptography.exceptions import InvalidSignature
-from cryptography.fernet import Fernet
+from cryptography import fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -57,8 +56,8 @@ def encrypt(unencrypted_data,
     :rtype: bytes
     """
 
-    return Fernet(_generate_key(passphrase, salt, key_length,
-                                iterations)).encrypt(unencrypted_data)
+    return fernet.Fernet(_generate_key(
+        passphrase, salt, key_length, iterations)).encrypt(unencrypted_data)
 
 
 def decrypt(encrypted_data,
@@ -88,14 +87,14 @@ def decrypt(encrypted_data,
     :type iterations: positive integer.
     :return: Decrypted secret data
     :rtype: bytes
-    :raises InvalidSignature: If the provided passphrase, and/or
+    :raises InvalidToken: If the provided passphrase, and/or
     salt does not match the values used to encrypt the data.
     """
 
     try:
-        return Fernet(_generate_key(passphrase, salt, key_length,
-                                    iterations)).decrypt(encrypted_data)
-    except InvalidSignature:
+        return fernet.Fernet(_generate_key(
+            passphrase, salt, key_length, iterations)).decrypt(encrypted_data)
+    except fernet.InvalidToken:
         LOG.error('Signature verification to decrypt secrets failed. Please '
                   'check your provided passphrase and salt and try again.')
         raise
