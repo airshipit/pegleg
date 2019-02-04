@@ -14,7 +14,6 @@
 
 from abc import ABC
 import logging
-import os
 import re
 
 from pegleg import config
@@ -43,7 +42,7 @@ class BaseCatalog(ABC):
         """
         self._documents = documents or definition.documents_for_site(sitename)
         self._site_name = sitename
-        self._catalog_path = None
+        self._catalog_path = []
         self._kind = kind
         self._catalog_docs = list()
         for document in self._documents:
@@ -61,7 +60,7 @@ class BaseCatalog(ABC):
 
     @property
     def catalog_path(self):
-        if self._catalog_path is None:
+        if not self._catalog_path:
             self._set_catalog_path()
         return self._catalog_path
 
@@ -69,15 +68,14 @@ class BaseCatalog(ABC):
         repo_name = git.repo_url(config.get_site_repo())
         catalog_name = self._get_document_name('{}.yaml'.format(self._kind))
         for file_path in definition.site_files(self.site_name):
-            if file_path.endswith(catalog_name) and repo_name in file_path:
-                self._catalog_path = os.path.join(
-                    repo_name, file_path.split(repo_name)[1].lstrip('/'))
-                return
-        # Cound not find the Catalog for this generated passphrase
-        # raise an exception.
-        LOG.error('Catalog path: {} was not found in repo: {}'.format(
-            catalog_name, repo_name))
-        raise PassphraseCatalogNotFoundException()
+            if file_path.endswith(catalog_name):
+                self._catalog_path.append(file_path)
+        if not self._catalog_path:
+            # Cound not find the Catalog for this generated passphrase
+            # raise an exception.
+            LOG.error('Catalog path: {} was not found in repo: {}'.format(
+                catalog_name, repo_name))
+            raise PassphraseCatalogNotFoundException()
 
     def _get_document_name(self, name):
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', name)
