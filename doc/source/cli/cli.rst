@@ -59,7 +59,7 @@ For example:
 .. code-block:: console
 
   cd /opt/airship-pegleg
-  export WORKSPACE=/opt/airship-treasuremap
+  export WORKSPACE=/opt/airship/treasuremap
   ./tools/pegleg.sh site -r /workspace --help
 
 .. note::
@@ -71,7 +71,7 @@ For example:
   .. code-block:: console
 
     cd /opt/airship-pegleg
-    export WORKSPACE=/opt/airship-treasuremap
+    export WORKSPACE=/opt/airship/treasuremap
     sudo -E ./tools/pegleg.sh site -r /workspace --help
 
 CLI Options
@@ -95,23 +95,23 @@ Options
 
 Path to the root of the site repository (containing site_definition.yaml) repo.
 
-For example: /opt/airship-treasuremap
+For example: /opt/airship/treasuremap
 
 The revision can also be specified via (for example):
 
 ::
 
-  -r /opt/airship-treasuremap@revision
+  -r /opt/airship/treasuremap@revision
 
 **-p / --clone-path** (Optional, Default=/tmp/).
 
-The path where the repo will be cloned. If this option is included and the
-repo already exists, then the repo will not be cloned again and the user must
-specify a new clone path or pass in the local copy of the repository as the
-site repository. Suppose the repo name is airship-treasuremap and the clone
-path is /tmp/mypath then the following directory is created
-/tmp/mypath/airship-treasuremap which will contain the contents of the repo.
-Example of using clone path:
+The path where the repo will be cloned. By default the repo will be cloned to
+the /tmp path. If this option is included and the repo already exists, then the
+repo will not be cloned again and the user must specify a new clone path or
+pass in the local copy of the repository as the site repository. Suppose the
+repo name is ``treasuremap`` and the clone path is ``/tmp/mypath`` then the
+following directory is created ``/tmp/mypath/treasuremap`` which will contain
+the contents of the repo. Example of using clone path:
 
 ::
 
@@ -145,13 +145,13 @@ Options
 
 Path to the root of the site repository (containing site_definition.yaml) repo.
 
-For example: /opt/airship-treasuremap
+For example: /opt/airship/treasuremap
 
 The revision can also be specified via (for example):
 
 ::
 
-  -r /opt/airship-treasuremap@revision
+  -r /opt/airship/treasuremap@revision
 
 **-e / --extra-repository** (Optional).
 
@@ -166,13 +166,13 @@ These should be named per the site-definition file, e.g.:
 
 **-p / --clone-path** (Optional, Default=/tmp/).
 
-The path where the repo will be cloned. If this option is included and the
-repo already exists, then the repo will not be cloned again and the user must
-specify a new clone path or pass in the local copy of the repository as the
-site repository. Suppose the repo name is airship-treasuremap and the clone
-path is /tmp/mypath then the following directory is created
-/tmp/mypath/airship-treasuremap which will contain the contents of the repo.
-Example of using clone path:
+The path where the repo will be cloned. By default the repo will be cloned to
+the /tmp path. If this option is included and the repo already exists, then the
+repo will not be cloned again and the user must specify a new clone path or
+pass in the local copy of the repository as the site repository. Suppose the
+repo name is ``treasuremap`` and the clone path is ``/tmp/mypath`` then the
+following directory is created ``/tmp/mypath/treasuremap`` which will
+contain the contents of the repo. Example of using clone path:
 
 ::
 
@@ -443,7 +443,9 @@ Usage:
 Site Secrets Group
 ------------------
 
-Subgroup of :ref:`site-group`.
+Subgroup of :ref:`site-group`. The commands below create
+:ref:`PeglegManagedDocument manifests <pegleg-managed-document>` in the local
+repository.
 
 A sub-group of site command group, which allows you to perform secrets
 level operations for secrets documents of a site.
@@ -473,7 +475,7 @@ Generate PKI
 ^^^^^^^^^^^^
 
 Generate certificates and keys according to all PKICatalog documents in the
-site using the PKI module. The default behavior is to generate all
+site using the :ref:`pki` module. The default behavior is to generate all
 certificates that are not yet present. For example, the first time generate PKI
 is run or when new entries are added to the PKICatalogue, only those new
 entries will be generated on subsequent runs.

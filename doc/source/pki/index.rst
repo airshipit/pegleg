@@ -14,42 +14,22 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-====================
-Pegleg Documentation
-====================
+===============
+Secrets Catalog
+===============
 
-Overview
---------
-
-.. toctree::
-   :maxdepth: 2
-
-   getting_started
-
-Design
-------
+Artifacts
+---------
 
 .. toctree::
    :maxdepth: 2
 
-   artifacts
-   authoring_strategy
-   pki/index
+   document-types
 
-Developer's Guide
------------------
+Public Key Infrastructure (PKI)
+-------------------------------
 
 .. toctree::
    :maxdepth: 2
 
-   developer-overview
-
-Operator's Guide
-----------------
-
-.. toctree::
-   :maxdepth: 2
-
-   cli/cli
-   lint-codes
-   exceptions
+   pki
