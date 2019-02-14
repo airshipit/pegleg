@@ -78,7 +78,7 @@ class PeglegManagedSecretsDocument(object):
             'schema': PEGLEG_MANAGED_SCHEMA,
             'metadata': {
                 'name': secrets_document['metadata']['name'],
-                'schema': 'deckhand/Document/v1',
+                'schema': 'metadata/Document/v1',
                 'labels': secrets_document['metadata'].get('labels', {}),
                 'layeringDefinition': {
                     'abstract': False,
