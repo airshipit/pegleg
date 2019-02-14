@@ -269,7 +269,8 @@ def _verify_document(document, schemas, filename):
                            'storagePolicy: "%s"' % (filename, name,
                                                     storage_policy)))
 
-        if not _filename_in_section(filename, 'secrets/'):
+        # Check if the file is in a secrets directory
+        if not util.files.file_in_subdir(filename, 'secrets/'):
             errors.append((SECRET_NOT_ENCRYPTED_POLICY,
                            '%s (document %s) is a secret, is not stored in a '
                            'secrets path' % (filename, name)))
@@ -330,12 +331,3 @@ def _load_schemas():
         schemas[key] = util.files.slurp(
             pkg_resources.resource_filename('pegleg', filename))
     return schemas
-
-
-def _filename_in_section(filename, section):
-    directory = util.files.directory_for(path=filename)
-    if directory is not None:
-        rest = filename[len(directory) + 1:]
-        return rest is not None and rest.startswith(section)
-    else:
-        return False

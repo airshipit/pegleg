@@ -36,3 +36,10 @@ class TestFileHelpers(object):
         documents = files.read(path)
         assert not documents, ("Documents returned should be empty for "
                                "site-definition.yaml")
+
+def test_file_in_subdir():
+    assert files.file_in_subdir("aaa/bbb/ccc.txt", "aaa")
+    assert files.file_in_subdir("aaa/bbb/ccc.txt", "bbb")
+    assert not files.file_in_subdir("aaa/bbb/ccc.txt", "ccc")
+    assert not files.file_in_subdir("aaa/bbb/ccc.txt", "bb")
+    assert not files.file_in_subdir("aaa/bbb/../ccc.txt", "bbb")

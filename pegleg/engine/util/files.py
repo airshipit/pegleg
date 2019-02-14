@@ -382,3 +382,15 @@ def collect_files_by_repo(site_name):
         documents = util.files.read(filename)
         collected_files_by_repo[repo_name].extend(documents)
     return collected_files_by_repo
+
+
+def file_in_subdir(filename, _dir):
+    """
+    Check if a folder named _dir is in the path to the file
+
+    :return: Whether _dir is a parent of the file
+    :rtype: bool
+    """
+    file_path, file_name = os.path.split(
+        os.path.realpath(filename))
+    return _dir in file_path.split(os.path.sep)
