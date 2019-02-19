@@ -17,17 +17,21 @@ from random import SystemRandom
 from rstr import Rstr
 import string
 
-__all__ = ['Passphrase']
+__all__ = ['CryptoString']
 
 
-class Passphrase(object):
+class CryptoString(object):
 
     def __init__(self):
         self._pool = string.ascii_letters + string.digits + string.punctuation
         self._rs = Rstr(SystemRandom())
 
-    def get_pass(self, pass_len=24):
-        """Create and return a random password, of the ``pass_len`` length."""
-        if pass_len < 24:
-            pass_len = 24
-        return self._rs.rstr(self._pool, pass_len)
+    def get_crypto_string(self, len=24):
+        """
+        Create and return a random cryptographic string,
+        of the ``len`` length.
+        """
+
+        if len < 24:
+            len = 24
+        return self._rs.rstr(self._pool, len)
