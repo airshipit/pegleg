@@ -389,6 +389,11 @@ class TestGenerateActions(BaseCLIActionTest):
 
         assert result.exit_code == 0, result.output
 
+    def test_generate_salt(self):
+        result = self.runner.invoke(cli.generate, ['salt'])
+
+        assert result.exit_code == 0, result.output
+
 
 class TestRepoCliActions(BaseCLIActionTest):
     """Tests repo-level CLI actions."""

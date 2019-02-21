@@ -549,4 +549,19 @@ def generate():
          'Length is >= 24, default length is 24, no maximum length')
 def generate_passphrase(length):
     click.echo("Generated Passhprase: {}".format(
-        engine.secrets.generate_passphrase(length)))
+        engine.secrets.generate_crypto_string(length)))
+
+
+@generate.command(
+    'salt',
+    help='Command to generate a salt and print out to stdout')
+@click.option(
+    '-l',
+    '--length',
+    'length',
+    default=24,
+    help='Generate a salt of the given length. '
+         'Length is >= 24, default length is 24, no maximum length')
+def generate_salt(length):
+    click.echo("Generated Salt: {}".format(
+        engine.secrets.generate_crypto_string(length)))

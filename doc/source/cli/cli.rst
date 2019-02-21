@@ -846,3 +846,34 @@ Example with length specified:
 ::
 
     ./pegleg.sh generate passphrase -l <length>
+
+Salt
+----
+
+Generate a salt and print to ``stdout``.
+
+**-l / --length** (Optional).
+
+Length of salt to generate.  By default length is 24.
+Minimum length is 24.  No maximum length.
+
+Usage:
+
+::
+
+    ./pegleg.sh generate salt -l <length>
+
+Examples
+^^^^^^^^
+
+Example without length specified:
+
+::
+
+    ./pegleg.sh generate salt
+
+Example with length specified:
+
+::
+
+    ./pegleg.sh generate salt -l <length>

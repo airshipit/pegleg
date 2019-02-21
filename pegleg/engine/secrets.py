@@ -16,9 +16,9 @@ import logging
 import os
 
 from pegleg.engine.generators.passphrase_generator import PassphraseGenerator
+from pegleg.engine.util.cryptostring import CryptoString
 from pegleg.engine.util import definition
 from pegleg.engine.util import files
-from pegleg.engine.util.passphrase import Passphrase
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 
 __all__ = ('encrypt', 'decrypt', 'generate_passphrases')
@@ -132,12 +132,12 @@ def generate_passphrases(site_name, save_location, author, interactive=False):
         interactive=interactive)
 
 
-def generate_passphrase(length):
+def generate_crypto_string(length):
     """
-    Create a passphrase.
+    Create a cryptographic string.
 
-    :param int length: Length of passphrase.
+    :param int length: Length of cryptographic string.
     :rtype: string
     """
 
-    return Passphrase().get_pass(length)
+    return CryptoString().get_crypto_string(length)

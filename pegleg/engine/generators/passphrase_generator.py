@@ -18,8 +18,8 @@ import logging
 from pegleg.engine.catalogs import passphrase_catalog
 from pegleg.engine.catalogs.passphrase_catalog import PassphraseCatalog
 from pegleg.engine.generators.base_generator import BaseGenerator
+from pegleg.engine.util.cryptostring import CryptoString
 from pegleg.engine.util import files
-from pegleg.engine.util.passphrase import Passphrase
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 
 __all__ = ['PassphraseGenerator']
@@ -49,7 +49,7 @@ class PassphraseGenerator(BaseGenerator):
             sitename, save_location, author)
         self._catalog = PassphraseCatalog(
             self._sitename, documents=self._documents)
-        self._pass_util = Passphrase()
+        self._pass_util = CryptoString()
 
     def generate(self, interactive=False):
         """
@@ -67,7 +67,7 @@ class PassphraseGenerator(BaseGenerator):
                     prompt="Input passphrase for {}. Leave blank to "
                            "auto-generate:\n".format(p_name))
             if not passphrase:
-                passphrase = self._pass_util.get_pass(
+                passphrase = self._pass_util.get_crypto_string(
                     self._catalog.get_length(p_name))
             docs = list()
             storage_policy = self._catalog.get_storage_policy(p_name)

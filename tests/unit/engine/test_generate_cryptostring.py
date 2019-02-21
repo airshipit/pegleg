@@ -19,7 +19,7 @@ import mock
 import string
 import yaml
 
-from pegleg.engine.util.passphrase import Passphrase
+from pegleg.engine.util.cryptostring import CryptoString
 from pegleg.engine.generators.passphrase_generator import PassphraseGenerator
 from pegleg.engine.util import encryption
 from pegleg.engine import util
@@ -99,30 +99,30 @@ TEST_SITE_DEFINITION = {
 TEST_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_PASSPHRASES_CATALOG]
 
 
-def test_passphrase_default_len():
-    p_util = Passphrase()
-    passphrase = p_util.get_pass()
-    assert len(passphrase) == 24
+def test_cryptostring_default_len():
+    s_util = CryptoString()
+    s = s_util.get_crypto_string()
+    assert len(s) == 24
     alphabet = set(string.punctuation + string.ascii_letters + string.digits)
-    assert any(c in alphabet for c in passphrase)
+    assert any(c in alphabet for c in s)
 
 
-def test_passphrase_short_len():
-    p_util = Passphrase()
-    p = p_util.get_pass(0)
-    assert len(p) == 24
-    p = p_util.get_pass(23)
-    assert len(p) == 24
-    p = p_util.get_pass(-1)
-    assert len(p) == 24
+def test_cryptostring_short_len():
+    s_util = CryptoString()
+    s = s_util.get_crypto_string(0)
+    assert len(s) == 24
+    s = s_util.get_crypto_string(23)
+    assert len(s) == 24
+    s = s_util.get_crypto_string(-1)
+    assert len(s) == 24
 
 
-def test_passphrase_long_len():
-    p_util = Passphrase()
-    p = p_util.get_pass(25)
-    assert len(p) == 25
-    p = p_util.get_pass(128)
-    assert len(p) == 128
+def test_cryptostring_long_len():
+    s_util = CryptoString()
+    s = s_util.get_crypto_string(25)
+    assert len(s) == 25
+    s = s_util.get_crypto_string(128)
+    assert len(s) == 128
 
 
 @mock.patch.object(
