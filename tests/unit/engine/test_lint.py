@@ -19,6 +19,8 @@ from pegleg.engine.errorcodes import DECKHAND_DUPLICATE_SCHEMA
 from pegleg.engine.errorcodes import DECKHAND_RENDER_EXCEPTION
 from pegleg.engine.util import deckhand
 from pegleg.engine.util import files
+from pegleg.engine.util.pegleg_managed_document \
+        import PeglegManagedSecretsDocument
 from tests.unit.fixtures import create_tmp_deployment_files
 
 
@@ -177,6 +179,27 @@ def test_verify_deckhand_render_error_handling(mock_render):
     errors = deckhand.deckhand_render()
     assert _deckhand_render_exception_msg(
         errors) == exp_dict['exp1'] + exp_dict['exp2'] + exp_dict['exp3']
+
+
+def test_handle_managed_document():
+    not_managed = {
+        "schema": "pegleg/FakeSchema/v1",
+        "metadata": {
+            "schema": "metadata/Document/v1",
+            "layeringDefinition": {
+                "abstract": "false",
+                "layer": "site"
+            },
+            "name": "fakesite",
+            "storagePolicy": "cleartext"
+        },
+        "data": "None"
+    }
+
+    managed = PeglegManagedSecretsDocument(not_managed).pegleg_document
+
+    assert lint._handle_managed_document(not_managed) == not_managed
+    assert lint._handle_managed_document(managed) == not_managed
 
 
 def _deckhand_render_exception_msg(errors):

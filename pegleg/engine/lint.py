@@ -276,6 +276,24 @@ def _verify_document(document, schemas, filename):
     return errors
 
 
+def _handle_managed_document(doc):
+    """
+    Unwrap a managed document without decrypting it, and convert
+    the data to an ASCII string if necessary. We're just
+    using this so that managed documents and the documents
+    that depend on them can be linted.
+
+    :param dict doc: A YAML document
+    :returns: the processed document
+    :rtype: dict
+    """
+    if "managedDocument" in doc["data"]:
+        doc = doc["data"]["managedDocument"]
+        if isinstance(doc["data"], bytes):
+            doc["data"] = doc["data"].decode("ascii")
+    return doc
+
+
 def _verify_deckhand_render(*, sitename=None, fail_on_missing_sub_src=False):
     """Verify Deckhand render works by using all relevant deployment files.
 
@@ -284,7 +302,9 @@ def _verify_deckhand_render(*, sitename=None, fail_on_missing_sub_src=False):
     all_errors = []
 
     if sitename:
-        documents_to_render = util.definition.documents_for_site(sitename)
+        documents_to_render = [_handle_managed_document(doc) for doc in
+                               util.definition.documents_for_site(sitename)]
+
         LOG.debug('Rendering documents for site: %s.', sitename)
         _, errors = util.deckhand.deckhand_render(
             documents=documents_to_render,
@@ -296,10 +316,13 @@ def _verify_deckhand_render(*, sitename=None, fail_on_missing_sub_src=False):
         all_errors.extend(errors)
     else:
         documents_to_render = util.definition.documents_for_each_site()
+
         for site_name, documents in documents_to_render.items():
+            clean_documents = [_handle_managed_document(doc) for doc
+                               in documents]
             LOG.debug('Rendering documents for site: %s.', site_name)
             _, errors = util.deckhand.deckhand_render(
-                documents=documents,
+                documents=clean_documents,
                 fail_on_missing_sub_src=fail_on_missing_sub_src,
                 validate=True,
             )
