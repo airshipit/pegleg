@@ -824,7 +824,8 @@ Generate a passphrase and print to ``stdout``.
 **-l / --length** (Optional).
 
 Length of passphrase to generate.  By default length is 24.
-Minimum length is 24.  No maximum length.
+Minimum length is 24. Lengths less than minimum will default to 24.
+No maximum length.
 
 Usage:
 
@@ -855,7 +856,8 @@ Generate a salt and print to ``stdout``.
 **-l / --length** (Optional).
 
 Length of salt to generate.  By default length is 24.
-Minimum length is 24.  No maximum length.
+Minimum length is 24. Lengths less than minimum will default to 24.
+No maximum length.
 
 Usage:
 
