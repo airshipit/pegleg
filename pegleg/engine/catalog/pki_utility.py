@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
+import datetime
 import json
 import logging
 import os
@@ -25,11 +25,11 @@ from dateutil import parser
 import pytz
 import yaml
 
+from pegleg.engine import exceptions
 from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument
 
 LOG = logging.getLogger(__name__)
-_ONE_YEAR_IN_HOURS = '8760h'  # 365 * 24
 
 __all__ = ['PKIUtility']
 
@@ -57,23 +57,27 @@ class PKIUtility(object):
         except subprocess.CalledProcessError:
             return False
 
-    def __init__(self, *, block_strings=True):
+    def __init__(self, *, block_strings=True, duration=None):
         self.block_strings = block_strings
         self._ca_config_string = None
+        self.duration = duration
 
     @property
     def ca_config(self):
+        if self.duration is not None and self.duration >= 0:
+            pass
+        else:
+            raise exceptions.PKICertificateInvalidDuration()
+
         if not self._ca_config_string:
             self._ca_config_string = json.dumps({
                 'signing': {
                     'default': {
-                        # TODO(felipemonteiro): Make this configurable.
                         'expiry':
-                            _ONE_YEAR_IN_HOURS,
+                            str(24 * self.duration) + 'h',
                         'usages': [
                             'signing', 'key encipherment', 'server auth',
-                            'client auth'
-                        ],
+                            'client auth'],
                     },
                 },
             })
@@ -198,17 +202,27 @@ class PKIUtility(object):
         """Chek whether a given certificate is expired.
 
         :param str cert: Client certificate that contains the public key.
-        :returns: True if certificate is expired, else False.
-        :rtype: bool
+        :returns: In dictionary format returns the expiration date of the cert
+            and True if the cert is or will be expired within the next
+            expire_in_days
+        :rtype: dict
 
         """
+
+        if self.duration is not None and self.duration >= 0:
+            pass
+        else:
+            raise exceptions.PKICertificateInvalidDuration()
 
         info = self.cert_info(cert)
         expiry_str = info['not_after']
         expiry = parser.parse(expiry_str)
         # expiry is timezone-aware; do the same for `now`.
-        now = pytz.utc.localize(datetime.utcnow())
-        return now > expiry
+        expiry_window = pytz.utc.localize(datetime.datetime.utcnow()) + \
+            datetime.timedelta(days=self.duration)
+        expired = expiry_window > expiry
+        expiry = expiry.strftime('%d-%b-%Y %H:%M:%S %Z')
+        return {'expiry_date': expiry, 'expired': expired}
 
     def _cfssl(self, command, *, files=None):
         """Executes ``cfssl`` command via ``subprocess`` call."""

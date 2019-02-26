@@ -91,7 +91,7 @@ class TestPKIUtility(object):
         assert PRIVATE_KEY_HEADER in priv_key['data']
 
     def test_generate_certificate(self):
-        pki_obj = pki_utility.PKIUtility()
+        pki_obj = pki_utility.PKIUtility(duration=365)
         ca_cert_wrapper, ca_key_wrapper = pki_obj.generate_ca(
             self.__class__.__name__)
         ca_cert = ca_cert_wrapper['data']['managedDocument']
@@ -121,7 +121,7 @@ class TestPKIUtility(object):
 
     def test_check_expiry_is_expired_false(self):
         """Check that ``check_expiry`` returns False if cert isn't expired."""
-        pki_obj = pki_utility.PKIUtility()
+        pki_obj = pki_utility.PKIUtility(duration=0)
 
         ca_config = json.loads(pki_obj.ca_config)
         ca_config['signing']['default']['expiry'] = '1h'
@@ -141,7 +141,7 @@ class TestPKIUtility(object):
         cert = cert_wrapper['data']['managedDocument']
 
         # Validate that the cert hasn't expired.
-        is_expired = pki_obj.check_expiry(cert=cert['data'])
+        is_expired = pki_obj.check_expiry(cert=cert['data'])['expired']
         assert not is_expired
 
     def test_check_expiry_is_expired_true(self):
@@ -149,7 +149,7 @@ class TestPKIUtility(object):
 
         Second values are used to demonstrate precision down to the second.
         """
-        pki_obj = pki_utility.PKIUtility()
+        pki_obj = pki_utility.PKIUtility(duration=0)
 
         ca_config = json.loads(pki_obj.ca_config)
         ca_config['signing']['default']['expiry'] = '1s'
@@ -171,5 +171,5 @@ class TestPKIUtility(object):
         time.sleep(2)
 
         # Validate that the cert has expired.
-        is_expired = pki_obj.check_expiry(cert=cert['data'])
+        is_expired = pki_obj.check_expiry(cert=cert['data'])['expired']
         assert is_expired

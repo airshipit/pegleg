@@ -562,6 +562,15 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
         assert result.exit_code == 0, result.output
 
+    @pytest.mark.skipif(
+        not pki_utility.PKIUtility.cfssl_exists(),
+        reason='cfssl must be installed to execute these tests')
+    def test_check_pki_certs(self):
+        repo_path = self.treasuremap_path
+        secrets_opts = ['secrets', 'check-pki-certs', self.site_name]
+        result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
+        assert result.exit_code == 0, result.output
+
     @mock.patch.dict(os.environ, {
         "PEGLEG_PASSPHRASE": "123456789012345678901234567890",
         "PEGLEG_SALT": "123456"
@@ -607,7 +616,6 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             doc = yaml.safe_load(output_fi)
             assert "encrypted" in doc["data"]
             assert "managedDocument" in doc["data"]
-
 
 class TestTypeCliActions(BaseCLIActionTest):
     """Tests type-level CLI actions."""

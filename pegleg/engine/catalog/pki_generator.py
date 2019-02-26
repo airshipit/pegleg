@@ -44,9 +44,12 @@ class PKIGenerator(object):
 
     """
 
-    def __init__(self, sitename, block_strings=True, author=None):
+    def __init__(self, sitename, block_strings=True, author=None,
+                 duration=365):
         """Constructor for ``PKIGenerator``.
 
+        :param int duration: Duration in days that generated certificates
+            are valid.
         :param str sitename: Site name for which to retrieve documents used for
             certificate and keypair generation.
         :param bool block_strings: Whether to dump out certificate data as
@@ -60,7 +63,8 @@ class PKIGenerator(object):
         self._documents = util.definition.documents_for_site(sitename)
         self._author = author
 
-        self.keys = pki_utility.PKIUtility(block_strings=block_strings)
+        self.keys = pki_utility.PKIUtility(block_strings=block_strings,
+                                           duration=duration)
         self.outputs = collections.defaultdict(dict)
 
         # Maps certificates to CAs in order to derive certificate paths.

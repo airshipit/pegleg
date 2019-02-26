@@ -16,6 +16,9 @@ import logging
 import os
 import yaml
 
+from prettytable import PrettyTable
+
+from pegleg.engine.catalog.pki_utility import PKIUtility
 from pegleg.engine.generators.passphrase_generator import PassphraseGenerator
 from pegleg.engine.util.cryptostring import CryptoString
 from pegleg.engine.util import definition
@@ -186,3 +189,38 @@ def wrap_secret(author, file_name, output_path, schema,
         output_doc = managed_secret.pegleg_document
     with open(output_path, "w") as output_fi:
         yaml.safe_dump(output_doc, output_fi)
+
+
+def check_cert_expiry(site_name, duration=60):
+    """
+    Check certs from a sites PKICatalog to determine if they are expired or
+    expiring within N days
+
+    :param str site_name: The site to read from
+    :param int duration: Number of days from today to check cert
+        expirations
+    :rtype: str
+    """
+
+    pki_util = PKIUtility(duration=duration)
+    # Create a table to output expired/expiring certs for this site.
+    cert_table = PrettyTable()
+    cert_table.field_names = ['cert_name', 'expiration_date']
+
+    s = definition.site_files(site_name)
+    for doc in s:
+        if 'certificate' in doc:
+            with open(doc, 'r') as f:
+                results = yaml.safe_load_all(f)  # Validate valid YAML.
+                results = PeglegSecretManagement(
+                    docs=results).get_decrypted_secrets()
+                for result in results:
+                    if result['schema'] == \
+                            "deckhand/Certificate/v1":
+                        cert = result['data']
+                        cert_info = pki_util.check_expiry(cert)
+                        if cert_info['expired'] is True:
+                            cert_table.add_row([doc, cert_info['expiry_date']])
+
+    # Return table of cert names and expiration dates that are expiring
+    return cert_table.get_string()
