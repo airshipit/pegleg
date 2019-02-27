@@ -25,8 +25,11 @@ PUSH_IMAGE        ?= false
 # use this variable for image labels added in internal build process
 LABEL             ?= org.airshipit.build=community
 COMMIT            ?= $(shell git rev-parse HEAD)
-IMAGE             ?= $(DOCKER_REGISTRY)/$(IMAGE_PREFIX)/$(IMAGE_NAME):$(IMAGE_TAG)
+DISTRO            ?= ubuntu_xenial
+IMAGE             ?= $(DOCKER_REGISTRY)/$(IMAGE_PREFIX)/$(IMAGE_NAME):$(IMAGE_TAG)-${DISTRO}
 PYTHON_BASE_IMAGE ?= python:3.6
+BASE_IMAGE        ?=
+
 export
 
 # Build all docker images for this project
@@ -62,6 +65,8 @@ lint: py_lint
 .PHONY: format
 format: py_format
 
+_BASE_IMAGE_ARG := $(if $(BASE_IMAGE),--build-arg FROM="${BASE_IMAGE}" ,)
+
 .PHONY: build_pegleg
 build_pegleg:
 ifeq ($(USE_PROXY), true)
@@ -69,8 +74,8 @@ ifeq ($(USE_PROXY), true)
 		--label "org.opencontainers.image.revision=$(COMMIT)" \
 		--label "org.opencontainers.image.created=$(shell date --rfc-3339=seconds --utc)" \
 		--label "org.opencontainers.image.title=$(IMAGE_NAME)" \
-		-f images/pegleg/Dockerfile \
-		--build-arg FROM=$(PYTHON_BASE_IMAGE) \
+		-f images/pegleg/Dockerfile.$(DISTRO) \
+		$(_BASE_IMAGE_ARG) \
 		--build-arg http_proxy=$(PROXY) \
 		--build-arg https_proxy=$(PROXY) \
 		--build-arg HTTP_PROXY=$(PROXY) \
@@ -83,8 +88,8 @@ else
 		--label "org.opencontainers.image.revision=$(COMMIT)" \
 		--label "org.opencontainers.image.created=$(shell date --rfc-3339=seconds --utc)" \
 		--label "org.opencontainers.image.title=$(IMAGE_NAME)" \
-		-f images/pegleg/Dockerfile \
-		--build-arg FROM=$(PYTHON_BASE_IMAGE) \
+		-f images/pegleg/Dockerfile.$(DISTRO) \
+		$(_BASE_IMAGE_ARG) \
 		--build-arg ctx_base=$(PEGLEG_BUILD_CTX) .
 endif
 ifeq ($(PUSH_IMAGE), true)

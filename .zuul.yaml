@@ -20,15 +20,18 @@
       jobs:
         - openstack-tox-pep8
         - airship-pegleg-doc-build
-        - airship-pegleg-docker-build-gate
+        - airship-pegleg-docker-build-gate-ubuntu
+        - airship-pegleg-docker-build-gate-opensuse
     gate:
       jobs:
         - openstack-tox-pep8
         - airship-pegleg-doc-build
-        - airship-pegleg-docker-build-gate
+        - airship-pegleg-docker-build-gate-ubuntu
+        - airship-pegleg-docker-build-gate-opensuse
     post:
       jobs:
-        - airship-pegleg-docker-publish
+        - airship-pegleg-docker-publish-ubuntu
+        - airship-pegleg-docker-publish-opensuse
 
 - nodeset:
     name: airship-pegleg-single-node
@@ -48,7 +51,7 @@
       - ^setup.cfg$
 
 - job:
-    name: airship-pegleg-docker-build-gate
+    name: airship-pegleg-docker-build-gate-ubuntu
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node
@@ -56,12 +59,27 @@
       - '^doc/.*'
     vars:
       publish: false
+      distro: ubuntu_xenial
       tags:
         dynamic:
           patch_set: true
 
 - job:
-    name: airship-pegleg-docker-publish
+    name: airship-pegleg-docker-build-gate-opensuse
+    timeout: 1800
+    run: tools/gate/playbooks/docker-image-build.yaml
+    nodeset: airship-pegleg-single-node
+    irrelevant-files:
+      - '^doc/.*'
+    vars:
+      publish: false
+      distro: opensuse_15
+      tags:
+        dynamic:
+          patch_set: true
+
+- job:
+    name: airship-pegleg-docker-publish-ubuntu
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node
@@ -71,6 +89,26 @@
       - '^doc/.*'
     vars:
       publish: true
+      distro: ubuntu_xenial
+      tags:
+        dynamic:
+          branch: true
+          commit: true
+        static:
+          - latest
+
+- job:
+    name: airship-pegleg-docker-publish-opensuse
+    timeout: 1800
+    run: tools/gate/playbooks/docker-image-build.yaml
+    nodeset: airship-pegleg-single-node
+    secrets:
+      - airship_pegleg_quay_creds
+    irrelevant-files:
+      - '^doc/.*'
+    vars:
+      publish: true
+      distro: opensuse_15
       tags:
         dynamic:
           branch: true

@@ -77,9 +77,10 @@ The Pegleg code base lives under ``pegleg``. Pegleg supports py36 interpreter.
 Docker
 ------
 
-The Pegleg Dockerfile is located in ``/images/pegleg`` along with any
-artifacts built specifically to enable the container image. Make targets are
-used for generating and testing the artifacts.
+Pegleg Dockerfiles for supported distributions are located in
+``/images/pegleg`` along with any artifacts built specifically to enable the
+container image. Make targets are used for generating and testing the
+artifacts.
 
 * ``make images`` - Build the Pegleg Docker image.
 

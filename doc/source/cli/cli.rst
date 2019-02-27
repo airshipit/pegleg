@@ -41,7 +41,7 @@ Environment Variables
 
     $IMAGE = Location of pegleg docker image.
 
-        Example: $IMAGE=quay.io/airshipit/pegleg:latest
+        Example: $IMAGE=quay.io/airshipit/pegleg:latest-ubuntu_xenial
 
 Usage
 =====
