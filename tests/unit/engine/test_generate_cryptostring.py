@@ -14,9 +14,13 @@
 
 import os
 import tempfile
+import uuid
 
+from cryptography import fernet
 import mock
+import pytest
 import string
+from testfixtures import log_capture
 import yaml
 
 from pegleg.engine.util.cryptostring import CryptoString
@@ -176,3 +180,23 @@ def test_generate_passphrases(*_):
                 assert len(decrypted_passphrase) == 25
             else:
                 assert len(decrypted_passphrase) == 24
+
+
+@log_capture()
+def test_generate_passphrases_exception(capture):
+    unenc_data = uuid.uuid4().bytes
+    passphrase1 = uuid.uuid4().bytes
+    passphrase2 = uuid.uuid4().bytes
+    salt1 = uuid.uuid4().bytes
+    salt2 = uuid.uuid4().bytes
+
+    # Generate random data and encrypt it
+    enc_data = encryption.encrypt(unenc_data, passphrase1, salt1)
+
+    # Decrypt using the wrong key to see to see the InvalidToken error
+    with pytest.raises(fernet.InvalidToken):
+        encryption.decrypt(enc_data, passphrase2, salt2)
+    capture.check(('pegleg.engine.util.encryption', 'ERROR',
+                   ('Signature verification to decrypt secrets failed. '
+                    'Please check your provided passphrase and salt and '
+                    'try again.')))
