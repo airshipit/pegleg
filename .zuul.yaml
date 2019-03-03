@@ -13,6 +13,7 @@
 - project:
     templates:
       - openstack-python36-jobs
+      - openstack-python37-jobs
       - openstack-cover-jobs
       - release-notes-jobs-python3
     check:
