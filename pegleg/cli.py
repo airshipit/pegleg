@@ -529,7 +529,7 @@ def encrypt(*, save_location, author, site_name):
 def decrypt(*, file_name, site_name):
     engine.repository.process_repositories(site_name)
 
-    engine.secrets.decrypt(file_name, site_name)
+    click.echo(engine.secrets.decrypt(file_name, site_name))
 
 
 @main.group(help="Miscellaneous generate commands")

@@ -516,24 +516,20 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         "PEGLEG_PASSPHRASE": "123456789012345678901234567890",
         "PEGLEG_SALT": "123456"
     })
-    def test_site_secrets_encrypt_local_repo_path(self):
+    def test_site_secrets_encrypt_and_decrypt_local_repo_path(self):
         """Validates ``generate-pki`` action using local repo path."""
         # Scenario:
         #
         # 1) Encrypt a file in a local repo
 
         repo_path = self.treasuremap_path
-        with open(os.path.join(repo_path, "site", "airship-seaworthy",
-                               "secrets", "passphrases", "ceph_fsid.yaml"),
-                  "r") \
-                as ceph_fsid_fi:
+        file_path = os.path.join(repo_path, "site", "airship-seaworthy",
+                               "secrets", "passphrases", "ceph_fsid.yaml")
+        with open(file_path, "r") as ceph_fsid_fi:
             ceph_fsid = yaml.load(ceph_fsid_fi)
             ceph_fsid["metadata"]["storagePolicy"] = "encrypted"
 
-        with open(os.path.join(repo_path, "site", "airship-seaworthy",
-                               "secrets", "passphrases", "ceph_fsid.yaml"),
-                  "w") \
-                as ceph_fsid_fi:
+        with open(file_path, "w") as ceph_fsid_fi:
             yaml.dump(ceph_fsid, ceph_fsid_fi)
 
         secrets_opts = ['secrets', 'encrypt', '-a', 'test', self.site_name]
@@ -549,6 +545,12 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             assert "encrypted" in ceph_fsid["data"]
             assert "managedDocument" in ceph_fsid["data"]
 
+        relative_file_path = os.path.join("secrets", "passphrases",
+                                          "ceph_fsid.yaml")
+        secrets_opts = ['secrets', 'decrypt', '-f', relative_file_path,
+                        self.site_name]
+        result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
+        assert result.exit_code == 0, result.output
 
 class TestTypeCliActions(BaseCLIActionTest):
     """Tests type-level CLI actions."""
