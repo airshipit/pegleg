@@ -25,7 +25,20 @@ from pegleg.engine.util.shipyard_helper import ShipyardClient
 
 # Dummy data to be used as collected documents
 DATA = {'test-repo':
-           {'test-data': 'RandomData'}}
+        [{'schema': 'pegleg/SiteDefinition/v1',
+            'metadata': {'schema': 'metadata/Document/v1',
+                         'layeringDefinition': {'abstract': False,
+                                                'layer': 'site'},
+                         'name': 'site-name',
+                         'storagePolicy': 'cleartext'},
+            'data': {'site_type': 'foundry'}}]}
+
+
+@pytest.fixture(autouse=True)
+def set_env_vars(monkeypatch):
+    monkeypatch.setenv("PEGLEG_PASSPHRASE", "1234567890123456789012345678")
+    monkeypatch.setenv("PEGLEG_SALT", "1234567890")
+
 
 class context():
     obj = {}
@@ -37,7 +50,7 @@ class FakeResponse():
 def _get_context():
     ctx = context()
     ctx.obj = {}
-    auth_vars =  {
+    auth_vars = {
         'project_domain_name': 'projDomainTest',
         'user_domain_name': 'userDomainTest',
         'project_name': 'projectTest',
@@ -55,7 +68,7 @@ def _get_context():
 def _get_bad_context():
     ctx = context()
     ctx.obj = {}
-    auth_vars =  {
+    auth_vars = {
         'project_domain_name': 'projDomainTest',
         'user_domain_name': 'userDomainTest',
         'project_name': 'projectTest',
@@ -99,7 +112,6 @@ def test_upload_documents(*args):
 
     context = _get_context()
     shipyard_helper = ShipyardHelper(context)
-
     with mock.patch('pegleg.engine.util.shipyard_helper.ShipyardClient',
                     autospec=True) as mock_shipyard:
         mock_api_client = mock_shipyard.return_value
@@ -108,7 +120,8 @@ def test_upload_documents(*args):
 
         # Validate Shipyard call to post configdocs was invoked with correct
         # collection name and buffer mode.
-        mock_api_client.post_configdocs.assert_called_with('test-repo', None, ANY)
+        mock_api_client.post_configdocs.assert_called_with('test-repo',
+                                            None, ANY)
         mock_api_client.post_configdocs.assert_called_once()
 
 @mock.patch('pegleg.engine.util.files.collect_files_by_repo', autospec=True,

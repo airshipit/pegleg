@@ -20,6 +20,7 @@ import yaml
 
 from pegleg.engine.exceptions import PeglegBaseException
 from pegleg.engine.util import files
+from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 
 from shipyard_client.api_client.shipyard_api_client import ShipyardClient
 from shipyard_client.api_client.shipyardclient_context import \
@@ -86,7 +87,11 @@ class ShipyardHelper(object):
             else:
                 buffer_mode = 'append'
 
-            data = yaml.safe_dump_all(collected_documents[document])
+            # Decrypt the documents if encrypted
+            pegleg_secret_mgmt = PeglegSecretManagement(
+                docs=collected_documents[document])
+            decrypted_documents = pegleg_secret_mgmt.get_decrypted_secrets()
+            data = yaml.safe_dump_all(decrypted_documents)
 
             try:
                 self.validate_auth_vars()
