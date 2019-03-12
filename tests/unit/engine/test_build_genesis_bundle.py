@@ -91,7 +91,7 @@ data: ABAgagajajkb839215387
 
 @mock.patch.dict(os.environ, {
     ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'
+    ENV_SALT: 'MySecretSalt1234567890]['
 })
 def test_no_encryption_key(temp_path):
     # Write the test data to temp file
@@ -119,7 +119,7 @@ def test_no_encryption_key(temp_path):
 
 @mock.patch.dict(os.environ, {
     ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'
+    ENV_SALT: 'MySecretSalt1234567890]['
 })
 def test_failed_deckhand_validation(temp_path):
     # Write the test data to temp file

@@ -434,26 +434,15 @@ def generate_pki(site_name, author):
          'to genesis.sh script.')
 @SITE_REPOSITORY_ARGUMENT
 def genesis_bundle(*, build_dir, validators, site_name):
-    prom_encryption_key = os.environ.get("PROMENADE_ENCRYPTION_KEY")
-    peg_encryption_key = os.environ.get("PEGLEG_PASSPHRASE")
-    encryption_key = None
-    if (prom_encryption_key and len(prom_encryption_key) > 24 and
-            peg_encryption_key and len(peg_encryption_key) > 24):
-        click.echo("WARNING: PROMENADE_ENCRYPTION_KEY is deprecated, "
-                   "using PEGLEG_PASSPHRASE instead", err=True)
-        config.set_passphrase(peg_encryption_key)
-        encryption_key = peg_encryption_key
-    elif prom_encryption_key and len(prom_encryption_key) > 24:
-        click.echo("ERROR: PROMENADE_ENCRYPTION_KEY is deprecated, "
-                   "use PEGLEG_PASSPHRASE instead", err=True)
-        raise click.ClickException("ERROR: PEGLEG_PASSPHRASE must be set "
-                                   "and at least 24 characters long.")
-    elif peg_encryption_key and len(peg_encryption_key) > 24:
-        config.set_passphrase(peg_encryption_key)
-        encryption_key = peg_encryption_key
-    else:
-        raise click.ClickException("ERROR: PEGLEG_PASSPHRASE must be set "
-                                   "and at least 24 characters long.")
+    passphrase = os.environ.get("PEGLEG_PASSPHRASE")
+    salt = os.environ.get("PEGLEG_SALT")
+    encryption_key = passphrase
+    if passphrase:
+        passphrase = passphrase.encode()
+    if salt:
+        salt = salt.encode()
+    config.set_passphrase(passphrase)
+    config.set_salt(salt)
 
     PeglegSecretManagement.check_environment()
     bundle.build_genesis(build_dir,

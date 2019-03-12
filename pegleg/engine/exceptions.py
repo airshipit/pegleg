@@ -102,3 +102,31 @@ class GenesisBundleGenerateException(PeglegBaseException):
     """
 
     message = 'Bundle generation failed on deckhand validation.'
+
+
+#
+# CREDENTIALS EXCEPTIONS
+#
+
+class PassphraseNotFoundException(PeglegBaseException):
+    """Exception raised when passphrase is not set."""
+
+    message = 'PEGLEG_PASSPHRASE must be set'
+
+
+class PassphraseInsufficientLengthException(PeglegBaseException):
+    """Exception raised when passphrase is too short."""
+
+    message = 'PEGLEG_PASSPHRASE must be at least 24 characters long.'
+
+
+class SaltNotFoundException(PeglegBaseException):
+    """Exception raised when salt is not set."""
+
+    message = 'PEGLEG_SALT must be set'
+
+
+class SaltInsufficientLengthException(PeglegBaseException):
+    """Exception raised when salt is too short."""
+
+    message = 'PEGLEG_SALT must be at least 24 characters long.'

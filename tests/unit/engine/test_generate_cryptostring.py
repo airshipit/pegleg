@@ -166,7 +166,7 @@ def test_cryptostring_long_len():
         'cicd_site_repo/site/cicd/passphrases/passphrase-catalog.yaml', ])
 @mock.patch.dict(os.environ, {
     ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'})
+    ENV_SALT: 'MySecretSalt1234567890]['})
 def test_generate_passphrases(*_):
     _dir = tempfile.mkdtemp()
     os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
@@ -239,7 +239,7 @@ def test_generate_passphrases_exception(capture):
         'cicd_global_repo/site/cicd/passphrases/passphrase-catalog.yaml', ])
 @mock.patch.dict(os.environ, {
     ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'})
+    ENV_SALT: 'MySecretSalt1234567890]['})
 def test_global_passphrase_catalog(*_):
     _dir = tempfile.mkdtemp()
     os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
