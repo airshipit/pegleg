@@ -18,13 +18,13 @@ from os import listdir
 import click
 import mock
 import pytest
-import yaml
 import tempfile
+import yaml
 
 from pegleg import config
-from pegleg.engine import secrets
-from pegleg.engine.catalog import pki_utility
 from pegleg.engine.catalog.pki_generator import PKIGenerator
+from pegleg.engine.catalog import pki_utility
+from pegleg.engine import secrets
 from pegleg.engine.util import encryption as crypt, catalog, git
 from pegleg.engine.util import files
 from pegleg.engine.util.pegleg_managed_document import \
@@ -120,7 +120,7 @@ data: {0}-password
 
 
 def test_pegleg_secret_management_constructor():
-    test_data = yaml.load(TEST_DATA)
+    test_data = yaml.safe_load(TEST_DATA)
     doc = PeglegManagedSecretsDocument(test_data)
     assert doc.is_storage_policy_encrypted()
     assert not doc.is_encrypted()
@@ -155,6 +155,18 @@ def test_pegleg_secret_management_constructor_with_invalid_arguments():
             docs=['doc'], generated=True, catalog='catalog')
     assert 'If the document is generated, author and catalog must be ' \
            'specified.' in str(err_info.value)
+
+
+@mock.patch.dict(os.environ, {
+    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    ENV_SALT: 'MySecretSalt1234567890]['
+})
+def test_pegleg_secret_management_double_encrypt():
+    encrypted_doc = PeglegSecretManagement(
+        docs=[yaml.safe_load(TEST_DATA)]).get_encrypted_secrets()[0][0]
+    encrypted_doc_2 = PeglegSecretManagement(
+        docs=[encrypted_doc]).get_encrypted_secrets()[0][0]
+    assert encrypted_doc == encrypted_doc_2
 
 
 @mock.patch.dict(os.environ, {
@@ -236,7 +248,8 @@ def test_generate_pki_using_local_repo_path(create_tmp_deployment_files):
     repo_path = str(git.git_handler(TEST_PARAMS["repo_url"],
                                     ref=TEST_PARAMS["repo_rev"]))
     with mock.patch.dict(config.GLOBAL_CONTEXT, {"site_repo": repo_path}):
-        pki_generator = PKIGenerator(duration=365, sitename=TEST_PARAMS["site_name"])
+        pki_generator = PKIGenerator(duration=365,
+                                     sitename=TEST_PARAMS["site_name"])
         generated_files = pki_generator.generate()
 
         assert len(generated_files), 'No secrets were generated'
@@ -258,7 +271,8 @@ def test_check_expiry(create_tmp_deployment_files):
     repo_path = str(git.git_handler(TEST_PARAMS["repo_url"],
                                     ref=TEST_PARAMS["repo_rev"]))
     with mock.patch.dict(config.GLOBAL_CONTEXT, {"site_repo": repo_path}):
-        pki_generator = PKIGenerator(duration=365, sitename=TEST_PARAMS["site_name"])
+        pki_generator = PKIGenerator(duration=365,
+                                     sitename=TEST_PARAMS["site_name"])
         generated_files = pki_generator.generate()
 
         pki_util = pki_utility.PKIUtility(duration=0)

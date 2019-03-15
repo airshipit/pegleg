@@ -20,6 +20,7 @@ import yaml
 from pegleg import config
 from pegleg.engine.util import files
 from tests.unit.fixtures import create_tmp_deployment_files
+from tests.unit.fixtures import temp_path
 
 
 class TestFileHelpers(object):
@@ -65,3 +66,18 @@ def test_file_in_subdir():
     assert not files.file_in_subdir("aaa/bbb/ccc.txt", "ccc")
     assert not files.file_in_subdir("aaa/bbb/ccc.txt", "bb")
     assert not files.file_in_subdir("aaa/bbb/../ccc.txt", "bbb")
+
+
+def test_read(temp_path):
+    # This will throw an error if yaml attempts to read the tag.
+    with open(os.path.join(temp_path, "invalid.yaml"), "w") as invalid_yaml:
+        invalid_yaml.write("!!python/name:fake_class''\n")
+        files.read(os.path.join(temp_path, "invalid.yaml"))
+
+    # Under PyYAML's default behavior, the tag !!python/name:builtins.int
+    # will be parsed into the method int. files.read should ignore this tag.
+    with open(os.path.join(temp_path, "valid.yaml"), "w") as valid_yaml:
+        valid_yaml.write("!!python/name:builtins.int ''\n")
+    read_files = files.read(os.path.join(temp_path, "valid.yaml"))
+    # Assert that the tag was not parsed into the method int
+    assert int not in read_files

@@ -154,7 +154,7 @@ class PeglegSecretManagement(object):
         for doc in self.documents:
             # do not re-encrypt already encrypted data
             if doc.is_encrypted():
-                doc_list.append(doc)
+                doc_list.append(doc.pegleg_document)
                 continue
 
             # only encrypt if storagePolicy is set to encrypted.
