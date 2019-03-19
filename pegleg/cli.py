@@ -23,6 +23,7 @@ from pegleg import config
 from pegleg import engine
 from pegleg.engine import bundle
 from pegleg.engine import catalog
+from pegleg.engine.secrets import wrap_secret
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 from pegleg.engine.util.shipyard_helper import ShipyardHelper
 
@@ -413,6 +414,62 @@ def generate_pki(site_name, author):
     output_paths = pkigenerator.generate()
 
     click.echo("Generated PKI files written to:\n%s" % '\n'.join(output_paths))
+
+
+@secrets.command(
+    'wrap',
+    help='Wrap bare files (e.g. pem or crt) in a PeglegManagedDocument '
+         'and encrypt them (by default).')
+@click.option(
+    '-a',
+    '--author',
+    'author',
+    help='Author for the new wrapped file.')
+@click.option(
+    '-f',
+    '--filename',
+    'file_name',
+    help='The relative file path for the file to be wrapped.')
+@click.option(
+    '-o',
+    '--output-path',
+    'output_path',
+    required=False,
+    help='The output path for the wrapped file. (default: input path with '
+         '.yaml)')
+@click.option(
+    '-s',
+    '--schema',
+    'schema',
+    help='The schema for the document to be wrapped, e.g. '
+         'deckhand/Certificate/v1')
+@click.option(
+    '-n',
+    '--name',
+    'name',
+    help='The name for the document to be wrapped, e.g. new-cert')
+@click.option(
+    '-l',
+    '--layer',
+    'layer',
+    help='The layer for the document to be wrapped., e.g. site.')
+@click.option(
+    '--encrypt/--no-encrypt',
+    'encrypt',
+    is_flag=True,
+    default=True,
+    help='Whether to encrypt the wrapped file (default: True).')
+@click.argument('site_name')
+def wrap_secret_cli(*, site_name, author, file_name, output_path, schema,
+                    name, layer, encrypt):
+    """Wrap a bare secrets file in a YAML and ManagedDocument.
+
+    """
+
+    engine.repository.process_repositories(site_name,
+                                           overwrite_existing=True)
+    wrap_secret(author, file_name, output_path, schema,
+                name, layer, encrypt)
 
 
 @site.command(
