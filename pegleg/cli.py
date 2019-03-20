@@ -106,7 +106,7 @@ ALLOW_MISSING_SUBSTITUTIONS_OPTION = click.option(
     type=click.BOOL,
     default=True,
     show_default=True,
-    help="Raise Deckhand exception on missing substition sources.")
+    help='Raise Deckhand exception on missing substition sources.')
 
 EXCLUDE_LINT_OPTION = click.option(
     '-x',
@@ -131,7 +131,7 @@ SITE_REPOSITORY_ARGUMENT = click.argument(
 @click.option(
     '-v',
     '--verbose',
-    is_flag=bool,
+    is_flag=True,
     default=False,
     help='Enable debug logging')
 def main(*, verbose):
@@ -235,7 +235,7 @@ def site(*, site_repository, clone_path, extra_repositories, repo_key,
     help='Directory to output the complete site definition. Created '
          'automatically if it does not already exist.')
 @click.option(
-    '--validate',
+    '--validate/--no-validate',
     'validate',
     is_flag=True,
     # TODO(felipemonteiro): Potentially set this to True in the future. This
@@ -479,7 +479,7 @@ def generate_pki(site_name, author, days):
 @click.option(
     '-f',
     '--filename',
-    'file_name',
+    'filename',
     help='The relative file path for the file to be wrapped.')
 @click.option(
     '-o',
@@ -512,7 +512,7 @@ def generate_pki(site_name, author, days):
     show_default=True,
     help='Whether to encrypt the wrapped file.')
 @click.argument('site_name')
-def wrap_secret_cli(*, site_name, author, file_name, output_path, schema,
+def wrap_secret_cli(*, site_name, author, filename, output_path, schema,
                     name, layer, encrypt):
     """Wrap a bare secrets file in a YAML and ManagedDocument.
 
@@ -520,7 +520,7 @@ def wrap_secret_cli(*, site_name, author, file_name, output_path, schema,
 
     engine.repository.process_repositories(site_name,
                                            overwrite_existing=True)
-    wrap_secret(author, file_name, output_path, schema,
+    wrap_secret(author, filename, output_path, schema,
                 name, layer, encrypt)
 
 
@@ -652,13 +652,21 @@ def generate():
     '-i',
     '--interactive',
     'interactive',
-    is_flag=bool,
+    is_flag=True,
     default=False,
     help='Generate passphrases interactively, not automatically')
-def generate_passphrases(*, site_name, save_location, author, interactive):
+@click.option(
+    '--force-cleartext',
+    'force_cleartext',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Force cleartext generation of passphrases. This is not recommended.')
+def generate_passphrases(*, site_name, save_location, author, interactive,
+                         force_cleartext):
     engine.repository.process_repositories(site_name)
-    engine.secrets.generate_passphrases(site_name, save_location, author,
-                                        interactive)
+    engine.secrets.generate_passphrases(
+        site_name, save_location, author, interactive, force_cleartext)
 
 
 @secrets.command(
@@ -736,7 +744,7 @@ def decrypt(*, path, save_location, overwrite, site_name):
             os.chmod(file_save_location, 0o600)
 
 
-@main.group(help="Miscellaneous generate commands")
+@main.group(help='Miscellaneous generate commands')
 def generate():
     pass
 
@@ -753,7 +761,7 @@ def generate():
     help='Generate a passphrase of the given length. '
          'Length is >= 24, no maximum length.')
 def generate_passphrase(length):
-    click.echo("Generated Passhprase: {}".format(
+    click.echo('Generated Passhprase: {}'.format(
         engine.secrets.generate_crypto_string(length)))
 
 

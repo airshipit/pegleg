@@ -52,7 +52,7 @@ class PassphraseGenerator(BaseGenerator):
             self._sitename, documents=self._documents)
         self._pass_util = CryptoString()
 
-    def generate(self, interactive=False):
+    def generate(self, interactive=False, force_cleartext=False):
         """
         For each passphrase entry in the passphrase catalog, generate a
         random passphrase string, based on a passphrase specification in the
@@ -60,6 +60,9 @@ class PassphraseGenerator(BaseGenerator):
         passphrase document in the pegleg managed document, and encrypt the
         passphrase. Write the wrapped and encrypted document in a file at
         <repo_name>/site/<site_name>/secrets/passphrases/passphrase_name.yaml.
+
+        :param bool interactive: If true, run interactively
+        :param bool force_cleartext: If true, don't encrypt
         """
         for p_name in self._catalog.get_passphrase_names:
             passphrase = None
@@ -76,7 +79,13 @@ class PassphraseGenerator(BaseGenerator):
                 passphrase = passphrase.encode()
                 passphrase = base64.b64encode(passphrase)
             docs = list()
-            storage_policy = self._catalog.get_storage_policy(p_name)
+            if force_cleartext:
+                storage_policy = passphrase_catalog.P_CLEARTEXT
+                LOG.warning("Passphrases for {} will be "
+                            "generated in clear text.".format(p_name))
+            else:
+                storage_policy = self._catalog.get_storage_policy(p_name)
+
             docs.append(self.generate_doc(
                 KIND,
                 p_name,

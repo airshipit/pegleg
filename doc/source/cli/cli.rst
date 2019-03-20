@@ -874,6 +874,15 @@ are placed in the following folder structure under ``save_location``:
 
 <save_location>/site/<site_name>/secrets/passphrases/<passphrase_name.yaml>
 
+**-i / --interactive** (Optional). False by default.
+
+Generate passphrases interactively, not automatically.
+
+**--force-cleartext** (Optional). False by default.
+
+Force cleartext generation of passphrases. This is not
+recommended.
+
 Usage:
 
 ::

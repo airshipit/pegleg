@@ -131,21 +131,24 @@ def _get_dest_path(repo_base, file_path, save_location):
         return file_path
 
 
-def generate_passphrases(site_name, save_location, author, interactive=False):
+def generate_passphrases(site_name, save_location, author, interactive=False,
+                         force_cleartext=False):
     """
     Look for the site passphrase catalogs, and for every passphrase entry in
     the passphrase catalog generate a passphrase document, wrap the
     passphrase document in a pegleg managed document, and encrypt the
     passphrase data.
 
-    :param interactive: Whether to generate the results interactively
     :param str site_name: The site to read from
     :param str save_location: Location to write files to
-    :param str author:
+    :param str author: Author who's generating the files
+    :param bool interactive: Whether to generate the results interactively
+    :param bool force_cleartext: Whether to generate results in clear text
     """
 
-    PassphraseGenerator(site_name, save_location, author).generate(
-        interactive=interactive)
+    PassphraseGenerator(
+        site_name, save_location, author).generate(
+            interactive=interactive, force_cleartext=force_cleartext)
 
 
 def generate_crypto_string(length):
@@ -159,12 +162,12 @@ def generate_crypto_string(length):
     return CryptoString().get_crypto_string(length)
 
 
-def wrap_secret(author, file_name, output_path, schema,
+def wrap_secret(author, filename, output_path, schema,
                 name, layer, encrypt):
     """Wrap a bare secrets file in a YAML and ManagedDocument.
 
     :param author: author for ManagedDocument
-    :param file_name: file path for input file
+    :param filename: file path for input file
     :param output_path: file path for output file
     :param schema: schema for wrapped document
     :param name: name for wrapped document
@@ -173,9 +176,9 @@ def wrap_secret(author, file_name, output_path, schema,
     """
 
     if not output_path:
-        output_path = os.path.splitext(file_name)[0] + ".yaml"
+        output_path = os.path.splitext(filename)[0] + ".yaml"
 
-    with open(file_name, "r") as in_fi:
+    with open(filename, "r") as in_fi:
         data = in_fi.read()
 
     inner_doc = {

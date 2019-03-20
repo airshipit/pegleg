@@ -411,7 +411,7 @@ def file_in_subdir(filename, _dir):
     :return: Whether _dir is a parent of the file
     :rtype: bool
     """
-    file_path, file_name = os.path.split(
+    file_path, filename = os.path.split(
         os.path.realpath(filename))
     return _dir in file_path.split(os.path.sep)
 

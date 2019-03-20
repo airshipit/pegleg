@@ -75,7 +75,7 @@ def site_files(site_name):
 
 
 def site_files_by_repo(site_name):
-    """Yield tuples of repo_base, file_name."""
+    """Yield tuples of repo_base, filename."""
     params = load_as_params(site_name)
     dir_map = files.directories_for_each_repo(**params)
     for repo, dl in dir_map.items():
