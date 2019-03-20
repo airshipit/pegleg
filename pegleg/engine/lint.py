@@ -270,10 +270,10 @@ def _verify_document(document, schemas, filename):
                                                     storage_policy)))
 
         # Check if the file is in a secrets directory
-        if not util.files.file_in_subdir(filename, 'secrets/'):
+        if not util.files.file_in_subdir(filename, 'secrets'):
             errors.append((SECRET_NOT_ENCRYPTED_POLICY,
-                           '%s (document %s) is a secret, is not stored in a '
-                           'secrets path' % (filename, name)))
+                           '%s (document %s) is a secret, is not stored in a'
+                           ' secrets path' % (filename, name)))
     return errors
 
 
