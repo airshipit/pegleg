@@ -394,3 +394,20 @@ def file_in_subdir(filename, _dir):
     file_path, file_name = os.path.split(
         os.path.realpath(filename))
     return _dir in file_path.split(os.path.sep)
+
+
+def path_leaf(path):
+    """
+    Return the last element in a path, UNLESS it's empty,
+    then return the second to last element (unlike os.path.split)
+
+    :param path: a path as a string
+    :return: the last non-empty element of a string
+    :rtype: str
+    """
+    split_path = [i for i in path.split(os.sep)
+                  if i]
+    if split_path:
+        return split_path[-1]
+    else:
+        return None
