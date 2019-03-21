@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-from random import SystemRandom
-from rstr import Rstr
+import random
 import string
 
 __all__ = ['CryptoString']
@@ -24,14 +22,11 @@ class CryptoString(object):
 
     def __init__(self):
         self._pool = string.ascii_letters + string.digits + string.punctuation
-        self._rs = Rstr(SystemRandom())
+        self._random = random.SystemRandom()
 
-    def get_crypto_string(self, len=24):
+    def get_crypto_string(self, length=24):
         """
-        Create and return a random cryptographic string,
-        of the ``len`` length.
+        Create and return a random cryptographic string of length ``length``.
         """
-
-        if len < 24:
-            len = 24
-        return self._rs.rstr(self._pool, len)
+        return ''.join(self._random.choice(self._pool)
+                       for _ in range(max(24, length)))
