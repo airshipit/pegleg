@@ -16,6 +16,8 @@
 # context passing but will require a somewhat heavy code refactor. See:
 # http://click.pocoo.org/5/commands/#nested-handling-and-contexts
 
+from pegleg.engine import exceptions
+
 try:
     if GLOBAL_CONTEXT:
         pass
@@ -28,7 +30,9 @@ except NameError:
         'site_rev': None,
         'type_path': 'type',
         'passphrase': None,
-        'salt': None
+        'salt': None,
+        'salt_min_length': 24,
+        'passphrase_min_length': 24
     }
 
 
@@ -151,9 +155,15 @@ def set_rel_type_path(p):
     GLOBAL_CONTEXT['type_path'] = p
 
 
-def set_passphrase(p):
+def set_passphrase(passphrase):
     """Set the passphrase for encryption and decryption."""
-    GLOBAL_CONTEXT['passphrase'] = p
+
+    if not passphrase:
+        raise exceptions.PassphraseNotFoundException()
+    elif len(passphrase) < GLOBAL_CONTEXT['passphrase_min_length']:
+        raise exceptions.PassphraseInsufficientLengthException()
+
+    GLOBAL_CONTEXT['passphrase'] = passphrase
 
 
 def get_passphrase():
@@ -161,9 +171,15 @@ def get_passphrase():
     return GLOBAL_CONTEXT['passphrase']
 
 
-def set_salt(p):
+def set_salt(salt):
     """Set the salt for encryption and decryption."""
-    GLOBAL_CONTEXT['salt'] = p
+
+    if not salt:
+        raise exceptions.SaltNotFoundException()
+    elif len(salt) < GLOBAL_CONTEXT['salt_min_length']:
+        raise exceptions.SaltInsufficientLengthException()
+
+    GLOBAL_CONTEXT['salt'] = salt
 
 
 def get_salt():

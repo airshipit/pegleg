@@ -74,7 +74,7 @@ def test_encrypt_and_decrypt():
 
 @mock.patch.dict(os.environ, {
     ENV_PASSPHRASE: 'aShortPassphrase',
-    ENV_SALT: 'MySecretSalt'
+    ENV_SALT: 'MySecretSalt1234567890]['
 })
 def test_short_passphrase():
     with pytest.raises(click.ClickException,
@@ -84,7 +84,7 @@ def test_short_passphrase():
 
 @mock.patch.dict(os.environ, {
     ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'})
+    ENV_SALT: 'MySecretSalt1234567890]['})
 def test_secret_encrypt_and_decrypt(create_tmp_deployment_files, tmpdir):
     site_dir = tmpdir.join("deployment_files", "site", "cicd")
     passphrase_doc = """---
@@ -160,7 +160,7 @@ def test_pegleg_secret_management_constructor_with_invalid_arguments():
 
 @mock.patch.dict(os.environ, {
     ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'
+    ENV_SALT: 'MySecretSalt1234567890]['
 })
 def test_encrypt_decrypt_using_file_path(temp_path):
     # write the test data to temp file
@@ -190,7 +190,7 @@ def test_encrypt_decrypt_using_file_path(temp_path):
 
 @mock.patch.dict(os.environ, {
     ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'
+    ENV_SALT: 'MySecretSalt1234567890]['
 })
 def test_encrypt_decrypt_using_docs(temp_path):
     # write the test data to temp file
@@ -226,7 +226,7 @@ def test_encrypt_decrypt_using_docs(temp_path):
     reason='cfssl must be installed to execute these tests')
 @mock.patch.dict(os.environ, {
     ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'
+    ENV_SALT: 'MySecretSalt1234567890]['
 })
 def test_generate_pki_using_local_repo_path(create_tmp_deployment_files):
     """Validates ``generate-pki`` action using local repo path."""
@@ -252,7 +252,7 @@ def test_generate_pki_using_local_repo_path(create_tmp_deployment_files):
     reason='cfssl must be installed to execute these tests')
 @mock.patch.dict(os.environ, {
     ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt'
+    ENV_SALT: 'MySecretSalt1234567890]['
 })
 def test_check_expiry(create_tmp_deployment_files):
     """ Validates check_expiry """

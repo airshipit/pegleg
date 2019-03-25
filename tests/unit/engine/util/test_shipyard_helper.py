@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 import json
 import mock
 import pytest
@@ -20,6 +22,8 @@ from tests.unit import test_utils
 from mock import ANY
 
 from pegleg.engine import util
+from pegleg.engine.util.pegleg_secret_management import ENV_PASSPHRASE
+from pegleg.engine.util.pegleg_secret_management import ENV_SALT
 from pegleg.engine.util.shipyard_helper import ShipyardHelper
 from pegleg.engine.util.shipyard_helper import ShipyardClient
 
@@ -102,6 +106,10 @@ def test_shipyard_helper_init_():
             return_value=DATA)
 @mock.patch.object(ShipyardHelper, 'formatted_response_handler',
                    autospec=True, return_value=None)
+@mock.patch.dict(os.environ, {
+    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    ENV_SALT: 'MySecretSalt1234567890]['
+})
 def test_upload_documents(*args):
     """ Tests upload document """
     # Scenario:
@@ -128,6 +136,10 @@ def test_upload_documents(*args):
             return_value=DATA)
 @mock.patch.object(ShipyardHelper, 'formatted_response_handler',
                    autospec=True, return_value=None)
+@mock.patch.dict(os.environ, {
+    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    ENV_SALT: 'MySecretSalt1234567890]['
+})
 def test_upload_documents_fail(*args):
     """ Tests Document upload error """
     # Scenario:
