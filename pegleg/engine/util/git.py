@@ -45,8 +45,10 @@ def git_handler(repo_url,
     Supported ``ref`` formats include:
 
     * branch name (e.g. 'master')
-    * refpath (e.g. 'refs/changes/54/457754/73')
-    * hexsha (e.g. 'ff5496b9c781918fdc49d79f927323eeef2f5320')
+    * refpath, for unmerged changes in Gerrit (e.g.
+        'refs/changes/54/457754/73')
+    * hexsha, for merged commits (e.g.
+        'ff5496b9c781918fdc49d79f927323eeef2f5320')
 
     :param repo_url: URL of remote Git repo or path to local Git repo. If no
         local copy exists, clone it. Afterward, check out ``ref`` in the repo.
