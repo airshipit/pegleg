@@ -77,11 +77,6 @@ class IncompletePKIPairError(PeglegBaseException):
     message = ("Incomplete keypair set %(kinds)s for name: %(name)s")
 
 
-class PassphraseSchemaNotFoundException(PeglegBaseException):
-    """Failed to find schema for Passphrases rendering."""
-    message = ('Could not find Passphrase schema for rendering Passphrases!')
-
-
 class PassphraseCatalogNotFoundException(PeglegBaseException):
     """Failed to find Catalog for Passphrases generation."""
     message = ('Could not find the Passphrase Catalog to generate '
