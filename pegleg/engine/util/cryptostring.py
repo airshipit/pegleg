@@ -21,7 +21,8 @@ __all__ = ['CryptoString']
 class CryptoString(object):
 
     def __init__(self):
-        self._pool = string.ascii_letters + string.digits + string.punctuation
+        punctuation = '@#&-+=?'
+        self._pool = string.ascii_letters + string.digits + punctuation
         self._random = random.SystemRandom()
 
     def get_crypto_string(self, length=24):
