@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
 import mock
 import os
-import yaml
 
 import click
 import pytest
@@ -24,6 +22,8 @@ from pegleg import config
 from pegleg.engine import exceptions
 from pegleg.engine import repository
 from pegleg.engine import util
+
+REPO_USERNAME="test_username"
 
 TEST_REPOSITORIES = {
     'repositories': {
@@ -40,6 +40,23 @@ TEST_REPOSITORIES = {
     }
 }
 
+FORMATTED_REPOSITORIES = {
+    'repositories': {
+        'global': {
+            'revision': '843d1a50106e1f17f3f722e2ef1634ae442fe68f',
+            'url': 'ssh://{}@gerrit:29418/aic-clcp-manifests.git'.format(
+                REPO_USERNAME)
+        },
+        'secrets': {
+            'revision':
+            'master',
+            'url': ('ssh://{}@gerrit:29418/aic-clcp-security-'
+                    'manifests.git'.format(REPO_USERNAME))
+        }
+    }
+}
+
+config.set_repo_username(REPO_USERNAME)
 
 @pytest.fixture(autouse=True)
 def clean_temp_folders():
@@ -129,7 +146,7 @@ def _test_process_repositories(site_repo=None,
             ]
             mock_calls.extend([
                 mock.call(r['url'], ref=r['revision'], auth_key=None)
-                for r in TEST_REPOSITORIES['repositories'].values()
+                for r in FORMATTED_REPOSITORIES['repositories'].values()
             ])
             m_clone_repo.assert_has_calls(mock_calls)
         elif repo_username:
@@ -140,7 +157,7 @@ def _test_process_repositories(site_repo=None,
                     r['url'].replace('REPO_USERNAME', repo_username),
                     ref=r['revision'],
                     auth_key=None)
-                for r in TEST_REPOSITORIES['repositories'].values()
+                for r in FORMATTED_REPOSITORIES['repositories'].values()
             ])
         elif repo_overrides:
             # This is computed from: len(cloned extra repos) +
@@ -148,7 +165,7 @@ def _test_process_repositories(site_repo=None,
             expected_call_count = len(TEST_REPOSITORIES['repositories']) + 1
             assert (expected_call_count == m_clone_repo.call_count)
 
-            for x, r in TEST_REPOSITORIES['repositories'].items():
+            for x, r in FORMATTED_REPOSITORIES['repositories'].items():
                 if x in expected_repo_overrides:
                     repo_url = expected_repo_overrides[x]['url']
                     ref = expected_repo_overrides[x]['revision']
@@ -161,7 +178,7 @@ def _test_process_repositories(site_repo=None,
         else:
             m_clone_repo.assert_has_calls([
                 mock.call(r['url'], ref=r['revision'], auth_key=None)
-                for r in TEST_REPOSITORIES['repositories'].values()
+                for r in FORMATTED_REPOSITORIES['repositories'].values()
             ])
 
     if site_repo:
@@ -195,19 +212,13 @@ def test_process_repositories():
 
 def test_process_repositories_with_site_repo_url():
     """Test process_repository when site repo is a remote URL."""
-    # With REPO_USERNAME.
-    site_repo = (
-        'ssh://REPO_USERNAME@gerrit:29418/aic-clcp-site-manifests.git@333')
-    _test_process_repositories(
-        site_repo=site_repo,
-        expected_repo_url=(
-            "ssh://REPO_USERNAME@gerrit:29418/aic-clcp-site-manifests"),
-        expected_repo_revision="333")
     # Without REPO_USERNAME.
-    site_repo = 'ssh://gerrit:29418/aic-clcp-site-manifests.git@333'
+    site_repo = 'ssh://{}:29418/aic-clcp-site-manifests.git@333'.format(
+        REPO_USERNAME)
     _test_process_repositories(
         site_repo=site_repo,
-        expected_repo_url="ssh://gerrit:29418/aic-clcp-site-manifests",
+        expected_repo_url="ssh://{}:29418/aic-clcp-site-manifests".format(
+            REPO_USERNAME),
         expected_repo_revision="333")
 
 
@@ -257,7 +268,8 @@ def test_process_repositories_with_repo_overrides_remote_urls():
     }
     expected_repo_overrides = {
         'global': {
-            'url': 'ssh://REPO_USERNAME@gerrit:29418/aic-clcp-manifests',
+            'url': 'ssh://{}@gerrit:29418/aic-clcp-manifests'.format(
+                REPO_USERNAME),
             'revision': '12345'
         },
     }
@@ -515,3 +527,26 @@ def test_process_site_repository(_):
     _do_test(
         'ssh://foo@opendev.org/airship/treasuremap:12345',
         expected='ssh://foo@opendev.org/airship/treasuremap:12345')
+
+
+def test_format_url_with_repo_username():
+    TEST_URL = 'ssh://REPO_USERNAME@gerrit:29418/airship/pegleg'
+
+    with mock.patch.object(
+            config,
+            'get_repo_username',
+            autospec=True,
+            return_value=REPO_USERNAME):
+        res = repository._format_url_with_repo_username(TEST_URL)
+        assert res == 'ssh://{}@gerrit:29418/airship/pegleg'.format(
+            REPO_USERNAME)
+
+    with mock.patch.object(
+            config,
+            'get_repo_username',
+            autospec=True,
+            return_value=''):
+        pytest.raises(
+            exceptions.GitMissingUserException,
+            repository._format_url_with_repo_username,
+            TEST_URL)

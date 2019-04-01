@@ -195,7 +195,7 @@ The SSH public key to use when cloning remote authenticated repositories.
 
 Required for cloning repositories via SSH protocol.
 
-**-u / --repo-username** (Optional, SSH only).
+**-u / --repo-username** (Optional, unless required by repo URL).
 
 The SSH username to use when cloning remote authenticated repositories
 specified in the site-definition file. Any occurrences of ``REPO_USERNAME``
@@ -203,6 +203,8 @@ in an entry under the ``repositories`` field in a given
 :file:`site-definition.yaml` will be replaced with this value.
 
 Required for cloning repositories via SSH protocol.
+This argument will generate an exception if no repo URL
+uses ``REPO_USERNAME``.
 
 Examples
 ^^^^^^^^

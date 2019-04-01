@@ -67,6 +67,11 @@ class GitInvalidRepoException(PeglegBaseException):
     message = 'The repository path or URL is invalid: %(repo_path)s'
 
 
+class GitMissingUserException(PeglegBaseException):
+    """Exception raised when a username is required, but not provided."""
+    message = 'Repo URL %(url)s reuqires a username, but none was provided.'
+
+
 #
 # PKI EXCEPTIONS
 #

@@ -81,7 +81,8 @@ REPOSITORY_USERNAME_OPTION = click.option(
     help='The SSH username to use when cloning remote authenticated '
          'repositories specified in the site-definition file. Any '
          'occurrences of REPO_USERNAME will be replaced with this '
-         'value.')
+         'value.\n'
+         'Use only if REPO_USERNAME appears in a repo URL.')
 
 REPOSITORY_CLONE_PATH_OPTION = click.option(
     '-p',
