@@ -15,7 +15,7 @@
 import logging
 
 from pegleg.engine.catalogs.base_catalog import BaseCatalog
-from pegleg.engine.exceptions import PassphraseSchemaNotFoundException
+from pegleg.engine.exceptions import PassphraseCatalogNotFoundException
 
 LOG = logging.getLogger(__name__)
 KIND = 'PassphraseCatalog'
@@ -45,12 +45,12 @@ class PassphraseCatalog(BaseCatalog):
 
         :param str sitename: Name of the environment
         :param list documents: Environment configuration documents
-        :raises PassphraseSchemaNotFoundException: If it cannot find a
+        :raises PassphraseCatalogNotFoundException: If it cannot find a
         ``pegleg/passphraseCatalog/v1`` document.
         """
         super(PassphraseCatalog, self).__init__(KIND, sitename, documents)
         if not self._catalog_docs:
-            raise PassphraseSchemaNotFoundException()
+            raise PassphraseCatalogNotFoundException()
 
     @property
     def get_passphrase_names(self):
