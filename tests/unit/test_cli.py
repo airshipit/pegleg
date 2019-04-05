@@ -36,6 +36,16 @@ TEST_PARAMS = {
     "repo_url": "https://github.com/openstack/airship-treasuremap.git",
 }
 
+test_cert = """
+-----BEGIN CERTIFICATE-----
+
+DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF
+DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF
+DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF
+DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF
+
+-----END CERTIFICATE-----
+"""
 
 @pytest.mark.skipif(
     not test_utils.is_connected(),
@@ -551,6 +561,53 @@ class TestSiteSecretsActions(BaseCLIActionTest):
                         self.site_name]
         result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
         assert result.exit_code == 0, result.output
+
+    @mock.patch.dict(os.environ, {
+        "PEGLEG_PASSPHRASE": "123456789012345678901234567890",
+        "PEGLEG_SALT": "123456"
+    })
+    def test_site_secrets_wrap(self):
+        """Validates ``generate-pki`` action using local repo path."""
+        # Scenario:
+        #
+        # 1) Encrypt a file in a local repo
+
+        repo_path = self.treasuremap_path
+        file_dir = os.path.join(repo_path, "site", "airship-seaworthy",
+                                "secrets", "certificates")
+        file_path = os.path.join(file_dir, "test.crt")
+        output_path = os.path.join(file_dir, "test.yaml")
+
+        with open(file_path, "w") as test_crt_fi:
+            test_crt_fi.write(test_cert)
+        secrets_opts = ['secrets', 'wrap', "-a", "lm734y", "-f", file_path,
+                        "-s", "deckhand/Certificate/v1",
+                        "-n", "test-certificate", "-l", "site", "--no-encrypt",
+                       self.site_name]
+        result = self.runner.invoke(cli.site, ["-r", repo_path] + secrets_opts)
+        assert result.exit_code == 0
+
+        with open(output_path, "r") as output_fi:
+            doc = yaml.safe_load(output_fi)
+            assert doc["data"]["managedDocument"]["data"] == test_cert
+            assert doc["data"]["managedDocument"]["schema"] == "deckhand/Certificate/v1"
+            assert doc["data"]["managedDocument"]["metadata"]["name"] == "test-certificate"
+            assert doc["data"]["managedDocument"]["metadata"]["layeringDefinition"]["layer"] == "site"
+            assert doc["data"]["managedDocument"]["metadata"]["storagePolicy"] == "cleartext"
+
+        os.remove(output_path)
+        secrets_opts = ['secrets', 'wrap', "-a", "lm734y", "-f", file_path,
+                        "-o", output_path, "-s", "deckhand/Certificate/v1",
+                        "-n", "test-certificate", "-l", "site",
+                       self.site_name]
+        result = self.runner.invoke(cli.site, ["-r", repo_path] + secrets_opts)
+        assert result.exit_code == 0
+
+        with open(output_path, "r") as output_fi:
+            doc = yaml.safe_load(output_fi)
+            assert "encrypted" in doc["data"]
+            assert "managedDocument" in doc["data"]
+
 
 class TestTypeCliActions(BaseCLIActionTest):
     """Tests type-level CLI actions."""

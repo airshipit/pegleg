@@ -14,11 +14,14 @@
 
 import logging
 import os
+import yaml
 
 from pegleg.engine.generators.passphrase_generator import PassphraseGenerator
 from pegleg.engine.util.cryptostring import CryptoString
 from pegleg.engine.util import definition
 from pegleg.engine.util import files
+from pegleg.engine.util.pegleg_managed_document import \
+    PeglegManagedSecretsDocument as PeglegManagedSecret
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 
 __all__ = ('encrypt', 'decrypt', 'generate_passphrases')
@@ -141,3 +144,45 @@ def generate_crypto_string(length):
     """
 
     return CryptoString().get_crypto_string(length)
+
+
+def wrap_secret(author, file_name, output_path, schema,
+                name, layer, encrypt):
+    """Wrap a bare secrets file in a YAML and ManagedDocument.
+
+    :param author: author for ManagedDocument
+    :param file_name: file path for input file
+    :param output_path: file path for output file
+    :param schema: schema for wrapped document
+    :param name: name for wrapped document
+    :param layer: layer for wrapped document
+    :param encrypt: whether to encrypt the output doc
+    """
+
+    if not output_path:
+        output_path = os.path.splitext(file_name)[0] + ".yaml"
+
+    with open(file_name, "r") as in_fi:
+        data = in_fi.read()
+
+    inner_doc = {
+        "schema": schema,
+        "data": data,
+        "metadata": {
+            "layeringDefinition": {
+                "abstract": False,
+                "layer": layer
+            },
+            "name": name,
+            "schema": "metadata/Document/v1",
+            "storagePolicy": "encrypted" if encrypt else "cleartext"
+        }
+    }
+    managed_secret = PeglegManagedSecret(inner_doc, author=author)
+    if encrypt:
+        psm = PeglegSecretManagement(docs=[inner_doc], author=author)
+        output_doc = psm.get_encrypted_secrets()[0][0]
+    else:
+        output_doc = managed_secret.pegleg_document
+    with open(output_path, "w") as output_fi:
+        yaml.safe_dump(output_doc, output_fi)
