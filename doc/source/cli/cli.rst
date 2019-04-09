@@ -477,10 +477,10 @@ Dashes in the document names will be converted to underscores for consistency.
 
 Name of site.
 
-**days** (Optional).
+**-d / --days** (Optional).
 
 Duration (in days) certificates should be valid.  Default=365,
-minimum=0, no maximum.
+minimum=0, no maximum.  Values less than 0 will raise an exception.
 
 NOTE: A generated certificate where days = 0 should only be used for testing.
 A certificate generated in such a way will be valid for 0 seconds.
@@ -510,14 +510,16 @@ Check PKI Certs
 ---------------
 
 Determine if any PKI certificates from a site are expired, or will be expired
-within N days (default N=60, no maximum, minimum 0). Print those cert names
-and expiration dates to ``stdout``.
+within ``days`` days.  If any are found, print the cert names and expiration
+dates to ``stdout``.
 
 **-d / --days** (Optional).
 
-Number of days past today's date to check certificate expirations.
-Default days=60.  Minimum days=0, days less than 0 will raise an exception.
-No maximum days.
+Duration (in days) to check certificate validity from today.  Default=60,
+minimum=0, no maximum.  Values less than 0 will raise an exception.
+
+NOTE: Checking PKI certs where days = 0 will check for certs that are expired
+at the time the command is run.
 
 **site_name** (Required).
 

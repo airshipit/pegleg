@@ -64,9 +64,7 @@ class PKIUtility(object):
 
     @property
     def ca_config(self):
-        if self.duration is not None and self.duration >= 0:
-            pass
-        else:
+        if self.duration is None or self.duration < 0:
             raise exceptions.PKICertificateInvalidDuration()
 
         if not self._ca_config_string:
@@ -209,9 +207,7 @@ class PKIUtility(object):
 
         """
 
-        if self.duration is not None and self.duration >= 0:
-            pass
-        else:
+        if self.duration is None or self.duration < 0:
             raise exceptions.PKICertificateInvalidDuration()
 
         info = self.cert_info(cert)
