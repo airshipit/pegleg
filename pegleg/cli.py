@@ -401,8 +401,15 @@ def secrets():
          'for tracking provenance information in the PeglegManagedDocuments. '
          'An attempt is made to automatically determine this value, '
          'but should be provided.')
+@click.option(
+    '-d',
+    '--days',
+    'days',
+    default=365,
+    help='Duration in days generated certificates should be valid. '
+         'Default is 365 days.')
 @click.argument('site_name')
-def generate_pki(site_name, author):
+def generate_pki(site_name, author, days):
     """Generate certificates, certificate authorities and keypairs for a given
     site.
 
@@ -410,7 +417,8 @@ def generate_pki(site_name, author):
 
     engine.repository.process_repositories(site_name,
                                            overwrite_existing=True)
-    pkigenerator = catalog.pki_generator.PKIGenerator(site_name, author=author)
+    pkigenerator = catalog.pki_generator.PKIGenerator(
+        site_name, author=author, duration=days)
     output_paths = pkigenerator.generate()
 
     click.echo("Generated PKI files written to:\n%s" % '\n'.join(output_paths))
@@ -507,6 +515,29 @@ def genesis_bundle(*, build_dir, validators, site_name):
                          validators,
                          logging.DEBUG == LOG.getEffectiveLevel(),
                          site_name)
+
+
+@secrets.command(
+    'check-pki-certs',
+    help='Determine if certificates in a sites PKICatalog are expired or '
+         'expiring within a specified number of days.')
+@click.option(
+    '-d',
+    '--days',
+    'days',
+    default=60,
+    help='The number of days past today to check if certificates are valid.')
+@click.argument('site_name')
+def check_pki_certs(site_name, days):
+    """Check PKI certificates of a site for expiration."""
+
+    engine.repository.process_repositories(site_name,
+                                           overwrite_existing=True)
+
+    cert_results = engine.secrets.check_cert_expiry(site_name, duration=days)
+
+    click.echo("The following certs will expire within {} days: \n{}"
+               .format(days, cert_results))
 
 
 @main.group(help='Commands related to types')

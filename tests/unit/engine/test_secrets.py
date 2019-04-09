@@ -237,7 +237,7 @@ def test_generate_pki_using_local_repo_path(create_tmp_deployment_files):
     repo_path = str(git.git_handler(TEST_PARAMS["repo_url"],
                                     ref=TEST_PARAMS["repo_rev"]))
     with mock.patch.dict(config.GLOBAL_CONTEXT, {"site_repo": repo_path}):
-        pki_generator = PKIGenerator(sitename=TEST_PARAMS["site_name"])
+        pki_generator = PKIGenerator(duration=365, sitename=TEST_PARAMS["site_name"])
         generated_files = pki_generator.generate()
 
         assert len(generated_files), 'No secrets were generated'
@@ -259,10 +259,10 @@ def test_check_expiry(create_tmp_deployment_files):
     repo_path = str(git.git_handler(TEST_PARAMS["repo_url"],
                                     ref=TEST_PARAMS["repo_rev"]))
     with mock.patch.dict(config.GLOBAL_CONTEXT, {"site_repo": repo_path}):
-        pki_generator = PKIGenerator(sitename=TEST_PARAMS["site_name"])
+        pki_generator = PKIGenerator(duration=365, sitename=TEST_PARAMS["site_name"])
         generated_files = pki_generator.generate()
 
-        pki_util = pki_utility.PKIUtility()
+        pki_util = pki_utility.PKIUtility(duration=0)
 
         assert len(generated_files), 'No secrets were generated'
         for generated_file in generated_files:
@@ -276,5 +276,7 @@ def test_check_expiry(create_tmp_deployment_files):
                     if result['schema'] == \
                             "deckhand/Certificate/v1":
                         cert = result['data']
-                        assert not pki_util.check_expiry(cert), \
-                            "%s is expired!" % generated_file.name
+                        cert_info = pki_util.check_expiry(cert)
+                        assert cert_info['expired'] is False, \
+                            "%s is expired/expiring on %s" % \
+                            (generated_file.name, cert_info['expiry_date'])

@@ -99,9 +99,16 @@ class GenesisBundleGenerateException(PeglegBaseException):
     message = 'Bundle generation failed on deckhand validation.'
 
 
+class PKICertificateInvalidDuration(PeglegBaseException):
+    """Exception for invalid duration of PKI Certificate."""
+    message = ('Provided duration is invalid. Certificate durations must be '
+               'a positive integer.')
+
+
 #
 # CREDENTIALS EXCEPTIONS
 #
+
 
 class PassphraseNotFoundException(PeglegBaseException):
     """Exception raised when passphrase is not set."""
