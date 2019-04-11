@@ -19,11 +19,9 @@ import uuid
 from cryptography import fernet
 import mock
 import pytest
-import string
 from testfixtures import log_capture
 import yaml
 
-from pegleg.engine.util.cryptostring import CryptoString
 from pegleg.engine.generators.passphrase_generator import PassphraseGenerator
 from pegleg.engine.util import encryption
 from pegleg.engine import util
@@ -120,32 +118,6 @@ TEST_SITE_DEFINITION = {
 
 TEST_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_PASSPHRASES_CATALOG]
 TEST_GLOBAL_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_GLOBAL_PASSPHRASES_CATALOG]
-
-
-def test_cryptostring_default_len():
-    s_util = CryptoString()
-    s = s_util.get_crypto_string()
-    assert len(s) == 24
-    alphabet = set(string.punctuation + string.ascii_letters + string.digits)
-    assert any(c in alphabet for c in s)
-
-
-def test_cryptostring_short_len():
-    s_util = CryptoString()
-    s = s_util.get_crypto_string(0)
-    assert len(s) == 24
-    s = s_util.get_crypto_string(23)
-    assert len(s) == 24
-    s = s_util.get_crypto_string(-1)
-    assert len(s) == 24
-
-
-def test_cryptostring_long_len():
-    s_util = CryptoString()
-    s = s_util.get_crypto_string(25)
-    assert len(s) == 25
-    s = s_util.get_crypto_string(128)
-    assert len(s) == 128
 
 
 @mock.patch.object(
