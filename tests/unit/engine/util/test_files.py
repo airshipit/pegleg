@@ -14,6 +14,9 @@
 
 import os
 
+import pytest
+import yaml
+
 from pegleg import config
 from pegleg.engine.util import files
 from tests.unit.fixtures import create_tmp_deployment_files
@@ -36,6 +39,25 @@ class TestFileHelpers(object):
         documents = files.read(path)
         assert not documents, ("Documents returned should be empty for "
                                "site-definition.yaml")
+
+    def test_write(self, create_tmp_deployment_files):
+        path = os.path.join(config.get_site_repo(), 'site', 'cicd',
+                            'test_out.yaml')
+        files.write(path, "test text")
+        with open(path, "r") as out_fi:
+            assert out_fi.read() == "test text"
+
+        files.write(path, {"a": 1})
+        with open(path, "r") as out_fi:
+            assert yaml.safe_load(out_fi) == {"a": 1}
+
+        files.write(path, [{"a": 1}])
+        with open(path, "r") as out_fi:
+            assert list(yaml.safe_load_all(out_fi)) == [{"a": 1}]
+
+        with pytest.raises(ValueError) as _:
+            files.write(path, object())
+
 
 def test_file_in_subdir():
     assert files.file_in_subdir("aaa/bbb/ccc.txt", "aaa")

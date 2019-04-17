@@ -296,18 +296,30 @@ def write(file_path, data):
     :param file_path: Destination file for the written data file
     :type file_path: str
     :param data: data to be written to the destination file
-    :type data: dict or a list of dicts
+    :type data: str, dict, or a list of dicts
     """
 
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    try:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-    with open(file_path, 'w') as stream:
-        yaml.safe_dump_all(
-            data,
-            stream,
-            explicit_start=True,
-            explicit_end=True,
-            default_flow_style=False)
+        with open(file_path, 'w') as stream:
+            if isinstance(data, str):
+                stream.write(data)
+            elif isinstance(data, (dict, collections.abc.Iterable)):
+                if isinstance(data, dict):
+                    data = [data]
+                yaml.safe_dump_all(
+                    data,
+                    stream,
+                    explicit_start=True,
+                    explicit_end=True,
+                    default_flow_style=False)
+            else:
+                raise ValueError('data must be str or dict, '
+                                 'not {}'.format(type(data)))
+    except EnvironmentError as e:
+        raise click.ClickError(
+            "Couldn't write data to {}: {}".format(file_path, e))
 
 
 def _recurse_subdirs(search_path, depth):

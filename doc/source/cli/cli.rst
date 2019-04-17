@@ -670,11 +670,18 @@ documents in the ``filename``.
 
 The absolute path to the pegleg managed encrypted secrets file.
 
+
+**-s / save-location** (Optional).
+
+The desired output path for the decrypted file. If not specified, it will be
+printed to stdout.
+
 Usage:
 
 ::
 
     ./pegleg.sh site <options> secrets decrypt <site_name> -f <file_path>
+      [-s <output_path>]
 
 Examples
 """"""""
