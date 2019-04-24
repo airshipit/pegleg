@@ -18,7 +18,7 @@ import uuid
 
 import yaml
 
-from pegleg.engine.exceptions import PeglegBaseException
+from pegleg.engine import exceptions
 from pegleg.engine.util import files
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 
@@ -29,14 +29,14 @@ from shipyard_client.api_client.shipyardclient_context import \
 LOG = logging.getLogger(__name__)
 
 
-class AuthValuesError(PeglegBaseException):
+class AuthValuesError(exceptions.PeglegBaseException):
     """Shipyard authentication failed. """
 
     def __init__(self, *, diagnostic):
         self.diagnostic = diagnostic
 
 
-class DocumentUploadError(PeglegBaseException):
+class DocumentUploadError(exceptions.PeglegBaseException):
     """Exception occurs while uploading documents"""
 
     def __init__(self, message):
@@ -52,7 +52,7 @@ class ShipyardHelper(object):
     4. Formats response from Shipyard api_client
     """
 
-    def __init__(self, context):
+    def __init__(self, context, buffer_mode='auto'):
         """
         Initializes params to be used by Shipyard
 
@@ -71,6 +71,7 @@ class ShipyardHelper(object):
         self.client_context = ShipyardClientContext(
             self.auth_vars, self.context_marker)
         self.api_client = ShipyardClient(self.client_context)
+        self.buffer_mode = buffer_mode
 
     def upload_documents(self):
         """Uploads documents to Shipyard """
@@ -82,10 +83,15 @@ class ShipyardHelper(object):
             # Append flag is not required for the first
             # collection being uploaded to Shipyard. It
             # is needed for subsequent collections.
-            if idx == 0:
-                buffer_mode = None
+            if self.buffer_mode == 'auto':
+                if idx == 0:
+                    buffer_mode = None
+                else:
+                    buffer_mode = 'append'
+            elif self.buffer_mode == 'append' or self.buffer_mode == 'replace':
+                buffer_mode = self.buffer_mode
             else:
-                buffer_mode = 'append'
+                raise exceptions.InvalidBufferModeException()
 
             # Decrypt the documents if encrypted
             pegleg_secret_mgmt = PeglegSecretManagement(

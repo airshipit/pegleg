@@ -132,3 +132,13 @@ class SaltInsufficientLengthException(PeglegBaseException):
     """Exception raised when salt is too short."""
 
     message = 'PEGLEG_SALT must be at least 24 characters long.'
+
+
+#
+# Shipyard Helper Exceptions
+#
+
+class InvalidBufferModeException(PeglegBaseException):
+    """Exception raised when invalid buffer mode specified"""
+
+    message = 'BUFFER MODE must be one of: append, auto, replace'

@@ -414,11 +414,24 @@ Please reference Shipyard's `CLI documentation`_ for information related to thes
 Specifies a UUID (8-4-4-4-12 format) that will be used to correlate logs,
 transactions, etc. in downstream activities triggered by this interaction.
 
+**-b / --buffer-mode** (Optional).  Default is auto.
+
+Set the buffer mode when uploading documents. Supported buffer modes
+include append, replace, auto.
+
+append: Add the collection to the Shipyard Buffer, only if that
+collection does not already exist in the Shipyard buffer.
+
+replace: Clear the Shipyard Buffer before adding the specified
+collection.
+
+auto: Let Pegleg determine the appropriate buffer mode to use.
+
 Usage:
 
 ::
 
-    ./pegleg.sh site <options> upload <site_name> --context-marker=<uuid>
+    ./pegleg.sh site <options> upload <site_name> --context-marker=<uuid> --buffer=<buffer>
 
 Site Secrets Group
 ------------------

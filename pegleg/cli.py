@@ -354,11 +354,25 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
          'interaction ',
     required=False,
     type=click.UUID)
+@click.option(
+    '-b',
+    '--buffer-mode',
+    'buffer_mode',
+    required=False,
+    default='auto',
+    show_default=True,
+    help='Set the buffer mode when uploading documents. Supported buffer '
+         'modes include append, replace, auto.\n'
+         'append: Add the collection to the Shipyard Buffer, only if that '
+         'collection does not already exist in the Shipyard buffer.\n'
+         'replace: Clear the Shipyard Buffer before adding the specified '
+         'collection.\n'
+         'auto: Let Pegleg determine the appropriate buffer mode to use.')
 @SITE_REPOSITORY_ARGUMENT
 @click.pass_context
 def upload(ctx, *, os_project_domain_name,
            os_user_domain_name, os_project_name, os_username,
-           os_password, os_auth_url, context_marker, site_name):
+           os_password, os_auth_url, context_marker, site_name, buffer_mode):
     if not ctx.obj:
         ctx.obj = {}
 
@@ -378,7 +392,7 @@ def upload(ctx, *, os_project_domain_name,
     ctx.obj['context_marker'] = str(context_marker)
     ctx.obj['site_name'] = site_name
 
-    click.echo(ShipyardHelper(ctx).upload_documents())
+    click.echo(ShipyardHelper(ctx, buffer_mode).upload_documents())
 
 
 @site.group(
