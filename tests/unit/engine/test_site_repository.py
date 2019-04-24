@@ -498,20 +498,20 @@ def test_process_site_repository(_):
 
     # Ensure that the reference is always pruned.
     _do_test(
-        'http://github.com/openstack/treasuremap@master',
-        expected='http://github.com/openstack/treasuremap')
+        'https://opendev.org/airship/treasuremap@master',
+        expected='https://opendev.org/airship/treasuremap')
     _do_test(
-        'http://github.com/openstack/treasuremap',
-        expected='http://github.com/openstack/treasuremap')
+        'https://opendev.org/airship/treasuremap',
+        expected='https://opendev.org/airship/treasuremap')
     _do_test(
-        'https://github.com/openstack/treasuremap@master',
-        expected='https://github.com/openstack/treasuremap')
+        'https://opendev.org/airship/treasuremap@master',
+        expected='https://opendev.org/airship/treasuremap')
     _do_test(
-        'https://github.com/openstack/treasuremap',
-        expected='https://github.com/openstack/treasuremap')
+        'https://opendev.org/airship/treasuremap',
+        expected='https://opendev.org/airship/treasuremap')
     _do_test(
-        'ssh://foo@github.com/openstack/treasuremap:12345@master',
-        expected='ssh://foo@github.com/openstack/treasuremap:12345')
+        'ssh://foo@opendev.org/airship/treasuremap:12345@master',
+        expected='ssh://foo@opendev.org/airship/treasuremap:12345')
     _do_test(
-        'ssh://foo@github.com/openstack/treasuremap:12345',
-        expected='ssh://foo@github.com/openstack/treasuremap:12345')
+        'ssh://foo@opendev.org/airship/treasuremap:12345',
+        expected='ssh://foo@opendev.org/airship/treasuremap:12345')

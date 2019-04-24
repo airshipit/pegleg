@@ -92,9 +92,9 @@ REPOSITORY_CLONE_PATH_OPTION = click.option(
          'exists, then the repo will not be cloned again and the '
          'user must specify a new clone path or pass in the local copy '
          'of the repository as the site repository. Suppose the repo '
-         'name is airship-treasuremap and the clone path is '
+         'name is airship/treasuremap and the clone path is '
          '/tmp/mypath then the following directory is '
-         'created /tmp/mypath/airship-treasuremap '
+         'created /tmp/mypath/airship/treasuremap '
          'which will contain the contents of the repo')
 
 ALLOW_MISSING_SUBSTITUTIONS_OPTION = click.option(

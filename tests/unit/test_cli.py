@@ -32,8 +32,8 @@ TEST_PARAMS = {
     "site_name": "airship-seaworthy",
     "site_type": "foundry",
     "repo_rev": '6b183e148b9bb7ba6f75c98dd13451088255c60b',
-    "repo_name": "airship-treasuremap",
-    "repo_url": "https://github.com/openstack/airship-treasuremap.git",
+    "repo_name": "treasuremap",
+    "repo_url": "https://opendev.org/airship/treasuremap.git",
 }
 
 test_cert = """
@@ -95,7 +95,7 @@ class TestSiteCLIOptions(BaseCLIActionTest):
         # 1) List sites (should clone repo automatically to `clone_path`
         #    location if `clone_path` is set)
 
-        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
 
         # Note that the -p option is used to specify the clone_folder
@@ -145,7 +145,7 @@ class TestSiteCLIOptionsNegative(BaseCLIActionTest):
         # 1) List sites (should clone repo automatically to `clone_path`
         #    location if `clone_path` is set)
 
-        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
 
         # Note that the -p option is used to specify the clone_folder
@@ -193,7 +193,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 2) Collect into save location (should clone repo automatically)
         # 3) Check that expected file name is there
 
-        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
         self._validate_collect_site_action(repo_url, temp_path)
 
@@ -206,7 +206,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 2) Collect into save location (should clone repo automatically)
         # 3) Check that expected file name is there
 
-        repo_url = 'https://github.com/openstack/%s@%s.git' % (self.repo_name,
+        repo_url = 'https://opendev.org/airship/%s@%s.git' % (self.repo_name,
                                                                self.repo_rev)
         self._validate_collect_site_action(repo_url, temp_path)
 
@@ -253,7 +253,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 1) Mock out Deckhand render (so we can ignore P005 issues)
         # 2) Lint site with exclude flags (should clone repo automatically)
 
-        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
         self._test_lint_site_action(repo_url, exclude=True)
 
@@ -295,7 +295,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         #
         # 1) List sites (should clone repo automatically)
 
-        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
 
         self._validate_list_site_action(repo_url)
@@ -327,7 +327,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         #
         # 1) Show site (should clone repo automatically)
 
-        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
         self._validate_site_show_action(repo_url)
 
@@ -361,7 +361,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 1) Mock out Deckhand render (so we can ignore P005 issues)
         # 2) Render site (should clone repo automatically)
 
-        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
         self._validate_render_site_action(repo_url)
 
@@ -417,7 +417,7 @@ class TestRepoCliActions(BaseCLIActionTest):
         # 1) Mock out Deckhand render (so we can ignore P005 issues)
         # 2) Lint repo with exclude flags (should clone repo automatically)
 
-        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
 
         lint_command = ['-r', repo_url, 'lint']
@@ -496,7 +496,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         #
         # 1) Generate PKI using remote repo URL
 
-        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
 
         secrets_opts = ['secrets', 'generate-pki', self.site_name]
@@ -642,7 +642,7 @@ class TestTypeCliActions(BaseCLIActionTest):
         #
         # 1) List types (should clone repo automatically)
 
-        repo_url = 'https://github.com/openstack/%s@%s' % (self.repo_name,
+        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
                                                            self.repo_rev)
         self._validate_type_list_action(repo_url)
 
@@ -679,13 +679,13 @@ class TestSiteCliActionsWithSubdirectory(BaseCLIActionTest):
         """Validates list action with subpath in remote URL."""
         # Scenario:
         #
-        # 1) List sites for https://github.com/airship-in-a-bottle/
+        # 1) List sites for https://opendev.org/airship/in-a-bottle
         #    deployment_files (subpath in remote URL)
 
         # Perform site action using remote URL.
-        repo_name = 'airship-in-a-bottle'
+        repo_name = 'in-a-bottle'
         repo_rev = '7a0717adc68261c7adb3a3db74a9326d6103519f'
-        repo_url = 'https://github.com/openstack/%s/deployment_files@%s' % (
+        repo_url = 'https://opendev.org/airship/%s/deployment_files@%s' % (
             repo_name, repo_rev)
 
         self._validate_list_site_action(repo_url)
@@ -694,13 +694,13 @@ class TestSiteCliActionsWithSubdirectory(BaseCLIActionTest):
         """Validates list action with subpath in local repo path."""
         # Scenario:
         #
-        # 1) List sites for local repo at /tmp/.../airship-in-a-bottle/
+        # 1) List sites for local repo at /tmp/.../in-a-bottle/
         #    deployment_files
 
         # Perform site action using local repo path.
-        repo_name = 'airship-in-a-bottle'
+        repo_name = 'in-a-bottle'
         repo_rev = '7a0717adc68261c7adb3a3db74a9326d6103519f'
-        repo_url = 'https://github.com/openstack/%s' % repo_name
+        repo_url = 'https://opendev.org/airship/%s' % repo_name
         _repo_path = git.git_handler(repo_url, ref=repo_rev)
         repo_path = os.path.join(_repo_path, 'deployment_files')
 

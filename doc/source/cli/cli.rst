@@ -972,7 +972,7 @@ P003 - All repos contain expected directories.
 .. _Deckhand: https://airship-deckhand.readthedocs.io/en/latest/users/rendering.html
 .. _Deckhand Validations: https://airship-deckhand.readthedocs.io/en/latest/overview.html#validation
 .. _Pegleg Managed Documents: https://airship-specs.readthedocs.io/en/latest/specs/approved/pegleg-secrets.html#peglegmanageddocument
-.. _Shipyard: https://github.com/openstack/airship-shipyard
+.. _Shipyard: https://opendev.org/airship/shipyard
 .. _CLI documentation: https://airship-shipyard.readthedocs.io/en/latest/CLI.html#openstack-keystone-authorization-environment-variables
 .. _Pegleg Passphrase Catalog: https://airship-specs.readthedocs.io/en/latest/specs/approved/pegleg-secrets.html#document-generation
 

@@ -64,7 +64,7 @@ def _assert_check_out_from_local_repo(mock_log, git_dir):
     not test_utils.is_connected(),
     reason='git clone requires network connectivity.')
 def test_git_clone_valid_url_http_protocol():
-    url = 'http://github.com/openstack/airship-armada'
+    url = 'https://opendev.org/airship/armada'
     git_dir = git.git_handler(url, ref='master')
     _validate_git_clone(git_dir)
 
@@ -73,7 +73,7 @@ def test_git_clone_valid_url_http_protocol():
     not test_utils.is_connected(),
     reason='git clone requires network connectivity.')
 def test_git_clone_valid_url_https_protocol():
-    url = 'https://github.com/openstack/airship-armada'
+    url = 'https://opendev.org/airship/armada'
     git_dir = git.git_handler(url, ref='master')
     _validate_git_clone(git_dir)
 
@@ -82,7 +82,7 @@ def test_git_clone_valid_url_https_protocol():
     not test_utils.is_connected(),
     reason='git clone requires network connectivity.')
 def test_git_clone_with_commit_reference():
-    url = 'https://github.com/openstack/airship-armada'
+    url = 'https://review.opendev.org/airship/armada'
     commit = 'cba78d1d03e4910f6ab1691bae633c5bddce893d'
     git_dir = git.git_handler(url, commit)
     _validate_git_clone(git_dir, commit)
@@ -93,7 +93,7 @@ def test_git_clone_with_commit_reference():
     reason='git clone requires network connectivity.')
 def test_git_clone_with_patch_ref():
     ref = 'refs/changes/54/457754/73'
-    git_dir = git.git_handler('https://github.com/openstack/openstack-helm',
+    git_dir = git.git_handler('https://review.opendev.org/openstack/openstack-helm',
                               ref)
     _validate_git_clone(git_dir, ref)
 
@@ -103,7 +103,7 @@ def test_git_clone_with_patch_ref():
     reason='git clone requires proxy connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
 def test_git_clone_behind_proxy(mock_log):
-    url = 'https://github.com/openstack/airship-armada'
+    url = 'https://review.opendev.org/airship/armada'
     commit = 'cba78d1d03e4910f6ab1691bae633c5bddce893d'
 
     for proxy_server in test_utils._PROXY_SERVERS.values():
@@ -127,7 +127,7 @@ def test_git_clone_existing_directory_checks_out_earlier_ref_from_local(
     """
     # Clone the openstack-helm repo and automatically checkout patch 34.
     ref = 'refs/changes/15/536215/35'
-    repo_url = 'https://github.com/openstack/openstack-helm'
+    repo_url = 'https://review.opendev.org/openstack/openstack-helm'
     git_dir = git.git_handler(repo_url, ref)
     _validate_git_clone(git_dir, fetched_ref=ref)
 
@@ -148,7 +148,7 @@ def test_git_clone_existing_directory_checks_out_master_from_local(mock_log):
     """
     # Clone the openstack-helm repo and automatically checkout patch 34.
     ref = 'refs/changes/15/536215/34'
-    repo_url = 'https://github.com/openstack/openstack-helm'
+    repo_url = 'https://review.opendev.org/openstack/openstack-helm'
     git_dir = git.git_handler(repo_url, ref)
     _validate_git_clone(git_dir, fetched_ref=ref)
 
@@ -169,7 +169,7 @@ def test_git_clone_checkout_refpath_saves_references_locally(mock_log):
     """
     # Clone the openstack-helm repo and automatically checkout patch 34.
     ref = 'refs/changes/15/536215/34'
-    repo_url = 'https://github.com/openstack/openstack-helm'
+    repo_url = 'https://review.opendev.org/openstack/openstack-helm'
     git_dir = git.git_handler(repo_url, ref)
     _validate_git_clone(git_dir, fetched_ref=ref)
 
@@ -201,7 +201,7 @@ def test_git_clone_checkout_hexsha_saves_references_locally(mock_log):
     # to the last patch as that is what gets pushed to github. In this case,
     # this corresponds to patch 'refs/changes/15/536215/35'.
     ref = 'bf126f46b1c175a8038949a87dafb0a716e3b9b6'
-    repo_url = 'https://github.com/openstack/openstack-helm'
+    repo_url = 'https://review.opendev.org/openstack/openstack-helm'
     git_dir = git.git_handler(repo_url, ref)
     _validate_git_clone(git_dir, fetched_ref=ref)
 
@@ -228,7 +228,7 @@ def test_git_clone_existing_directory_checks_out_next_local_ref(mock_log):
     """
     # Clone the openstack-helm repo and automatically checkout patch 73.
     ref = 'refs/changes/54/457754/73'
-    repo_url = 'https://github.com/openstack/openstack-helm'
+    repo_url = 'https://review.opendev.org/openstack/openstack-helm'
     git_dir = git.git_handler(repo_url, ref)
     _validate_git_clone(git_dir, ref)
 
@@ -248,7 +248,7 @@ def test_git_checkout_without_reference_defaults_to_current(mock_log):
     """Validate that the currently checked out ref is defaulted to when
     ref=None is passed to ``git.git_handler``.
     """
-    url = 'https://github.com/openstack/airship-armada'
+    url = 'https://review.opendev.org/airship/armada'
     commit = 'cba78d1d03e4910f6ab1691bae633c5bddce893d'
     git_dir = git.git_handler(url, commit)
     _validate_git_clone(git_dir, commit)
@@ -267,7 +267,7 @@ def test_git_clone_delete_repo_and_reclone(mock_log):
     """
     # Clone the openstack-helm repo and automatically checkout patch 73.
     ref = 'refs/changes/54/457754/73'
-    repo_url = 'https://github.com/openstack/openstack-helm'
+    repo_url = 'https://review.opendev.org/openstack/openstack-helm'
     first_git_dir = git.git_handler(repo_url, ref)
     _validate_git_clone(first_git_dir, ref)
 
@@ -295,7 +295,7 @@ def test_git_clone_delete_repo_and_reclone(mock_log):
 @mock.patch.object(git, 'LOG', autospec=True)
 def test_git_checkout_none_ref_checks_out_master(mock_log):
     """Validate that ref=None checks out master."""
-    url = 'https://github.com/openstack/airship-armada'
+    url = 'https://opendev.org/airship/armada'
     git_dir = git.git_handler(url, ref=None)
     _validate_git_clone(git_dir, 'master')
 
@@ -308,7 +308,7 @@ def test_git_checkout_dirty_repo_tracked_file_committed(mock_log):
     """Validate a dirty tracked file is committed."""
     # Clone the openstack-helm repo and automatically checkout patch 73.
     ref = 'refs/changes/54/457754/73'
-    repo_url = 'https://github.com/openstack/openstack-helm'
+    repo_url = 'https://review.opendev.org/openstack/openstack-helm'
     git_dir = git.git_handler(repo_url, ref)
     _validate_git_clone(git_dir, ref)
 
@@ -337,7 +337,7 @@ def test_git_checkout_dirty_repo_untracked_file_committed(mock_log):
     """Validate a dirty untracked file is committed."""
     # Clone the openstack-helm repo and automatically checkout patch 73.
     ref = 'refs/changes/54/457754/73'
-    repo_url = 'https://github.com/openstack/openstack-helm'
+    repo_url = 'https://review.opendev.org/openstack/openstack-helm'
     git_dir = git.git_handler(repo_url, ref)
     _validate_git_clone(git_dir, ref)
 
@@ -367,7 +367,7 @@ def test_git_clone_existing_directory_raises_exc_for_invalid_ref(mock_log):
     """
     # Clone the openstack-helm repo and automatically checkout patch 73.
     ref = 'refs/changes/54/457754/73'
-    repo_url = 'https://github.com/openstack/openstack-helm'
+    repo_url = 'https://review.opendev.org/openstack/openstack-helm'
     git_dir = git.git_handler(repo_url, ref)
     _validate_git_clone(git_dir, ref)
 
@@ -429,7 +429,7 @@ def test_git_clone_invalid_remote_url_protocol():
     not test_utils.is_connected(),
     reason='git clone requires network connectivity.')
 def test_git_clone_fake_proxy():
-    url = 'https://github.com/openstack/airship-armada'
+    url = 'https://opendev.org/airship/armada'
     proxy_url = test_utils.rand_name(
         'not.a.proxy.that.works.and.never.will', prefix='http://') + ":8080"
 
@@ -443,7 +443,7 @@ def test_git_clone_fake_proxy():
 @mock.patch('os.path.exists', return_value=True, autospec=True)
 def test_git_clone_ssh_auth_method_fails_auth(_):
     fake_user = test_utils.rand_name('fake_user')
-    url = ('ssh://%s@review.openstack.org:29418/openstack/airship-armada' %
+    url = ('ssh://%s@review.opendev.org:29418/airship/armada' %
            fake_user)
     with pytest.raises(exceptions.GitAuthException):
         git._try_git_clone(
@@ -456,7 +456,7 @@ def test_git_clone_ssh_auth_method_fails_auth(_):
 @mock.patch('os.path.exists', return_value=False, autospec=True)
 def test_git_clone_ssh_auth_method_missing_ssh_key(_):
     fake_user = test_utils.rand_name('fake_user')
-    url = ('ssh://%s@review.openstack.org:29418/openstack/airship-armada' %
+    url = ('ssh://%s@review.opendev.org:29418/airship/armada' %
            fake_user)
     with pytest.raises(exceptions.GitSSHException):
         git.git_handler(
@@ -489,23 +489,23 @@ def test_is_repository():
 
     # airship-treasuremap
     do_test(
-        url='http://github.com/openstack/airship-treasuremap',
+        url='https://review.opendev.org/airship/treasuremap',
         ref='refs/changes/17/597217/1')
     do_test(
-        url='http://github.com/openstack/airship-treasuremap',
+        url='https://review.opendev.org/airship/treasuremap',
         ref='refs/changes/17/597217/1',
         subpath='site')
 
     # airship-in-a-bottle
     do_test(
-        url='http://github.com/openstack/airship-in-a-bottle',
+        url='https://review.opendev.org/airship/in-a-bottle',
         ref='refs/changes/39/596439/1')
     do_test(
-        url='http://github.com/openstack/airship-in-a-bottle',
+        url='https://review.opendev.org/airship/in-a-bottle',
         ref='refs/changes/39/596439/1',
         subpath='deployment_files')
     do_test(
-        url='http://github.com/openstack/airship-in-a-bottle',
+        url='https://review.opendev.org/airship/in-a-bottle',
         ref='refs/changes/39/596439/1',
         subpath='deployment_files/site')
 
@@ -518,12 +518,12 @@ def test_is_repository_negative(temp_path):
     not test_utils.is_connected(),
     reason='git clone requires network connectivity.')
 def test_repo_name_ending_in_git():
-    url = "http://github.com/openstack/airship-pegleg.git"
+    url = "https://opendev.org/airship/pegleg.git"
     git_dir = git.git_handler(url, ref="master")
     _validate_git_clone(git_dir)
 
     name = git.repo_name(git_dir)
-    expected = "airship-pegleg"
+    expected = "pegleg"
     assert name == expected
 
 
@@ -531,12 +531,12 @@ def test_repo_name_ending_in_git():
     not test_utils.is_connected(),
     reason='git clone requires network connectivity.')
 def test_repo_name_not_ending_in_git_and_no_fwd_slash_at_end():
-    url = "http://github.com/openstack/airship-pegleg"
+    url = "https://opendev.org/airship/pegleg"
     git_dir = git.git_handler(url, ref="master")
     _validate_git_clone(git_dir)
 
     name = git.repo_name(git_dir)
-    expected = "airship-pegleg"
+    expected = "pegleg"
     assert name == expected
 
 
@@ -544,12 +544,12 @@ def test_repo_name_not_ending_in_git_and_no_fwd_slash_at_end():
     not test_utils.is_connected(),
     reason='git clone requires network connectivity.')
 def test_repo_name_not_ending_in_git_with_fwd_slash_at_end():
-    url = "http://github.com/openstack/airship-pegleg/"
+    url = "https://opendev.org/airship/pegleg/"
     git_dir = git.git_handler(url, ref="master")
     _validate_git_clone(git_dir)
 
     name = git.repo_name(git_dir)
-    expected = "airship-pegleg"
+    expected = "pegleg"
     assert name == expected
 
 
@@ -559,12 +559,12 @@ def test_repo_name_not_ending_in_git_with_fwd_slash_at_end():
 def test_is_equal():
     """Tests whether 2 repositories are equal => reference same remote repo."""
 
-    url = "http://github.com/openstack/airship-pegleg"
+    url = "https://review.opendev.org/airship/pegleg"
     git_dir1 = git.git_handler(url, ref="master")
     _validate_git_clone(git_dir1)
 
     # Re-clone the same repo using a different ref.
-    url = "http://github.com/openstack/airship-pegleg"
+    url = "https://review.opendev.org/airship/pegleg"
     git_dir2 = git.git_handler(url, ref="refs/changes/40/604640/4")
     _validate_git_clone(git_dir2)
 
