@@ -313,9 +313,19 @@ def show(*, output_stream, site_name):
     default=sys.stdout,
     show_default=True,
     help='Where to output.')
+@click.option(
+    '-v',
+    '--validate',
+    'validate',
+    is_flag=True,
+    default=True,
+    show_default=True,
+    help='Whether to pre-validate documents using built-in schema validation. '
+         'Skips over externally registered DataSchema documents to avoid '
+         'false positives.')
 @SITE_REPOSITORY_ARGUMENT
-def render(*, output_stream, site_name):
-    engine.site.render(site_name, output_stream)
+def render(*, output_stream, site_name, validate):
+    engine.site.render(site_name, output_stream, validate)
 
 
 @site.command('lint', help='Lint a given site in a repository')

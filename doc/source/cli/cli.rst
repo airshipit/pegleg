@@ -337,6 +337,12 @@ Name of site.
 
 Where to output.
 
+**-v/--validate** (Optional). Default is True.
+
+Whether to pre-validate documents using built-in schema validation.
+Skips over externally registered DataSchema documents to avoid
+false positives.
+
 ::
 
   ./pegleg <command> <options> render site_name

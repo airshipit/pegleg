@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+from deckhand.engine import document_validation
 from deckhand.engine import layering
 from deckhand import errors as dh_errors
 
@@ -43,7 +44,7 @@ def load_schemas_from_docs(documents):
 
 def deckhand_render(documents=None,
                     fail_on_missing_sub_src=False,
-                    validate=False):
+                    validate=True):
     documents = documents or []
     errors = []
     rendered_documents = []
@@ -57,6 +58,17 @@ def deckhand_render(documents=None,
             fail_on_missing_sub_src=fail_on_missing_sub_src,
             validate=validate)
         rendered_documents = [dict(d) for d in deckhand_eng.render()]
+        if validate:
+            validator = document_validation.DocumentValidation(
+                rendered_documents)
+            results = validator.validate_all()
+            for result in results:
+                if result['errors']:
+                    errors.append(
+                        (DECKHAND_RENDER_EXCEPTION,
+                         'During rendering Deckhand was unable to validate '
+                         'the following document, details: %s.' % (
+                             result['errors'])))
     except dh_errors.DeckhandException as e:
         errors.append(
             (DECKHAND_RENDER_EXCEPTION,

@@ -83,14 +83,14 @@ def collect(site_name, save_location):
         _collect_to_stdout(site_name)
 
 
-def render(site_name, output_stream):
+def render(site_name, output_stream, validate):
     documents = []
     for filename in util.definition.site_files(site_name):
         with open(filename) as f:
             documents.extend(list(yaml.safe_load_all(f)))
 
     rendered_documents, errors = util.deckhand.deckhand_render(
-        documents=documents)
+        documents=documents, validate=validate)
     err_msg = ''
     if errors:
         for err in errors:
