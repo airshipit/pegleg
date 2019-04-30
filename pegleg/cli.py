@@ -52,8 +52,8 @@ MAIN_REPOSITORY_OPTION = click.option(
     '--site-repository',
     'site_repository',
     required=True,
-    help=('Path or URL to the primary repository (containing '
-          'site_definition.yaml) repo.'))
+    help='Path or URL to the primary repository (containing '
+         'site_definition.yaml) repo.')
 
 EXTRA_REPOSITORY_OPTION = click.option(
     '-e',
@@ -77,10 +77,10 @@ REPOSITORY_USERNAME_OPTION = click.option(
     '-u',
     '--repo-username',
     'repo_username',
-    help=('The SSH username to use when cloning remote authenticated '
-          'repositories specified in the site-definition file. Any '
-          'occurrences of REPO_USERNAME will be replaced with this '
-          'value.'))
+    help='The SSH username to use when cloning remote authenticated '
+         'repositories specified in the site-definition file. Any '
+         'occurrences of REPO_USERNAME will be replaced with this '
+         'value.')
 
 REPOSITORY_CLONE_PATH_OPTION = click.option(
     '-p',
@@ -103,8 +103,8 @@ ALLOW_MISSING_SUBSTITUTIONS_OPTION = click.option(
     required=False,
     type=click.BOOL,
     default=True,
-    help=("Raise Deckhand exception on missing substition sources. "
-          "Defaults to True."))
+    show_default=True,
+    help="Raise Deckhand exception on missing substition sources.")
 
 EXCLUDE_LINT_OPTION = click.option(
     '-x',
@@ -283,7 +283,8 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     'output_stream',
     type=click.File(mode='w'),
     default=sys.stdout,
-    help='Where to output. Defaults to sys.stdout.')
+    show_default=True,
+    help='Where to output.')
 def list_sites(*, output_stream):
     engine.repository.process_site_repository(update_config=True)
     engine.site.list_(output_stream)
@@ -296,7 +297,8 @@ def list_sites(*, output_stream):
     'output_stream',
     type=click.File(mode='w'),
     default=sys.stdout,
-    help='Where to output. Defaults to sys.stdout.')
+    show_default=True,
+    help='Where to output.')
 @SITE_REPOSITORY_ARGUMENT
 def show(*, output_stream, site_name):
     engine.site.show(site_name, output_stream)
@@ -309,7 +311,8 @@ def show(*, output_stream, site_name):
     'output_stream',
     type=click.File(mode='w'),
     default=sys.stdout,
-    help='Where to output. Defaults to sys.stdout.')
+    show_default=True,
+    help='Where to output.')
 @SITE_REPOSITORY_ARGUMENT
 def render(*, output_stream, site_name):
     engine.site.render(site_name, output_stream)
@@ -406,8 +409,8 @@ def secrets():
     '--days',
     'days',
     default=365,
-    help='Duration in days generated certificates should be valid. '
-         'Default is 365 days.')
+    show_default=True,
+    help='Duration in days generated certificates should be valid.')
 @click.argument('site_name')
 def generate_pki(site_name, author, days):
     """Generate certificates, certificate authorities and keypairs for a given
@@ -466,7 +469,8 @@ def generate_pki(site_name, author, days):
     'encrypt',
     is_flag=True,
     default=True,
-    help='Whether to encrypt the wrapped file (default: True).')
+    show_default=True,
+    help='Whether to encrypt the wrapped file.')
 @click.argument('site_name')
 def wrap_secret_cli(*, site_name, author, file_name, output_path, schema,
                     name, layer, encrypt):
@@ -567,7 +571,8 @@ def type(*, site_repository, clone_path, extra_repositories, repo_key,
     'output_stream',
     type=click.File(mode='w'),
     default=sys.stdout,
-    help='Where to output. Defaults to sys.stdout.')
+    show_default=True,
+    help='Where to output.')
 def list_types(*, output_stream):
     """List type names for a given repository."""
     engine.repository.process_site_repository(update_config=True)
@@ -673,8 +678,9 @@ def generate():
     '--length',
     'length',
     default=24,
+    show_default=True,
     help='Generate a passphrase of the given length. '
-         'Length is >= 24, default length is 24, no maximum length')
+         'Length is >= 24, no maximum length.')
 def generate_passphrase(length):
     click.echo("Generated Passhprase: {}".format(
         engine.secrets.generate_crypto_string(length)))
@@ -688,8 +694,9 @@ def generate_passphrase(length):
     '--length',
     'length',
     default=24,
-    help='Generate a salt of the given length. '
-         'Length is >= 24, default length is 24, no maximum length')
+    show_default=True,
+    help='Generate a passphrase of the given length. '
+         'Length is >= 24, no maximum length.')
 def generate_salt(length):
     click.echo("Generated Salt: {}".format(
         engine.secrets.generate_crypto_string(length)))
