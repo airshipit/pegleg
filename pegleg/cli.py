@@ -24,6 +24,7 @@ from pegleg import engine
 from pegleg.engine import bundle
 from pegleg.engine import catalog
 from pegleg.engine.secrets import wrap_secret
+from pegleg.engine.util import files
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 from pegleg.engine.util.shipyard_helper import ShipyardHelper
 
@@ -681,12 +682,24 @@ def encrypt(*, save_location, author, site_name):
     '-f',
     '--filename',
     'file_name',
-    help='The file name to decrypt and print out to stdout')
+    help='The file to decrypt')
+@click.option(
+    '-s',
+    '--save-location',
+    'save_location',
+    default=None,
+    help='The destination where the decrypted file should be saved. '
+         'If not specified, it will be printed to stdout.')
 @click.argument('site_name')
-def decrypt(*, file_name, site_name):
+def decrypt(*, file_name, save_location, site_name):
     engine.repository.process_repositories(site_name)
 
-    click.echo(engine.secrets.decrypt(file_name, site_name))
+    decrypted = engine.secrets.decrypt(file_name, site_name)
+    if save_location is None:
+        click.echo(decrypted)
+    else:
+        files.write(save_location, decrypted)
+        os.chmod(save_location, 0o600)
 
 
 @main.group(help="Miscellaneous generate commands")
