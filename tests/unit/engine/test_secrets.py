@@ -116,7 +116,7 @@ data: {0}-password
     # for _file in encrypted_files:
     decrypted = secrets.decrypt(str(save_location.join(
         "site/cicd/secrets/passphrases/"
-        "cicd-passphrase-encrypted.yaml")), "cicd")
+        "cicd-passphrase-encrypted.yaml")))
     assert yaml.load(decrypted) == yaml.load(passphrase_doc)
 
 
