@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from glob import glob
 import logging
 import os
-import yaml
 
 from prettytable import PrettyTable
+import yaml
 
 from pegleg.engine.catalog.pki_utility import PKIUtility
 from pegleg.engine.generators.passphrase_generator import PassphraseGenerator
@@ -68,7 +69,7 @@ def encrypt(save_location, author, site_name):
             'No secret documents were found for site: {}'.format(site_name))
 
 
-def decrypt(file_path):
+def decrypt(path):
     """Decrypt one secrets file, and print the decrypted file to standard out.
 
     Search the specified file_path for a file.
@@ -77,17 +78,31 @@ def decrypt(file_path):
     If the file is found, but it is not encrypted, print the contents of the
     file to standard out.
     Passphrase and salt for the decryption are read from environment variables.
-    :param file_path: Path to the file to be unwrapped and decrypted.
-    :type file_path: string
+    :param path: Path to the file to be unwrapped and decrypted.
+    :type path: string
     :return: The decrypted secrets
-    :rtype: list
+    :rtype: dict
     """
     LOG.info('Started decrypting...')
-    if os.path.isfile(file_path):
-        return PeglegSecretManagement(file_path).decrypt_secrets()
+    file_dict = {}
+
+    if not os.path.exists(path):
+        LOG.error('Path: {} was not found. Check your path and site name, '
+                  'and try again.'.format(path))
+        return file_dict
+
+    if os.path.isfile(path):
+        file_dict[path] = PeglegSecretManagement(path).decrypt_secrets()
     else:
-        LOG.info('File: {} was not found. Check your file path and name, '
-                 'and try again.'.format(file_path))
+        match = os.path.join(path, '**', '*.yaml')
+        file_list = glob(match, recursive=True)
+        if not file_list:
+            LOG.warning('No YAML files were discovered in path: {}'
+                        .format(path))
+        for file_path in file_list:
+            file_dict[file_path] = PeglegSecretManagement(
+                file_path).decrypt_secrets()
+    return file_dict
 
 
 def _get_dest_path(repo_base, file_path, save_location):

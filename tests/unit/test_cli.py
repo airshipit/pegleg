@@ -555,9 +555,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             assert "encrypted" in ceph_fsid["data"]
             assert "managedDocument" in ceph_fsid["data"]
 
-        relative_file_path = os.path.join("secrets", "passphrases",
-                                          "ceph_fsid.yaml")
-        secrets_opts = ['secrets', 'decrypt', '-f', relative_file_path,
+        secrets_opts = ['secrets', 'decrypt', '-p', file_path,
                         self.site_name]
         result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
         assert result.exit_code == 0, result.output

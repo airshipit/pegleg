@@ -113,11 +113,10 @@ data: {0}-password
     encrypted_files = listdir(save_location_str)
     assert len(encrypted_files) > 0
 
-    # for _file in encrypted_files:
-    decrypted = secrets.decrypt(str(save_location.join(
-        "site/cicd/secrets/passphrases/"
-        "cicd-passphrase-encrypted.yaml")))
-    assert yaml.load(decrypted) == yaml.load(passphrase_doc)
+    encrypted_path = str(save_location.join("site/cicd/secrets/passphrases/"
+                                            "cicd-passphrase-encrypted.yaml"))
+    decrypted = secrets.decrypt(encrypted_path)
+    assert yaml.load(decrypted[encrypted_path]) == yaml.load(passphrase_doc)
 
 
 def test_pegleg_secret_management_constructor():

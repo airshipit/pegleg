@@ -662,9 +662,9 @@ Example without optional save location:
 Decrypt
 ^^^^^^^
 
-Unwrap an encrypted secrets document from a `Pegleg Managed Documents`_,
-decrypt the encrypted secrets, and dump the cleartext secrets file to
-``stdout``.
+Unwrap one or more encrypted secrets document from
+`Pegleg Managed Documents`_, decrypt the encrypted secrets, and dump the
+cleartext to stdout or a specified location.
 
 **site_name** (Required).
 
@@ -673,21 +673,25 @@ repository folder structure. This is used to ensure the correct revision of
 the site and global repositories are used, as specified in the site's
 :file:`site-definition.yaml`.
 
-**-f / filename** (Required).
+**-p / --path** (Required).
 
-The absolute path to the pegleg managed encrypted secrets file.
+Path to pegleg managed encrypted secrets file or directory of files.
 
+**-s / --save-location** (Optional).
 
-**-s / save-location** (Optional).
+The desired output path for the decrypted file. If not specified, decrypted
+data will output to stdout.
 
-The desired output path for the decrypted file. If not specified, it will be
-printed to stdout.
+**-o / --overwrite** (Optional). False by default.
+
+When set, encrypted file(s) at the specified path will be overwritten with
+the decrypted data. Overrides ``--save-location`` option.
 
 Usage:
 
 ::
 
-    ./pegleg.sh site <options> secrets decrypt <site_name> -f <file_path>
+    ./pegleg.sh site <options> secrets decrypt <site_name> -p <path>
       [-s <output_path>]
 
 Examples

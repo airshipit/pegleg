@@ -679,27 +679,45 @@ def encrypt(*, save_location, author, site_name):
     help='Command to unwrap and decrypt one site '
          'secrets document and print it to stdout.')
 @click.option(
-    '-f',
-    '--filename',
-    'file_name',
-    help='The file to decrypt')
+    '-p',
+    '--path',
+    'path',
+    type=click.Path(exists=True, readable=True),
+    required=True,
+    help='The file or directory path to decrypt.')
 @click.option(
     '-s',
     '--save-location',
     'save_location',
     default=None,
-    help='The destination where the decrypted file should be saved. '
-         'If not specified, it will be printed to stdout.')
+    help='The destination where the decrypted file(s) should be saved. '
+         'If not specified, decrypted data will output to stdout.')
+@click.option(
+    '-o',
+    '--overwrite',
+    'overwrite',
+    is_flag=True,
+    default=False,
+    help='Overwrites original file(s) at path with decrypted data when set. '
+         'Overrides --save-location option.')
 @click.argument('site_name')
-def decrypt(*, file_name, save_location, site_name):
+def decrypt(*, path, save_location, overwrite, site_name):
     engine.repository.process_repositories(site_name)
 
-    decrypted = engine.secrets.decrypt(file_name)
-    if save_location is None:
-        click.echo(decrypted)
+    decrypted = engine.secrets.decrypt(path)
+    if overwrite:
+        for key, value in decrypted.items():
+            files.write(key, value)
+            os.chmod(key, 0o600)
+    elif save_location is None:
+        for value in decrypted.values():
+            click.echo(value)
     else:
-        files.write(save_location, decrypted)
-        os.chmod(save_location, 0o600)
+        for key, value in decrypted.items():
+            file_name = os.path.split(key)
+            file_save_location = os.path.join(save_location, file_name)
+            files.write(file_save_location, value)
+            os.chmod(file_save_location, 0o600)
 
 
 @main.group(help="Miscellaneous generate commands")
