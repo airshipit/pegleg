@@ -19,13 +19,11 @@
     check:
       jobs:
         - openstack-tox-pep8
-        - airship-pegleg-tox-py36
         - airship-pegleg-doc-build
         - airship-pegleg-docker-build-gate
     gate:
       jobs:
         - openstack-tox-pep8
-        - airship-pegleg-tox-py36
         - airship-pegleg-doc-build
         - airship-pegleg-docker-build-gate
     post:
@@ -37,20 +35,6 @@
     nodes:
       - name: primary
         label: ubuntu-xenial
-
-- job:
-    name: airship-pegleg-tox-py36
-    description: |
-      Executes unit tests under Python 3.6
-    parent: openstack-tox-py36
-    pre-run:
-      - tools/gate/playbooks/install-cfssl.yaml
-    irrelevant-files:
-      - ^.*\.rst$
-      - ^doc/.*$
-      - ^etc/.*$
-      - ^releasenotes/.*$
-      - ^setup.cfg$
 
 - job:
     name: airship-pegleg-doc-build
