@@ -2,6 +2,7 @@
 pytest==3.2.1
 pytest-cov==2.5.1
 testfixtures
+pytest-xdist==1.23.2
 mock==2.0.0
 
 # Formatting

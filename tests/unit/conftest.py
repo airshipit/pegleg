@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import atexit
 import copy
-
 import os
-import pytest
 import shutil
 import tempfile
+
+import pytest
 
 from pegleg import config
 """Fixtures that are applied to all unit tests."""
@@ -35,7 +36,10 @@ def restore_config():
         config.GLOBAL_CONTEXT = original_global_context
 
 
-@pytest.fixture(scope="module", autouse=True)
+# NOTE(felipemonteiro): This uses `atexit` rather than a `pytest.fixture`
+# decorator because 1) this only needs to be run exactly once and 2) this
+# works across multiple test executors via `pytest -n <num_cores>`
+@atexit.register
 def clean_temporary_git_repos():
     """Iterates through all temporarily created directories and deletes each
     one that was created for testing.
@@ -51,8 +55,5 @@ def clean_temporary_git_repos():
                 if any(p.startswith('airship') for p in os.listdir(path)):
                     yield path
 
-    try:
-        yield
-    finally:
-        for tempdir in temporary_git_repos():
-            shutil.rmtree(tempdir, ignore_errors=True)
+    for tempdir in temporary_git_repos():
+        shutil.rmtree(tempdir, ignore_errors=True)
