@@ -27,8 +27,8 @@ from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument as PeglegManagedSecret
 
 LOG = logging.getLogger(__name__)
-PASSPHRASE_PATTERN = '^.{24,}$'
-ENV_PASSPHRASE = 'PEGLEG_PASSPHRASE'
+PASSPHRASE_PATTERN = '^.{24,}$'  # nosec (alexanderhughes)
+ENV_PASSPHRASE = 'PEGLEG_PASSPHRASE'  # nosec (alexanderhughes)
 ENV_SALT = 'PEGLEG_SALT'
 
 
