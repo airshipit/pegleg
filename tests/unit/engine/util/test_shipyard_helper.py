@@ -14,12 +14,9 @@
 
 import os
 
-import json
 import mock
 import pytest
-
-from tests.unit import test_utils
-from mock import ANY
+import yaml
 
 from pegleg.engine import util
 from pegleg.engine.util.pegleg_secret_management import ENV_PASSPHRASE
@@ -28,14 +25,35 @@ from pegleg.engine.util.shipyard_helper import ShipyardHelper
 from pegleg.engine.util.shipyard_helper import ShipyardClient
 
 # Dummy data to be used as collected documents
-DATA = {'test-repo':
+DATA = {
+    'test-repo':
         [{'schema': 'pegleg/SiteDefinition/v1',
-            'metadata': {'schema': 'metadata/Document/v1',
-                         'layeringDefinition': {'abstract': False,
-                                                'layer': 'site'},
-                         'name': 'site-name',
-                         'storagePolicy': 'cleartext'},
-            'data': {'site_type': 'foundry'}}]}
+          'metadata': {'schema': 'metadata/Document/v1',
+                       'layeringDefinition': {'abstract': False,
+                                              'layer': 'site'},
+                       'name': 'site-name',
+                       'storagePolicy': 'cleartext'},
+          'data': {'site_type': 'foundry'}}]}
+
+MULTI_REPO_DATA = {
+    'repo1':
+        [{'schema': 'pegleg/SiteDefinition/v1',
+          'metadata': {'schema': 'metadata/Document/v1',
+                       'layeringDefinition': {'abstract': False,
+                                              'layer': 'site'},
+                       'name': 'site-name',
+                       'storagePolicy': 'cleartext'},
+          'data': {'site_type': 'foundry'}}],
+    'repo2':
+        [{'schema': 'pegleg/SiteDefinition/v1',
+          'metadata': {'schema': 'metadata/Document/v1',
+                       'layeringDefinition': {'abstract': False,
+                                              'layer': 'site'},
+                       'name': 'site-name',
+                       'storagePolicy': 'cleartext'},
+          'data': {'site_type': 'foundry'}}]
+
+}
 
 
 @pytest.fixture(autouse=True)
@@ -50,6 +68,7 @@ class context():
 
 class FakeResponse():
     code = 404
+
 
 def _get_context():
     ctx = context()
@@ -67,7 +86,9 @@ def _get_context():
     }
     ctx.obj['context_marker'] = '88888888-4444-4444-4444-121212121212'
     ctx.obj['site_name'] = 'test-site'
+    ctx.obj['collection'] = 'test-site'
     return ctx
+
 
 def _get_bad_context():
     ctx = context()
@@ -85,7 +106,16 @@ def _get_bad_context():
     }
     ctx.obj['context_marker'] = '88888888-4444-4444-4444-121212121212'
     ctx.obj['site_name'] = 'test-site'
+    ctx.obj['collection'] = None
     return ctx
+
+
+def _get_data_as_collection(data):
+    collection = []
+    for repo, documents in data.items():
+        for document in documents:
+            collection.append(document)
+    return yaml.dump_all(collection, Dumper=yaml.SafeDumper)
 
 
 def test_shipyard_helper_init_():
@@ -102,8 +132,9 @@ def test_shipyard_helper_init_():
     assert shipyard_helper.site_name == context.obj['site_name']
     assert isinstance(shipyard_helper.api_client, ShipyardClient)
 
+
 @mock.patch('pegleg.engine.util.files.collect_files_by_repo', autospec=True,
-            return_value=DATA)
+            return_value=MULTI_REPO_DATA)
 @mock.patch.object(ShipyardHelper, 'formatted_response_handler',
                    autospec=True, return_value=None)
 @mock.patch.dict(os.environ, {
@@ -119,18 +150,21 @@ def test_upload_documents(*args):
     # 3) Check documents uploaded to Shipyard with correct parameters
 
     context = _get_context()
-    shipyard_helper = ShipyardHelper(context)
     with mock.patch('pegleg.engine.util.shipyard_helper.ShipyardClient',
                     autospec=True) as mock_shipyard:
         mock_api_client = mock_shipyard.return_value
         mock_api_client.post_configdocs.return_value = 'Success'
-        result = ShipyardHelper(context).upload_documents()
+        result = ShipyardHelper(context, 'replace').upload_documents()
 
         # Validate Shipyard call to post configdocs was invoked with correct
         # collection name and buffer mode.
-        mock_api_client.post_configdocs.assert_called_with('test-repo',
-                                            None, ANY)
+        expected_data = _get_data_as_collection(MULTI_REPO_DATA)
+        mock_api_client.post_configdocs.assert_called_with(
+            collection_id='test-site',
+            buffer_mode='replace',
+            document_data=expected_data)
         mock_api_client.post_configdocs.assert_called_once()
+
 
 @mock.patch('pegleg.engine.util.files.collect_files_by_repo', autospec=True,
             return_value=DATA)
@@ -158,6 +192,7 @@ def test_upload_documents_fail(*args):
         with pytest.raises(util.shipyard_helper.DocumentUploadError):
             ShipyardHelper(context).upload_documents()
 
+
 @mock.patch('pegleg.engine.util.files.collect_files_by_repo', autospec=True,
             return_value=DATA)
 @mock.patch.object(ShipyardHelper, 'formatted_response_handler',
@@ -174,6 +209,7 @@ def test_fail_auth(*args):
 
     with pytest.raises(util.shipyard_helper.AuthValuesError):
         ShipyardHelper(context).validate_auth_vars()
+
 
 @mock.patch.object(ShipyardHelper, 'formatted_response_handler',
                    autospec=True, return_value=None)

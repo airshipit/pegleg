@@ -52,7 +52,7 @@ class ShipyardHelper(object):
     4. Formats response from Shipyard api_client
     """
 
-    def __init__(self, context, buffer_mode='auto'):
+    def __init__(self, context, buffer_mode='replace'):
         """
         Initializes params to be used by Shipyard
 
@@ -72,80 +72,69 @@ class ShipyardHelper(object):
             self.auth_vars, self.context_marker)
         self.api_client = ShipyardClient(self.client_context)
         self.buffer_mode = buffer_mode
+        self.collection = self.ctx.obj.get('collection', self.site_name)
 
     def upload_documents(self):
-        """Uploads documents to Shipyard """
+        """Uploads documents to Shipyard"""
 
         collected_documents = files.collect_files_by_repo(self.site_name)
 
-        LOG.info("Uploading %d collection(s) ", len(collected_documents))
+        collection_data = []
+        LOG.info("Processing %d collection(s)", len(collected_documents))
         for idx, document in enumerate(collected_documents):
-            # Append flag is not required for the first
-            # collection being uploaded to Shipyard. It
-            # is needed for subsequent collections.
-            if self.buffer_mode == 'auto':
-                if idx == 0:
-                    buffer_mode = None
-                else:
-                    buffer_mode = 'append'
-            elif self.buffer_mode == 'append' or self.buffer_mode == 'replace':
-                buffer_mode = self.buffer_mode
-            else:
-                raise exceptions.InvalidBufferModeException()
-
             # Decrypt the documents if encrypted
             pegleg_secret_mgmt = PeglegSecretManagement(
                 docs=collected_documents[document])
             decrypted_documents = pegleg_secret_mgmt.get_decrypted_secrets()
-            data = yaml.safe_dump_all(decrypted_documents)
+            collection_data.extend(decrypted_documents)
+        collection_as_yaml = yaml.dump_all(collection_data,
+                                           Dumper=yaml.SafeDumper)
 
-            try:
-                self.validate_auth_vars()
-                # Get current buffer status.
-                response = self.api_client.get_configdocs_status()
-                buff_stat = response.json()
-                # If buffer is empty then proceed with existing buffer value
-                # else pass the 'replace' flag.
-                for stat in range(len(buff_stat)):
-                    if (buff_stat[stat]['new_status'] != 'unmodified' and
-                            buffer_mode != 'append'):
-                        buffer_mode = 'replace'
-                resp_text = self.api_client.post_configdocs(
-                    collection_id=document,
-                    buffer_mode=buffer_mode,
-                    document_data=data
-                )
+        # Append flag is not required for the first
+        # collection being uploaded to Shipyard. It
+        # is needed for subsequent collections.
+        if self.buffer_mode in ['append', 'replace']:
+            buffer_mode = self.buffer_mode
+        else:
+            raise exceptions.InvalidBufferModeException()
 
-            except AuthValuesError as ave:
-                resp_text = "Error: {}".format(ave.diagnostic)
-                raise DocumentUploadError(resp_text)
-            except Exception as ex:
-                resp_text = (
-                    "Error: Unable to invoke action due to: {}"
-                    .format(str(ex)))
-                LOG.debug(resp_text, exc_info=True)
-                raise DocumentUploadError(resp_text)
+        try:
+            self.validate_auth_vars()
+            resp_text = self.api_client.post_configdocs(
+                collection_id=self.collection,
+                buffer_mode=buffer_mode,
+                document_data=collection_as_yaml
+            )
 
-            # FIXME: Standardize status_code in Deckhand to avoid this
-            # workaround.
-            code = 0
-            if hasattr(resp_text, 'status_code'):
-                code = resp_text.status_code
-            elif hasattr(resp_text, 'code'):
-                code = resp_text.code
-            if code >= 400:
-                if hasattr(resp_text, 'content'):
-                    raise DocumentUploadError(resp_text.content)
-                else:
-                    raise DocumentUploadError(resp_text)
+        except AuthValuesError as ave:
+            resp_text = "Error: {}".format(ave.diagnostic)
+            raise DocumentUploadError(resp_text)
+        except Exception as ex:
+            resp_text = (
+                "Error: Unable to invoke action due to: {}"
+                .format(str(ex)))
+            LOG.debug(resp_text, exc_info=True)
+            raise DocumentUploadError(resp_text)
+
+        # FIXME: Standardize status_code in Deckhand to avoid this
+        # workaround.
+        code = 0
+        if hasattr(resp_text, 'status_code'):
+            code = resp_text.status_code
+        elif hasattr(resp_text, 'code'):
+            code = resp_text.code
+        if code >= 400:
+            if hasattr(resp_text, 'content'):
+                raise DocumentUploadError(resp_text.content)
             else:
-                output = self.formatted_response_handler(resp_text)
-                LOG.info("Uploaded document in buffer %s ", output)
+                raise DocumentUploadError(resp_text)
+        else:
+            output = self.formatted_response_handler(resp_text)
+            LOG.info("Uploaded document in buffer %s ", output)
 
         # Commit in the last iteration of the loop when all the documents
         # have been pushed to Shipyard buffer.
-        if idx == len(collected_documents) - 1:
-            return self.commit_documents()
+        return self.commit_documents()
 
     def commit_documents(self):
         """Commit Shipyard buffer documents """

@@ -427,13 +427,18 @@ collection does not already exist in the Shipyard buffer.
 replace: Clear the Shipyard Buffer before adding the specified
 collection.
 
-auto: Let Pegleg determine the appropriate buffer mode to use.
+**--collection** (Required, Default=<site_name>).
+
+Specifies the name of the compiled collection of documents that will be
+uploaded to Shipyard.
 
 Usage:
 
 ::
 
-    ./pegleg.sh site <options> upload <site_name> --context-marker=<uuid> --buffer=<buffer>
+    ./pegleg.sh site <options> upload <site_name> --context-marker=<uuid> \
+                                                  --buffer-mode=<buffer> \
+                                                  --collection=<collection>
 
 Site Secrets Group
 ------------------

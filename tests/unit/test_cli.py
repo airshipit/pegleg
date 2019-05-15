@@ -13,10 +13,8 @@
 # limitations under the License.
 
 import os
-import shutil
 
 from click.testing import CliRunner
-from mock import ANY
 import mock
 import pytest
 import yaml
@@ -375,6 +373,8 @@ class TestSiteCliActions(BaseCLIActionTest):
         repo_path = self.treasuremap_path
         self._validate_render_site_action(repo_path)
 
+    ### Upload tests ###
+
     def test_upload_documents_shipyard_using_local_repo_path(self):
         """Validates ShipyardHelper is called with correct arguments."""
         # Scenario:
@@ -387,8 +387,25 @@ class TestSiteCliActions(BaseCLIActionTest):
         with mock.patch('pegleg.cli.ShipyardHelper') as mock_obj:
             result = self.runner.invoke(cli.site,
                                         ['-r', repo_path, 'upload',
-                                         self.site_name])
+                                         self.site_name, '--collection',
+                                         'collection'])
 
+        assert result.exit_code == 0
+        mock_obj.assert_called_once()
+
+    def test_upload_collection_callback_default_to_site_name(self):
+        """Validates that collection will default to the given site_name"""
+        # Scenario:
+        #
+        # 1) Mock out ShipyardHelper
+        # 2) Check that ShipyardHelper was called with collection set to
+        #    site_name
+        repo_path = self.treasuremap_path
+
+        with mock.patch('pegleg.cli.ShipyardHelper') as mock_obj:
+            result = self.runner.invoke(cli.site,
+                                        ['-r', repo_path, 'upload',
+                                         self.site_name])
         assert result.exit_code == 0
         mock_obj.assert_called_once()
 

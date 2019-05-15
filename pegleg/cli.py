@@ -346,6 +346,13 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
         warn_lint=warn_lint)
 
 
+def collection_default_callback(ctx, param, value):
+    LOG.debug('Evaluating %s: %s', param.name, value)
+    if not value:
+        return ctx.params['site_name']
+    return value
+
+
 @site.command('upload', help='Upload documents to Shipyard')
 # Keystone authentication parameters
 @click.option('--os-project-domain-name',
@@ -374,20 +381,26 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
     '--buffer-mode',
     'buffer_mode',
     required=False,
-    default='auto',
+    default='replace',
     show_default=True,
+    type=click.Choice(['append', 'replace']),
     help='Set the buffer mode when uploading documents. Supported buffer '
          'modes include append, replace, auto.\n'
          'append: Add the collection to the Shipyard Buffer, only if that '
          'collection does not already exist in the Shipyard buffer.\n'
          'replace: Clear the Shipyard Buffer before adding the specified '
-         'collection.\n'
-         'auto: Let Pegleg determine the appropriate buffer mode to use.')
+         'collection.\n')
+@click.option(
+    '--collection',
+    'collection',
+    help='Specifies the name to use for the uploaded collection. '
+         'Defaults to the specified `site_name`.',
+    callback=collection_default_callback)
 @SITE_REPOSITORY_ARGUMENT
 @click.pass_context
-def upload(ctx, *, os_project_domain_name,
-           os_user_domain_name, os_project_name, os_username,
-           os_password, os_auth_url, context_marker, site_name, buffer_mode):
+def upload(ctx, *, os_project_domain_name, os_user_domain_name,
+           os_project_name, os_username, os_password, os_auth_url,
+           context_marker, site_name, buffer_mode, collection):
     if not ctx.obj:
         ctx.obj = {}
 
@@ -406,6 +419,7 @@ def upload(ctx, *, os_project_domain_name,
     }
     ctx.obj['context_marker'] = str(context_marker)
     ctx.obj['site_name'] = site_name
+    ctx.obj['collection'] = collection
 
     click.echo(ShipyardHelper(ctx, buffer_mode).upload_documents())
 
