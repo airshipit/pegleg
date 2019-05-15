@@ -791,7 +791,7 @@ Usage:
 
 ::
     ./pegleg.sh site <options> genesis_bundle <site_name> \
-      -b <build_locaton> -k <encryption_passphrase/key> --validators
+      -b <build_locaton> -k <encryption_passphrase/key> --include-validators
 
 Examples
 ^^^^^^^^
@@ -802,7 +802,7 @@ Examples
       genesis_bundle site1 \
       -b ../../site1_build \
       -k yourEncryptionPassphrase \
-      --validators
+      --include-validators
 
 generate
 ^^^^^^^^
