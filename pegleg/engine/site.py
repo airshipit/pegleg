@@ -16,10 +16,12 @@ import logging
 import os
 
 import click
+import git
 import yaml
 
 from prettytable import PrettyTable
 
+from pegleg import config
 from pegleg.engine import util
 from pegleg.engine.util import files
 
@@ -48,6 +50,13 @@ def _collect_to_stdout(site_name):
             for line in _read_and_format_yaml(filename):
                 # This code is a pattern to convert \r\n to \n.
                 click.echo("\n".join(line.splitlines()))
+        res = yaml.safe_dump(_get_deployment_data_doc(),
+                             explicit_start=True,
+                             explicit_end=True,
+                             default_flow_style=False)
+        # Click isn't splitting these lines correctly, so do it manually
+        for line in res.split('\n'):
+            click.echo(line)
     except Exception as ex:
         raise click.ClickException("Error printing output: %s" % str(ex))
 
@@ -60,6 +69,8 @@ def _collect_to_file(site_name, save_location):
     files.check_file_save_location(save_location)
 
     save_files = dict()
+    curr_site_repo = files.path_leaf(config.get_site_repo())
+
     try:
         for repo_base, filename in util.definition.site_files_by_repo(
                 site_name):
@@ -69,6 +80,9 @@ def _collect_to_file(site_name, save_location):
                 save_files[repo_name] = open(save_file, "w")
             LOG.debug("Collecting file %s to file %s", filename, save_file)
             save_files[repo_name].writelines(_read_and_format_yaml(filename))
+        save_files[curr_site_repo].writelines(yaml.safe_dump(
+            _get_deployment_data_doc(), default_flow_style=False,
+            explicit_start=True, explicit_end=True))
     except Exception as ex:
         raise click.ClickException("Error saving output: %s" % str(ex))
     finally:
@@ -140,3 +154,55 @@ def show(site_name, output_stream):
                 ["", data['site_name'], data['site_type'], file])
     # Write tables to specified output_stream
     output_stream.write(site_table.get_string() + "\n")
+
+
+def _get_deployment_data_doc():
+    stanzas = {files.path_leaf(repo): _get_repo_deployment_data_stanza(repo)
+               for repo in config.all_repos()}
+    return {
+        "schema": "pegleg/DeploymentData/v1",
+        "metadata": {
+            "schema": "metadata/Document/v1",
+            "name": "deployment-version",
+        },
+        "layeringDefinition": {
+            "abstract": "false",
+            "layer": "global"
+        },
+        "storagePolicy": "cleartext",
+        "data": {
+            "documents": stanzas
+        }
+    }
+
+
+def _get_repo_deployment_data_stanza(repo_path):
+    try:
+        repo = git.Repo(repo_path)
+        commit = repo.commit()
+
+        # If we're at a particular tag, reference it
+        tag = [tag.name for tag in
+               repo.tags if tag.commit == commit]
+        if tag:
+            tag == ", ".join(tag)
+        else:
+            # Otherwise just use the branch name
+            try:
+                tag = repo.active_branch.name
+            except TypeError as e:
+                if "HEAD is a detached symbolic reference" in str(e):
+                    tag = "Detached HEAD"
+                else:
+                    raise e
+        return {
+            "commit": commit.hexsha,
+            "tag": tag,
+            "dirty": repo.is_dirty()
+        }
+    except git.InvalidGitRepositoryError:
+        return {
+            "commit": "None",
+            "tag": "None",
+            "dirty": "None"
+        }

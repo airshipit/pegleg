@@ -58,6 +58,7 @@ def _expected_document_names(site_name):
         _site_definition(site_name)["metadata"]["name"],
         '%s-chart' % site_name,
         '%s-passphrase' % site_name,
+        'deployment-version'
     ]
     return EXPECTED_DOCUMENT_NAMES
 
@@ -77,6 +78,7 @@ def _test_site_collect_to_file(tmpdir, site_name, collection_path):
 
         assert sorted(_expected_document_names(site_name)) == sorted(
             [x['metadata']['name'] for x in deployment_documents])
+        assert "pegleg/DeploymentData/v1" in lines
     finally:
         if os.path.exists(collection_str_path):
             shutil.rmtree(collection_str_path, ignore_errors=True)
@@ -96,8 +98,9 @@ def _test_site_collect_to_stdout(site_name):
     all_lines = [x[1][0].strip() for x in mock_echo.mock_calls]
 
     assert all_lines, "Nothing written to stdout"
+    assert any("pegleg/DeploymentData/v1" in line for line in all_lines)
     for expected in expected_names:
-        assert 'name: %s' % expected in all_lines
+        assert 'name: {}'.format(expected) in all_lines
 
 
 def test_site_collect_to_stdout(create_tmp_deployment_files):
