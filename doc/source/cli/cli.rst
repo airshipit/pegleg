@@ -77,7 +77,7 @@ For example:
 CLI Options
 ===========
 
-**-v / --verbose** (Optional). False by default.
+**-v / --verbose** (Optional, Default=False).
 
 Enable debug logging.
 
@@ -103,15 +103,15 @@ The revision can also be specified via (for example):
 
   -r /opt/airship-treasuremap@revision
 
-**-p / --clone-path** (Optional).
+**-p / --clone-path** (Optional, Default=/tmp/).
 
-The path where the repo will be cloned. By default the repo will be cloned to
-the /tmp path. If this option is included and the repo already exists, then the
-repo will not be cloned again and the user must specify a new clone path or
-pass in the local copy of the repository as the site repository. Suppose the
-repo name is airship-treasuremap and the clone path is /tmp/mypath then the
-following directory is created /tmp/mypath/airship-treasuremap which will
-contain the contents of the repo. Example of using clone path:
+The path where the repo will be cloned. If this option is included and the
+repo already exists, then the repo will not be cloned again and the user must
+specify a new clone path or pass in the local copy of the repository as the
+site repository. Suppose the repo name is airship-treasuremap and the clone
+path is /tmp/mypath then the following directory is created
+/tmp/mypath/airship-treasuremap which will contain the contents of the repo.
+Example of using clone path:
 
 ::
 
@@ -164,15 +164,15 @@ These should be named per the site-definition file, e.g.:
 
   -e global=/opt/global -e secrets=/opt/secrets
 
-**-p / --clone-path** (Optional).
+**-p / --clone-path** (Optional, Default=/tmp/).
 
-The path where the repo will be cloned. By default the repo will be cloned to
-the /tmp path. If this option is included and the repo already exists, then the
-repo will not be cloned again and the user must specify a new clone path or
-pass in the local copy of the repository as the site repository. Suppose the
-repo name is airship-treasuremap and the clone path is /tmp/mypath then the
-following directory is created /tmp/mypath/airship-treasuremap which will
-contain the contents of the repo. Example of using clone path:
+The path where the repo will be cloned. If this option is included and the
+repo already exists, then the repo will not be cloned again and the user must
+specify a new clone path or pass in the local copy of the repository as the
+site repository. Suppose the repo name is airship-treasuremap and the clone
+path is /tmp/mypath then the following directory is created
+/tmp/mypath/airship-treasuremap which will contain the contents of the repo.
+Example of using clone path:
 
 ::
 
@@ -231,15 +231,15 @@ Name of the site.
 Where to output collected documents. If omitted, the results will be dumped
 to ``stdout``.
 
-**-x <code>** (Optional, validation only).
+**-x** (Optional, validation only).
 
 Will exclude the specified lint option. -w takes priority over -x.
 
-**-w <code>** (Optional, validation only).
+**-w** (Optional, validation only).
 
 Will warn of lint failures from the specified lint options.
 
-**--validate** (Optional, validation only). False by default.
+**--validate** (Optional, validation only, Default=False).
 
 Perform validation of documents prior to collection. See :ref:`cli-site-lint`
 for additional information on document linting. It is recommended that document
@@ -277,15 +277,13 @@ List
 
 List known sites.
 
-**-o/--output** (Optional).
+**-o / --output** (Optional, Default=stdout).
 
 Where to output.
 
 ::
 
   ./pegleg <command> <options> list
-
-Results are dumped to ``stdout`` by default.
 
 Examples
 ^^^^^^^^
@@ -305,15 +303,13 @@ Show details for one site.
 
 Name of site.
 
-**-o/--output** (Optional).
+**-o / --output** (Optional, Default=stdout).
 
 Where to output.
 
 ::
 
   ./pegleg <command> <options> show site_name
-
-Results are dumped to ``stdout`` by default.
 
 Examples
 ^^^^^^^^
@@ -333,11 +329,11 @@ Render documents via `Deckhand`_ for one site.
 
 Name of site.
 
-**-o/--output** (Optional).
+**-o / --output** (Optional, Default=stdout).
 
 Where to output.
 
-**-v/--validate** (Optional). Default is True.
+**-v / --validate** (Optional, Default=True).
 
 Whether to pre-validate documents using built-in schema validation.
 Skips over externally registered DataSchema documents to avoid
@@ -346,8 +342,6 @@ false positives.
 ::
 
   ./pegleg <command> <options> render site_name
-
-Results are dumped to ``stdout`` by default.
 
 Examples
 ^^^^^^^^
@@ -407,7 +401,7 @@ Uploads documents to `Shipyard`_.
 Name of the site. The ``site_name`` must match a ``site`` name in the site
 repository folder structure
 
-**--os-<various>=<value>** (Required).
+**--os-<various>** (Required).
 
 Shipyard needs these options for authenticating with OpenStack Keystone.
 This option can be set as environment variables or it can be passed via
@@ -415,12 +409,12 @@ the command line.
 
 Please reference Shipyard's `CLI documentation`_ for information related to these options.
 
-**--context-marker=<uuid>** (Optional).
+**--context-marker** (Optional).
 
 Specifies a UUID (8-4-4-4-12 format) that will be used to correlate logs,
 transactions, etc. in downstream activities triggered by this interaction.
 
-**-b / --buffer-mode** (Optional).  Default is auto.
+**-b / --buffer-mode** (Optional, Default=auto).
 
 Set the buffer mode when uploading documents. Supported buffer modes
 include append, replace, auto.
@@ -496,22 +490,16 @@ Dashes in the document names will be converted to underscores for consistency.
 
 Name of site.
 
-**-d / --days** (Optional).
+**-d / --days** (Optional, Default=365).
 
-Duration (in days) certificates should be valid.  Default=365,
-minimum=0, no maximum.  Values less than 0 will raise an exception.
+Duration (in days) certificates should be valid.
+Minimum=0, no maximum.  Values less than 0 will raise an exception.
 
 NOTE: A generated certificate where days = 0 should only be used for testing.
 A certificate generated in such a way will be valid for 0 seconds.
 
 Examples
 """"""""
-
-::
-
-    ./pegleg.sh site -r <site_repo> -e <extra_repo> \
-      upload <site_name> <options>
-
 
 ::
 
@@ -532,10 +520,10 @@ Determine if any PKI certificates from a site are expired, or will be expired
 within ``days`` days.  If any are found, print the cert names and expiration
 dates to ``stdout``.
 
-**-d / --days** (Optional).
+**-d / --days** (Optional, Default=60).
 
-Duration (in days) to check certificate validity from today.  Default=60,
-minimum=0, no maximum.  Values less than 0 will raise an exception.
+Duration (in days) to check certificate validity from today.
+Minimum=0, no maximum.  Values less than 0 will raise an exception.
 
 NOTE: Checking PKI certs where days = 0 will check for certs that are expired
 at the time the command is run.
@@ -752,9 +740,9 @@ The name for the document to be wrapped, e.g. new-cert.
 
 The layer for the document to be wrapped, e.g. site.
 
-**--encrypt / --no-encrypt**
+**--encrypt / --no-encrypt** (Default=True).
 
-A flag specifying whether to encrypt the output file. (default: True)
+A flag specifying whether to encrypt the output file.
 
 Examples
 """"""""
@@ -783,7 +771,7 @@ Constructs genesis bundle based on a site configuration.
 
 Destination directory for the genesis bundle.
 
-**--include-validators** (Optional). False by default.
+**--include-validators** (Optional, Default=False).
 
 A flag to request build genesis validation scripts as well.
 
@@ -965,15 +953,15 @@ Valid Git references for checking out repositories include:
 Linting
 =======
 
-**-f / --fail-on-missing-sub-src** (Optional).
+**-f / --fail-on-missing-sub-src** (Optional, Default=True).
 
-Raise Deckhand exception on missing substitution sources. Defaults to True.
+Raise Deckhand exception on missing substitution sources.
 
-**-x <code>** (Optional).
+**-x** (Optional).
 
 Will exclude the specified lint option. -w takes priority over -x.
 
-**-w <code>** (Optional).
+**-w** (Optional).
 
 Will warn of lint failures from the specified lint options.
 
@@ -1013,9 +1001,9 @@ Passphrase
 
 Generate a passphrase and print to ``stdout``.
 
-**-l / --length** (Optional).
+**-l / --length** (Optional, Default=24).
 
-Length of passphrase to generate.  By default length is 24.
+Length of passphrase to generate.
 Minimum length is 24. Lengths less than minimum will default to 24.
 No maximum length.
 
@@ -1045,9 +1033,9 @@ Salt
 
 Generate a salt and print to ``stdout``.
 
-**-l / --length** (Optional).
+**-l / --length** (Optional, Default=24).
 
-Length of salt to generate.  By default length is 24.
+Length of salt to generate.
 Minimum length is 24. Lengths less than minimum will default to 24.
 No maximum length.
 
