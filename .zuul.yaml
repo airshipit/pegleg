@@ -12,20 +12,22 @@
 
 - project:
     templates:
+      - docs-on-readthedocs
       - openstack-python36-jobs
       - openstack-python37-jobs
       - openstack-cover-jobs
       - release-notes-jobs-python3
+    vars:
+      rtd_webhook_id: '38574'
+      rtd_project_name: 'airship-pegleg'
     check:
       jobs:
         - openstack-tox-pep8
-        - airship-pegleg-doc-build
         - airship-pegleg-docker-build-gate-ubuntu
         - airship-pegleg-docker-build-gate-opensuse
     gate:
       jobs:
         - openstack-tox-pep8
-        - airship-pegleg-doc-build
         - airship-pegleg-docker-build-gate-ubuntu
         - airship-pegleg-docker-build-gate-opensuse
     post:
@@ -38,17 +40,6 @@
     nodes:
       - name: primary
         label: ubuntu-xenial
-
-- job:
-    name: airship-pegleg-doc-build
-    description: |
-      Locally build the documentation to check for errors
-    run: tools/gate/playbooks/doc-build.yaml
-    timeout: 300
-    nodeset: airship-pegleg-single-node
-    irrelevant-files:
-      - ^tests/.*$
-      - ^setup.cfg$
 
 - job:
     name: airship-pegleg-docker-build-gate-ubuntu
