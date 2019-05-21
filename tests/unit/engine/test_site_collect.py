@@ -19,13 +19,8 @@ import yaml
 
 import click
 
-from pegleg import cli
-from pegleg import config
-from pegleg.engine import errorcodes
-from pegleg.engine import lint
 from pegleg.engine import site
 from pegleg.engine.util import deckhand
-from pegleg.engine.util import files
 from tests.unit.fixtures import create_tmp_deployment_files
 
 
@@ -79,6 +74,14 @@ def _test_site_collect_to_file(tmpdir, site_name, collection_path):
         assert sorted(_expected_document_names(site_name)) == sorted(
             [x['metadata']['name'] for x in deployment_documents])
         assert "pegleg/DeploymentData/v1" in lines
+
+        # Make sure our generated YAMLs are valid
+        deckhand.deckhand_render(
+            documents=deployment_documents,
+            fail_on_missing_sub_src=False,
+            validate=True,
+        )
+
     finally:
         if os.path.exists(collection_str_path):
             shutil.rmtree(collection_str_path, ignore_errors=True)
