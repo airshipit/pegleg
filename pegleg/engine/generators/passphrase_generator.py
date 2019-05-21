@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 from getpass import getpass
 import logging
 
@@ -69,6 +70,11 @@ class PassphraseGenerator(BaseGenerator):
             if not passphrase:
                 passphrase = self._pass_util.get_crypto_string(
                     self._catalog.get_length(p_name))
+            encoding_method = self._catalog.get_encoding_method(p_name)
+            if encoding_method == 'base64':
+                # Convert string to bytes, then encode in base64
+                passphrase = passphrase.encode()
+                passphrase = base64.b64encode(passphrase)
             docs = list()
             storage_policy = self._catalog.get_storage_policy(p_name)
             docs.append(self.generate_doc(

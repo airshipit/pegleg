@@ -163,9 +163,11 @@ class PeglegSecretManagement(object):
                 # policies
                 doc_list.append(doc.embedded_document)
                 continue
-
+            secret_doc = doc.get_secret()
+            if type(secret_doc) != bytes:
+                secret_doc = secret_doc.encode()
             doc.set_secret(
-                encrypt(doc.get_secret().encode(), self.passphrase, self.salt))
+                encrypt(secret_doc, self.passphrase, self.salt))
             doc.set_encrypted(self._author)
             encrypted_docs = True
             doc_list.append(doc.pegleg_document)

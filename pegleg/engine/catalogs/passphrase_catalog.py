@@ -24,8 +24,10 @@ P_LENGTH = 'length'
 P_DESCRIPTION = 'description'
 P_ENCRYPTED = 'encrypted'
 P_CLEARTEXT = 'cleartext'
+P_ENCODING = 'encoding'
 P_DEFAULT_LENGTH = 24
 P_DEFAULT_STORAGE_POLICY = 'encrypted'
+P_DEFAULT_ENCODING = 'none'
 
 __all__ = ['PassphraseCatalog']
 
@@ -86,3 +88,18 @@ class PassphraseCatalog(BaseCatalog):
                         return P_CLEARTEXT
                     else:
                         return P_DEFAULT_STORAGE_POLICY
+
+    def get_encoding_method(self, passphrase_name):
+        """Return the encoding method of the ``passphrase_name``.
+
+        If the catalog does not specify an encoding method for the
+        ``passphrase_name``, return the default encoding method, 'none'.
+        :param str passphrase_name: The name of the passphrase to evaluate.
+        :returns: The encoding method to be used for ``passphrase_name``.
+        :rtype: str
+        """
+
+        for c_doc in self._catalog_docs:
+            for passphrase in c_doc['data']['passphrases']:
+                if passphrase[P_DOCUMENT_NAME] == passphrase_name:
+                    return passphrase.get(P_ENCODING, P_DEFAULT_ENCODING)
