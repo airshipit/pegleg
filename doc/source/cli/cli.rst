@@ -669,9 +669,9 @@ decrypt the encrypted secrets, and dump the cleartext secrets file to
 **site_name** (Required).
 
 Name of the ``site``. The ``site_name`` must match a ``site`` name in the site
-repository folder structure. The ``decrypt`` command also validates that the
-``site-name`` exists in the file path, before unwrapping and decrypting the
-documents in the ``filename``.
+repository folder structure. This is used to ensure the correct revision of
+the site and global repositories are used, as specified in the site's
+:file:`site-definition.yaml`.
 
 **-f / filename** (Required).
 

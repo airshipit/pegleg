@@ -694,7 +694,7 @@ def encrypt(*, save_location, author, site_name):
 def decrypt(*, file_name, save_location, site_name):
     engine.repository.process_repositories(site_name)
 
-    decrypted = engine.secrets.decrypt(file_name, site_name)
+    decrypted = engine.secrets.decrypt(file_name)
     if save_location is None:
         click.echo(decrypted)
     else:

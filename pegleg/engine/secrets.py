@@ -68,27 +68,22 @@ def encrypt(save_location, author, site_name):
             'No secret documents were found for site: {}'.format(site_name))
 
 
-def decrypt(file_path, site_name):
-    """
-    Decrypt one secrets file, and print the decrypted file to standard out.
+def decrypt(file_path):
+    """Decrypt one secrets file, and print the decrypted file to standard out.
 
-    Search in secrets file of a site, identified by ``site_name``, for a file
-    named ``file_name``.
-    If the  file is found and encrypted, unwrap and decrypt it, and print the
+    Search the specified file_path for a file.
+    If the file is found and encrypted, unwrap and decrypt it, and print the
     result to standard out.
     If the file is found, but it is not encrypted, print the contents of the
     file to standard out.
     Passphrase and salt for the decryption are read from environment variables.
     :param file_path: Path to the file to be unwrapped and decrypted.
     :type file_path: string
-    :param site_name: The name of the site to search for the file.
-    :type site_name: string
     :return: The decrypted secrets
     :rtype: list
     """
     LOG.info('Started decrypting...')
-    if (os.path.isfile(file_path) and
-            [s for s in file_path.split(os.path.sep) if s == site_name]):
+    if os.path.isfile(file_path):
         return PeglegSecretManagement(file_path).decrypt_secrets()
     else:
         LOG.info('File: {} was not found. Check your file path and name, '
