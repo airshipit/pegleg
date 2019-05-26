@@ -164,12 +164,12 @@ def _get_deployment_data_doc():
         "metadata": {
             "schema": "metadata/Document/v1",
             "name": "deployment-version",
+            "layeringDefinition": {
+                "abstract": False,
+                "layer": "global"
+            },
+            "storagePolicy": "cleartext",
         },
-        "layeringDefinition": {
-            "abstract": "false",
-            "layer": "global"
-        },
-        "storagePolicy": "cleartext",
         "data": {
             "documents": stanzas
         }
