@@ -327,6 +327,10 @@ def _format_url_with_repo_username(repo_url_or_path):
         else:
             repo_url_or_path = repo_url_or_path.replace(
                 'REPO_USERNAME', repo_user)
+
+    elif "REPO_USERNAME" in repo_url_or_path:
+        raise exceptions.GitMissingUserException(url=repo_url_or_path)
+
     return repo_url_or_path
 
 
