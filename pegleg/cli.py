@@ -714,7 +714,7 @@ def decrypt(*, path, save_location, overwrite, site_name):
             click.echo(value)
     else:
         for key, value in decrypted.items():
-            file_name = os.path.split(key)
+            file_name = os.path.split(key)[1]
             file_save_location = os.path.join(save_location, file_name)
             files.write(file_save_location, value)
             os.chmod(file_save_location, 0o600)
