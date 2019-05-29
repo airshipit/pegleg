@@ -1,4 +1,4 @@
-gitpython
+gitpython==2.1.11
 click==6.7
 jsonschema==2.6.0
 pyyaml==5.1
