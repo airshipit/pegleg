@@ -19,7 +19,23 @@ from pegleg.engine.util import definition
 
 LOG = logging.getLogger(__name__)
 
-__all__ = ('iterate', )
+__all__ = ('iterate', 'decode_bytes')
+
+
+def decode_bytes(obj):
+    """If the argument is bytes, decode it.
+
+    :param Object obj: A string or byte object
+    :return: A string representation of obj
+    :rtype: str
+
+    """
+    if isinstance(obj, bytes):
+        return obj.decode('utf-8')
+    elif isinstance(obj, str):
+        return obj
+    else:
+        raise ValueError("ERROR: {} is not bytes or a string.".format(obj))
 
 
 def iterate(kind, sitename=None, documents=None):

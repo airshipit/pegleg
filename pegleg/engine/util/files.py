@@ -18,6 +18,7 @@ import os
 
 import click
 import yaml
+from yaml.constructor import SafeConstructor
 
 from pegleg import config
 from pegleg.engine import util
@@ -227,6 +228,9 @@ def slurp(path):
 
     with open(path) as f:
         try:
+            # Ignore YAML tags, only construct dicts
+            SafeConstructor.add_multi_constructor(
+                '', lambda loader, suffix, node: None)
             return yaml.safe_load(f)
         except Exception as e:
             raise click.ClickException('Failed to parse %s:\n%s' % (path, e))
@@ -277,10 +281,14 @@ def read(path):
             document)
 
     with open(path) as stream:
+        # Ignore YAML tags, only construct dicts
+        SafeConstructor.add_multi_constructor(
+            '', lambda loader, suffix, node: None)
         try:
             return [
                 d for d in yaml.safe_load_all(stream)
-                if is_deckhand_document(d) or is_pegleg_managed_document(d)
+                if d and (is_deckhand_document(d) or
+                          is_pegleg_managed_document(d))
             ]
         except yaml.YAMLError as e:
             raise click.ClickException('Failed to parse %s:\n%s' % (path, e))

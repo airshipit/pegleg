@@ -26,6 +26,7 @@ import pytz
 import yaml
 
 from pegleg.engine import exceptions
+from pegleg.engine.util.catalog import decode_bytes
 from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument
 
@@ -227,15 +228,14 @@ class PKIUtility(object):
         with tempfile.TemporaryDirectory() as tmp:
             for filename, data in files.items():
                 with open(os.path.join(tmp, filename), 'w') as f:
-                    f.write(data)
+                    f.write(decode_bytes(data))
 
             # Ignore bandit false positive:
             #   B603:subprocess_without_shell_equals_true
             # This method wraps cfssl calls originating from this module.
             result = subprocess.check_output(  # nosec
                 ['cfssl'] + command, cwd=tmp, stderr=subprocess.PIPE)
-            if not isinstance(result, str):
-                result = result.decode('utf-8')
+            result = decode_bytes(result)
             return json.loads(result)
 
     def _openssl(self, command, *, files=None):
@@ -246,7 +246,7 @@ class PKIUtility(object):
         with tempfile.TemporaryDirectory() as tmp:
             for filename, data in files.items():
                 with open(os.path.join(tmp, filename), 'w') as f:
-                    f.write(data)
+                    f.write(decode_bytes(data))
 
             # Ignore bandit false positive:
             #   B603:subprocess_without_shell_equals_true

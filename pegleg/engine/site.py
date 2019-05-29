@@ -18,6 +18,7 @@ import os
 import click
 import git
 import yaml
+from yaml.constructor import SafeConstructor
 
 from prettytable import PrettyTable
 
@@ -99,6 +100,9 @@ def collect(site_name, save_location):
 
 def render(site_name, output_stream, validate):
     documents = []
+    # Ignore YAML tags, only construct dicts
+    SafeConstructor.add_multi_constructor(
+        '', lambda loader, suffix, node: None)
     for filename in util.definition.site_files(site_name):
         with open(filename) as f:
             documents.extend(list(yaml.safe_load_all(f)))
