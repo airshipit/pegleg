@@ -497,6 +497,12 @@ Dashes in the document names will be converted to underscores for consistency.
 
 Name of site.
 
+**-a / --author** (Optional).
+
+Identifying name of the author generating new certificates. Used for tracking
+provenance information in the PeglegManagedDocuments. An attempt is made to
+automatically determine this value, but should be provided.
+
 **-d / --days** (Optional, Default=365).
 
 Duration (in days) certificates should be valid.
@@ -513,8 +519,7 @@ Examples
   ./pegleg.sh site -r <site_repo> -e <extra_repo> \
     secrets generate-pki \
     <site_name> \
-    -o <output> \
-    -f <filename> \
+    -a <author> \
     -d <days>
 
 .. _command-line-repository-overrides:
