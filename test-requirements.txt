@@ -1,7 +1,7 @@
 # Testing
 pytest==3.2.1
 pytest-cov==2.5.1
-testfixtures
+testfixtures==6.8.2
 pytest-xdist==1.23.2
 mock==2.0.0
 
@@ -9,7 +9,7 @@ mock==2.0.0
 yapf==0.20.0
 
 # Linting
-hacking>=1.1.0,<1.2.0 # Apache-2.0
+hacking==1.1.0
 
 # Security
-bandit>=1.5.0
+bandit==1.6.0
