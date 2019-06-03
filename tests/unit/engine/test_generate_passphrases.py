@@ -31,7 +31,7 @@ import pegleg
 from pegleg.engine.util.pegleg_secret_management import ENV_PASSPHRASE
 from pegleg.engine.util.pegleg_secret_management import ENV_SALT
 
-TEST_PASSPHRASES_CATALOG = yaml.load("""
+TEST_PASSPHRASES_CATALOG = yaml.safe_load("""
 ---
 schema: pegleg/PassphraseCatalog/v1
 metadata:
@@ -69,7 +69,7 @@ data:
 ...
 """)
 
-TEST_GLOBAL_PASSPHRASES_CATALOG = yaml.load("""
+TEST_GLOBAL_PASSPHRASES_CATALOG = yaml.safe_load("""
 ---
 schema: pegleg/PassphraseCatalog/v1
 metadata:
@@ -87,7 +87,7 @@ data:
 ...
 """)
 
-TEST_BASE64_PASSPHRASES_CATALOG = yaml.load("""
+TEST_BASE64_PASSPHRASES_CATALOG = yaml.safe_load("""
 ---
 schema: pegleg/PassphraseCatalog/v1
 metadata:
@@ -180,7 +180,7 @@ def test_generate_passphrases(*_):
                                             passphrase_file_name)
         assert os.path.isfile(passphrase_file_path)
         with open(passphrase_file_path) as stream:
-            doc = yaml.load(stream)
+            doc = yaml.safe_load(stream)
             assert doc['schema'] == 'pegleg/PeglegManagedDocument/v1'
             assert doc['metadata']['storagePolicy'] == 'cleartext'
             assert 'encrypted' in doc['data']

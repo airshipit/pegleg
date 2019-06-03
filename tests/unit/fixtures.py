@@ -43,7 +43,7 @@ def _gen_document(**kwargs):
     if "storagePolicy" not in kwargs:
         kwargs["storagePolicy"] = "cleartext"
     test_document = TEST_DOCUMENT % kwargs
-    return yaml.load(test_document)
+    return yaml.safe_load(test_document)
 
 
 @pytest.fixture()
