@@ -185,4 +185,4 @@ site definition contains a set of documents.::
     in whatever way makes sense. The best practice here to define
     them by racks is only a suggestion.
 
-.. _Airship in a Bottle: https://opendev.org/airship/in-a-bottle
+.. _Airship in a Bottle: https://opendev.org/airship/airship-in-a-bottle

@@ -498,14 +498,14 @@ def test_is_repository():
 
     # airship-in-a-bottle
     do_test(
-        url='https://review.opendev.org/airship/in-a-bottle',
+        url='https://review.opendev.org/airship/airship-in-a-bottle',
         ref='refs/changes/39/596439/1')
     do_test(
-        url='https://review.opendev.org/airship/in-a-bottle',
+        url='https://review.opendev.org/airship/airship-in-a-bottle',
         ref='refs/changes/39/596439/1',
         subpath='deployment_files')
     do_test(
-        url='https://review.opendev.org/airship/in-a-bottle',
+        url='https://review.opendev.org/airship/airship-in-a-bottle',
         ref='refs/changes/39/596439/1',
         subpath='deployment_files/site')
 

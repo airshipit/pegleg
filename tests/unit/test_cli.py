@@ -694,11 +694,11 @@ class TestSiteCliActionsWithSubdirectory(BaseCLIActionTest):
         """Validates list action with subpath in remote URL."""
         # Scenario:
         #
-        # 1) List sites for https://opendev.org/airship/in-a-bottle
+        # 1) List sites for https://opendev.org/airship/airship-in-a-bottle
         #    deployment_files (subpath in remote URL)
 
         # Perform site action using remote URL.
-        repo_name = 'in-a-bottle'
+        repo_name = 'airship-in-a-bottle'
         repo_rev = '7a0717adc68261c7adb3a3db74a9326d6103519f'
         repo_url = 'https://opendev.org/airship/%s/deployment_files@%s' % (
             repo_name, repo_rev)
@@ -709,11 +709,11 @@ class TestSiteCliActionsWithSubdirectory(BaseCLIActionTest):
         """Validates list action with subpath in local repo path."""
         # Scenario:
         #
-        # 1) List sites for local repo at /tmp/.../in-a-bottle/
+        # 1) List sites for local repo at /tmp/.../airship-in-a-bottle/
         #    deployment_files
 
         # Perform site action using local repo path.
-        repo_name = 'in-a-bottle'
+        repo_name = 'airship-in-a-bottle'
         repo_rev = '7a0717adc68261c7adb3a3db74a9326d6103519f'
         repo_url = 'https://opendev.org/airship/%s' % repo_name
         _repo_path = git.git_handler(repo_url, ref=repo_rev)
