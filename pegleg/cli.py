@@ -545,7 +545,7 @@ def wrap_secret_cli(*, site_name, author, file_name, output_path, schema,
 def genesis_bundle(*, build_dir, validators, site_name):
     passphrase = os.environ.get("PEGLEG_PASSPHRASE")
     salt = os.environ.get("PEGLEG_SALT")
-    encryption_key = passphrase
+    encryption_key = os.environ.get("PROMENADE_ENCRYPTION_KEY")
     if passphrase:
         passphrase = passphrase.encode()
     if salt:
@@ -558,7 +558,8 @@ def genesis_bundle(*, build_dir, validators, site_name):
                          encryption_key,
                          validators,
                          logging.DEBUG == LOG.getEffectiveLevel(),
-                         site_name)
+                         site_name
+                         )
 
 
 @secrets.command(

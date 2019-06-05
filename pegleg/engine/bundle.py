@@ -78,8 +78,6 @@ def build_genesis(build_path, encryption_key, validators, debug, site_name):
             allow_missing_substitutions=False,
             leave_kubectl=False)
         if c.get_path('EncryptionPolicy:scripts.genesis') and encryption_key:
-            os.environ['PROMENADE_ENCRYPTION_KEY'] = encryption_key
-            os.environ['PEGLEG_PASSPHRASE'] = encryption_key
             Builder(c, validators=validators).build_all(output_dir=build_path)
         else:
             raise GenesisBundleEncryptionException()
