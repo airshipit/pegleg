@@ -116,7 +116,7 @@ data: {0}-password
     encrypted_path = str(save_location.join("site/cicd/secrets/passphrases/"
                                             "cicd-passphrase-encrypted.yaml"))
     decrypted = secrets.decrypt(encrypted_path)
-    assert yaml.load(decrypted[encrypted_path]) == yaml.load(passphrase_doc)
+    assert yaml.safe_load(decrypted[encrypted_path]) == yaml.safe_load(passphrase_doc)
 
 
 def test_pegleg_secret_management_constructor():

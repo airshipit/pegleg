@@ -553,7 +553,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         file_path = os.path.join(repo_path, "site", "airship-seaworthy",
                                "secrets", "passphrases", "ceph_fsid.yaml")
         with open(file_path, "r") as ceph_fsid_fi:
-            ceph_fsid = yaml.load(ceph_fsid_fi)
+            ceph_fsid = yaml.safe_load(ceph_fsid_fi)
             ceph_fsid["metadata"]["storagePolicy"] = "encrypted"
 
         with open(file_path, "w") as ceph_fsid_fi:
@@ -568,7 +568,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
                                "secrets", "passphrases", "ceph_fsid.yaml"),
                   "r") \
                 as ceph_fsid_fi:
-            ceph_fsid = yaml.load(ceph_fsid_fi)
+            ceph_fsid = yaml.safe_load(ceph_fsid_fi)
             assert "encrypted" in ceph_fsid["data"]
             assert "managedDocument" in ceph_fsid["data"]
 
