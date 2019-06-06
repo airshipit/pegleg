@@ -13,3 +13,4 @@ hacking==1.1.0
 
 # Security
 bandit==1.6.0
+safety==1.8.5
