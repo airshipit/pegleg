@@ -23,16 +23,19 @@
     check:
       jobs:
         - openstack-tox-pep8
-        - airship-pegleg-docker-build-gate-ubuntu
+        - airship-pegleg-docker-build-gate-ubuntu_xenial
+        - airship-pegleg-docker-build-gate-ubuntu_bionic
         - airship-pegleg-docker-build-gate-opensuse
     gate:
       jobs:
         - openstack-tox-pep8
-        - airship-pegleg-docker-build-gate-ubuntu
+        - airship-pegleg-docker-build-gate-ubuntu_xenial
+        - airship-pegleg-docker-build-gate-ubuntu_bionic
         - airship-pegleg-docker-build-gate-opensuse
     post:
       jobs:
-        - airship-pegleg-docker-publish-ubuntu
+        - airship-pegleg-docker-publish-ubuntu_xenial
+        - airship-pegleg-docker-publish-ubuntu_bionic
         - airship-pegleg-docker-publish-opensuse
         - pegleg-upload-git-mirror
 
@@ -43,7 +46,7 @@
         label: ubuntu-xenial
 
 - job:
-    name: airship-pegleg-docker-build-gate-ubuntu
+    name: airship-pegleg-docker-build-gate-ubuntu_xenial
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node
@@ -52,6 +55,20 @@
     vars:
       publish: false
       distro: ubuntu_xenial
+      tags:
+        dynamic:
+          patch_set: true
+
+- job:
+    name: airship-pegleg-docker-build-gate-ubuntu_bionic
+    timeout: 1800
+    run: tools/gate/playbooks/docker-image-build.yaml
+    nodeset: airship-pegleg-single-node
+    irrelevant-files:
+      - '^doc/.*'
+    vars:
+      publish: false
+      distro: ubuntu_bionic
       tags:
         dynamic:
           patch_set: true
@@ -71,7 +88,7 @@
           patch_set: true
 
 - job:
-    name: airship-pegleg-docker-publish-ubuntu
+    name: airship-pegleg-docker-publish-ubuntu_xenial
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node
@@ -82,6 +99,25 @@
     vars:
       publish: true
       distro: ubuntu_xenial
+      tags:
+        dynamic:
+          branch: true
+          commit: true
+        static:
+          - latest
+
+- job:
+    name: airship-pegleg-docker-publish-ubuntu_bionic
+    timeout: 1800
+    run: tools/gate/playbooks/docker-image-build.yaml
+    nodeset: airship-pegleg-single-node
+    secrets:
+      - airship_pegleg_quay_creds
+    irrelevant-files:
+      - '^doc/.*'
+    vars:
+      publish: true
+      distro: ubuntu_bionic
       tags:
         dynamic:
           branch: true
