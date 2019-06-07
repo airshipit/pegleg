@@ -21,6 +21,7 @@ RUN set -ex \
          git \
          libssl-dev \
          netbase \
+         openssh-client \
          python3-dev \
          python3-pip \
          python3-setuptools \
@@ -33,6 +34,7 @@ RUN set -ex \
          /usr/share/doc-base \
          /usr/share/man \
          /var/lib/apt/lists/* \
+         /var/log/* \
          /var/tmp/*
 
 VOLUME /var/pegleg

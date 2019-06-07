@@ -12,26 +12,27 @@ LABEL org.opencontainers.image.licenses='Apache-2.0'
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 
-RUN set -x && \
-    zypper up -y && \
-    zypper --non-interactive install \
-       git-core \
-       which \
-       gcc \
-       curl \
-       python3-devel \
-       python3-setuptools \
-       python3-dbm \
-       python3-pip && \
-       pip install --upgrade pip && \
-       zypper clean -a && \
-       rm -rf \
+RUN set -x \
+    && zypper up -y \
+    && zypper --non-interactive install \
+         curl \
+         gcc \
+         git-core \
+         openssh \
+         python3-dbm \
+         python3-devel \
+         python3-pip \
+         python3-setuptools \
+         which \
+    && python3 -m pip install -U pip \
+    && zypper clean -a \
+    && rm -rf \
          /tmp/* \
-         /var/tmp/* \
-         /var/log/* \
-         /usr/share/man \
          /usr/share/doc \
-         /usr/share/doc-base
+         /usr/share/doc-base \
+         /usr/share/man \
+         /var/log/* \
+         /var/tmp/*
 
 VOLUME /var/pegleg
 WORKDIR /var/pegleg
