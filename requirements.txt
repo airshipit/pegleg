@@ -6,6 +6,6 @@ cryptography==2.3.1
 python-dateutil==2.7.3
 
 # External dependencies
-git+https://opendev.org/airship/deckhand.git@49ad9f38842f7f1ecb86d907d86d332f8186eb8c
-git+https://opendev.org/airship/shipyard.git@44f7022df6438de541501c2fdd5c46df198b82bf#egg=shipyard_client&subdirectory=src/bin/shipyard_client
-git+https://opendev.org/airship/promenade.git@a6e8fdbe22bd153c78a008b92cd5d1c245bc63e3
+git+https://opendev.org/airship/deckhand.git@a76ffb66ae809c19281a6cf5c9414ed197d249b7
+git+https://opendev.org/airship/shipyard.git@89a8eda43e4af3cf146f89a25e96c37dbaa5fa88#egg=shipyard_client&subdirectory=src/bin/shipyard_client
+git+https://opendev.org/airship/promenade.git@1f5c57d1de732ed3a31469c4a526a34f7d381eff
