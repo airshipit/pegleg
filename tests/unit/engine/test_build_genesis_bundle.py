@@ -24,8 +24,6 @@ from pegleg.engine import bundle
 from pegleg.engine.exceptions import GenesisBundleEncryptionException
 from pegleg.engine.exceptions import GenesisBundleGenerateException
 from pegleg.engine.util import files
-from pegleg.engine.util.pegleg_secret_management import ENV_PASSPHRASE
-from pegleg.engine.util.pegleg_secret_management import ENV_SALT
 
 from tests.unit.fixtures import temp_path
 
@@ -90,8 +88,8 @@ data: ABAgagajajkb839215387
 
 
 @mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt1234567890]['
+    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    'PEGLEG_SALT': 'MySecretSalt1234567890]['
 })
 def test_no_encryption_key(temp_path):
     # Write the test data to temp file
@@ -118,8 +116,8 @@ def test_no_encryption_key(temp_path):
 
 
 @mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt1234567890]['
+    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    'PEGLEG_SALT': 'MySecretSalt1234567890]['
 })
 def test_failed_deckhand_validation(temp_path):
     # Write the test data to temp file

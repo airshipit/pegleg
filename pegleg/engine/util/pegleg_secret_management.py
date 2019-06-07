@@ -13,8 +13,6 @@
 # limitations under the License.
 
 import logging
-import os
-import re
 
 import click
 import yaml
@@ -27,22 +25,29 @@ from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument as PeglegManagedSecret
 
 LOG = logging.getLogger(__name__)
-PASSPHRASE_PATTERN = '^.{24,}$'  # nosec (alexanderhughes)
-ENV_PASSPHRASE = 'PEGLEG_PASSPHRASE'  # nosec (alexanderhughes)
-ENV_SALT = 'PEGLEG_SALT'
 
 
 class PeglegSecretManagement(object):
     """An object to handle operations on of a pegleg managed file."""
 
-    def __init__(self, file_path=None, docs=None, generated=False,
-                 catalog=None, author=None):
+    def __init__(self,
+                 file_path=None,
+                 docs=None,
+                 generated=False,
+                 catalog=None,
+                 author=None):
         """
         Read the source file and the environment data needed to wrap and
         process the file documents as pegleg managed document.
         Either of the ``file_path`` or ``docs`` must be
         provided.
         """
+
+        config.set_passphrase()
+        self.passphrase = config.get_passphrase()
+
+        config.set_salt()
+        self.salt = config.get_salt()
 
         if all([file_path, docs]) or not any([file_path, docs]):
             raise ValueError('Either `file_path` or `docs` must be '
@@ -52,17 +57,17 @@ class PeglegSecretManagement(object):
             raise ValueError("If the document is generated, author and "
                              "catalog must be specified.")
 
-        self.check_environment()
         self.file_path = file_path
         self.documents = list()
         self._generated = generated
 
         if docs:
             for doc in docs:
-                self.documents.append(PeglegManagedSecret(doc,
-                                                          generated=generated,
-                                                          catalog=catalog,
-                                                          author=author))
+                self.documents.append(
+                    PeglegManagedSecret(doc,
+                                        generated=generated,
+                                        catalog=catalog,
+                                        author=author))
         else:
             self.file_path = file_path
             for doc in files.read(file_path):
@@ -70,46 +75,12 @@ class PeglegSecretManagement(object):
 
         self._author = author
 
-        if config.get_passphrase() and config.get_salt():
-            self.passphrase = config.get_passphrase()
-            self.salt = config.get_salt()
-        elif config.get_passphrase() or config.get_salt():
-            raise ValueError("ERROR: Pegleg configuration must either have "
-                             "both a passphrase and a salt or neither.")
-        else:
-            self.passphrase = os.environ.get(ENV_PASSPHRASE).encode()
-            self.salt = os.environ.get(ENV_SALT).encode()
-            config.set_passphrase(self.passphrase)
-            config.set_salt(self.salt)
-
     def __iter__(self):
         """
         Make the secret management object iterable
         :return: the wrapped documents
         """
         return (doc.pegleg_document for doc in self.documents)
-
-    @staticmethod
-    def check_environment():
-        """
-        Validate required environment variables for encryption or decryption.
-
-        :return None
-        :raises click.ClickException: If environment validation should fail.
-        """
-
-        # Verify that passphrase environment variable is defined and is longer
-        # than 24 characters.
-        if not os.environ.get(ENV_PASSPHRASE) or not re.match(
-                PASSPHRASE_PATTERN, os.environ.get(ENV_PASSPHRASE)):
-            raise click.ClickException(
-                'Environment variable {} is not defined or '
-                'is not at least 24-character long.'.format(ENV_PASSPHRASE))
-
-        if not os.environ.get(ENV_SALT):
-            raise click.ClickException(
-                'Environment variable {} is not defined or '
-                'is an empty string.'.format(ENV_SALT))
 
     def encrypt_secrets(self, save_path):
         """
@@ -166,8 +137,7 @@ class PeglegSecretManagement(object):
             secret_doc = doc.get_secret()
             if type(secret_doc) != bytes:
                 secret_doc = secret_doc.encode()
-            doc.set_secret(
-                encrypt(secret_doc, self.passphrase, self.salt))
+            doc.set_secret(encrypt(secret_doc, self.passphrase, self.salt))
             doc.set_encrypted(self._author)
             encrypted_docs = True
             doc_list.append(doc.pegleg_document)
@@ -180,11 +150,10 @@ class PeglegSecretManagement(object):
 
         secrets = self.get_decrypted_secrets()
 
-        return yaml.safe_dump_all(
-            secrets,
-            explicit_start=True,
-            explicit_end=True,
-            default_flow_style=False)
+        return yaml.safe_dump_all(secrets,
+                                  explicit_start=True,
+                                  explicit_end=True,
+                                  default_flow_style=False)
 
     def get_decrypted_secrets(self):
         """
