@@ -477,7 +477,6 @@ def generate_pki(site_name, author, days):
     'author',
     help='Author for the new wrapped file.')
 @click.option(
-    '-f',
     '--filename',
     'file_name',
     help='The relative file path for the file to be wrapped.')
@@ -694,7 +693,6 @@ def encrypt(*, save_location, author, site_name):
     help='Command to unwrap and decrypt one site '
          'secrets document and print it to stdout.')
 @click.option(
-    '-p',
     '--path',
     'path',
     type=click.Path(exists=True, readable=True),

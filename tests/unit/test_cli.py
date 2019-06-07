@@ -572,7 +572,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             assert "encrypted" in ceph_fsid["data"]
             assert "managedDocument" in ceph_fsid["data"]
 
-        secrets_opts = ['secrets', 'decrypt', '-p', file_path,
+        secrets_opts = ['secrets', 'decrypt', '--path', file_path,
                         self.site_name]
         result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
         assert result.exit_code == 0, result.output
@@ -604,8 +604,8 @@ class TestSiteSecretsActions(BaseCLIActionTest):
 
         with open(file_path, "w") as test_crt_fi:
             test_crt_fi.write(test_cert)
-        secrets_opts = ['secrets', 'wrap', "-a", "lm734y", "-f", file_path,
-                        "-s", "deckhand/Certificate/v1",
+        secrets_opts = ['secrets', 'wrap', "-a", "lm734y", "--filename",
+                        file_path, "-s", "deckhand/Certificate/v1",
                         "-n", "test-certificate", "-l", "site", "--no-encrypt",
                        self.site_name]
         result = self.runner.invoke(cli.site, ["-r", repo_path] + secrets_opts)
@@ -620,7 +620,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             assert doc["data"]["managedDocument"]["metadata"]["storagePolicy"] == "cleartext"
 
         os.remove(output_path)
-        secrets_opts = ['secrets', 'wrap', "-a", "lm734y", "-f", file_path,
+        secrets_opts = ['secrets', 'wrap', "-a", "lm734y", "--filename", file_path,
                         "-o", output_path, "-s", "deckhand/Certificate/v1",
                         "-n", "test-certificate", "-l", "site",
                        self.site_name]
