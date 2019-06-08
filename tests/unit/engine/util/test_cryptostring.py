@@ -21,6 +21,7 @@ def test_cryptostring_default_len():
     s = s_util.get_crypto_string()
     assert len(s) == 24
 
+
 def test_cryptostring_short_len():
     s_util = CryptoString()
     s = s_util.get_crypto_string(0)
@@ -30,12 +31,14 @@ def test_cryptostring_short_len():
     s = s_util.get_crypto_string(-1)
     assert len(s) == 24
 
+
 def test_cryptostring_long_len():
     s_util = CryptoString()
     s = s_util.get_crypto_string(25)
     assert len(s) == 25
     s = s_util.get_crypto_string(128)
     assert len(s) == 128
+
 
 def test_cryptostring_has_upper():
     s_util = CryptoString()
@@ -46,6 +49,7 @@ def test_cryptostring_has_upper():
     crypto_string = 'th1sp@sswordh4snouppers!'
     assert s_util.has_upper(crypto_string) is False
 
+
 def test_cryptostring_has_lower():
     s_util = CryptoString()
     crypto_string = 'Th1sP@sswordH4sLowers!'
@@ -54,6 +58,7 @@ def test_cryptostring_has_lower():
     assert s_util.has_lower(crypto_string) is True
     crypto_string = 'TH1SP@SSWORDH4SNOLOWERS!'
     assert s_util.has_lower(crypto_string) is False
+
 
 def test_cryptostring_has_number():
     s_util = CryptoString()
@@ -64,6 +69,7 @@ def test_cryptostring_has_number():
     crypto_string = 'ThisP@sswordHasNoNumbers!'
     assert s_util.has_number(crypto_string) is False
 
+
 def test_cryptostring_has_symbol():
     s_util = CryptoString()
     crypto_string = 'Th1sP@sswordH4sSymbols!'
@@ -72,6 +78,7 @@ def test_cryptostring_has_symbol():
     assert s_util.has_symbol(crypto_string) is True
     crypto_string = 'ThisPasswordH4sNoSymbols'
     assert s_util.has_symbol(crypto_string) is False
+
 
 def test_cryptostring_has_all():
     s_util = CryptoString()

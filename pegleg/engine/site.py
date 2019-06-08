@@ -17,10 +17,9 @@ import os
 
 import click
 import git
+from prettytable import PrettyTable
 import yaml
 from yaml.constructor import SafeConstructor
-
-from prettytable import PrettyTable
 
 from pegleg import config
 from pegleg.engine import util
@@ -51,10 +50,11 @@ def _collect_to_stdout(site_name):
             for line in _read_and_format_yaml(filename):
                 # This code is a pattern to convert \r\n to \n.
                 click.echo("\n".join(line.splitlines()))
-        res = yaml.safe_dump(_get_deployment_data_doc(),
-                             explicit_start=True,
-                             explicit_end=True,
-                             default_flow_style=False)
+        res = yaml.safe_dump(
+            _get_deployment_data_doc(),
+            explicit_start=True,
+            explicit_end=True,
+            default_flow_style=False)
         # Click isn't splitting these lines correctly, so do it manually
         for line in res.split('\n'):
             click.echo(line)
@@ -82,10 +82,11 @@ def _collect_to_file(site_name, save_location):
             LOG.debug("Collecting file %s to file %s", filename, save_file)
             save_files[repo_name].writelines(_read_and_format_yaml(filename))
         save_files[curr_site_repo].writelines(
-            yaml.safe_dump(_get_deployment_data_doc(),
-                           default_flow_style=False,
-                           explicit_start=True,
-                           explicit_end=True))
+            yaml.safe_dump(
+                _get_deployment_data_doc(),
+                default_flow_style=False,
+                explicit_start=True,
+                explicit_end=True))
     except Exception as ex:
         raise click.ClickException("Error saving output: %s" % str(ex))
     finally:
@@ -121,16 +122,19 @@ def render(site_name, output_stream, validate):
         raise click.ClickException(err_msg)
 
     if output_stream:
-        files.dump_all(rendered_documents,
-                       output_stream,
-                       default_flow_style=False,
-                       explicit_start=True,
-                       explicit_end=True)
+        files.dump_all(
+            rendered_documents,
+            output_stream,
+            default_flow_style=False,
+            explicit_start=True,
+            explicit_end=True)
     else:
-        click.echo(yaml.dump_all(rendered_documents,
-                                 default_flow_style=False,
-                                 explicit_start=True,
-                                 explicit_end=True))
+        click.echo(
+            yaml.dump_all(
+                rendered_documents,
+                default_flow_style=False,
+                explicit_start=True,
+                explicit_end=True))
 
 
 def list_(output_stream):

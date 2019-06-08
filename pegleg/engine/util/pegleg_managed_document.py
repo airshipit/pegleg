@@ -53,8 +53,8 @@ class PeglegManagedSecretsDocument(object):
         if self.is_pegleg_managed_secret(document):
             self._pegleg_document = document
         else:
-            self._pegleg_document = self.__wrap(document, generated, catalog,
-                                                author)
+            self._pegleg_document = self.__wrap(
+                document, generated, catalog, author)
         self._embedded_document = \
             self._pegleg_document['data']['managedDocument']
 

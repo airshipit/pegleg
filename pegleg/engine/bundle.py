@@ -16,15 +16,14 @@ import logging
 import os
 
 import click
+from promenade.builder import Builder
+from promenade.config import Configuration
+from promenade import exceptions
 
 from pegleg.engine.exceptions import GenesisBundleEncryptionException
 from pegleg.engine.exceptions import GenesisBundleGenerateException
 from pegleg.engine import util
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
-
-from promenade.builder import Builder
-from promenade.config import Configuration
-from promenade import exceptions
 
 LOG = logging.getLogger(__name__)
 
@@ -80,8 +79,8 @@ def build_genesis(build_path, encryption_key, validators, debug, site_name):
             raise GenesisBundleEncryptionException()
 
     except exceptions.PromenadeException as e:
-        LOG.error('Build genesis bundle failed! {}.'.format(
-            e.display(debug=debug)))
+        LOG.error(
+            'Build genesis bundle failed! {}.'.format(e.display(debug=debug)))
         raise GenesisBundleGenerateException()
 
     LOG.info('=== Done! ===')

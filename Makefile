@@ -63,7 +63,8 @@ lint: py_lint
 
 # Perform auto formatting
 .PHONY: format
-format: py_format
+format:
+	tox -e fmt
 
 _BASE_IMAGE_ARG := $(if $(BASE_IMAGE),--build-arg FROM="${BASE_IMAGE}" ,)
 
@@ -108,7 +109,3 @@ clean:
 .PHONY: py_lint
 py_lint:
 	tox -e pep8
-
-.PHONY: py_format
-py_format:
-	tox -e fmt

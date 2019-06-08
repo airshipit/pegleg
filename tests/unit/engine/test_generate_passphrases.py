@@ -29,7 +29,8 @@ from pegleg.engine.util import encryption
 from pegleg.engine import util
 import pegleg
 
-TEST_PASSPHRASES_CATALOG = yaml.safe_load("""
+TEST_PASSPHRASES_CATALOG = yaml.safe_load(
+    """
 ---
 schema: pegleg/PassphraseCatalog/v1
 metadata:
@@ -67,7 +68,8 @@ data:
 ...
 """)
 
-TEST_GLOBAL_PASSPHRASES_CATALOG = yaml.safe_load("""
+TEST_GLOBAL_PASSPHRASES_CATALOG = yaml.safe_load(
+    """
 ---
 schema: pegleg/PassphraseCatalog/v1
 metadata:
@@ -85,7 +87,8 @@ data:
 ...
 """)
 
-TEST_BASE64_PASSPHRASES_CATALOG = yaml.safe_load("""
+TEST_BASE64_PASSPHRASES_CATALOG = yaml.safe_load(
+    """
 ---
 schema: pegleg/PassphraseCatalog/v1
 metadata:
@@ -119,8 +122,9 @@ TEST_REPOSITORIES = {
         },
         'secrets': {
             'revision': 'master',
-            'url': ('ssh://REPO_USERNAME@gerrit:29418/aic-clcp-security-'
-                    'manifests.git')
+            'url': (
+                'ssh://REPO_USERNAME@gerrit:29418/aic-clcp-security-'
+                'manifests.git')
         }
     }
 }
@@ -143,8 +147,12 @@ TEST_SITE_DEFINITION = {
 }
 
 TEST_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_PASSPHRASES_CATALOG]
-TEST_GLOBAL_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_GLOBAL_PASSPHRASES_CATALOG]
-TEST_BASE64_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_BASE64_PASSPHRASES_CATALOG]
+TEST_GLOBAL_SITE_DOCUMENTS = [
+    TEST_SITE_DEFINITION, TEST_GLOBAL_PASSPHRASES_CATALOG
+]
+TEST_BASE64_SITE_DOCUMENTS = [
+    TEST_SITE_DEFINITION, TEST_BASE64_PASSPHRASES_CATALOG
+]
 
 
 @mock.patch.object(
@@ -162,10 +170,13 @@ TEST_BASE64_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_BASE64_PASSPHRASES_CATA
     'site_files',
     autospec=True,
     return_value=[
-        'cicd_site_repo/site/cicd/passphrases/passphrase-catalog.yaml', ])
-@mock.patch.dict(os.environ, {
-    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    'PEGLEG_SALT': 'MySecretSalt1234567890]['})
+        'cicd_site_repo/site/cicd/passphrases/passphrase-catalog.yaml',
+    ])
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
 def test_generate_passphrases(*_):
     _dir = tempfile.mkdtemp()
     os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
@@ -173,9 +184,9 @@ def test_generate_passphrases(*_):
 
     for passphrase in TEST_PASSPHRASES_CATALOG['data']['passphrases']:
         passphrase_file_name = '{}.yaml'.format(passphrase['document_name'])
-        passphrase_file_path = os.path.join(_dir, 'site', 'cicd', 'secrets',
-                                            'passphrases',
-                                            passphrase_file_name)
+        passphrase_file_path = os.path.join(
+            _dir, 'site', 'cicd', 'secrets', 'passphrases',
+            passphrase_file_name)
         assert os.path.isfile(passphrase_file_path)
         with open(passphrase_file_path) as stream:
             doc = yaml.safe_load(stream)
@@ -187,7 +198,7 @@ def test_generate_passphrases(*_):
             assert doc['data']['generated']['by'] == 'test_author'
             assert 'managedDocument' in doc['data']
             assert doc['data']['managedDocument']['metadata'][
-                       'storagePolicy'] == 'encrypted'
+                'storagePolicy'] == 'encrypted'
             decrypted_passphrase = encryption.decrypt(
                 doc['data']['managedDocument']['data'],
                 os.environ['PEGLEG_PASSPHRASE'].encode(),
@@ -214,10 +225,12 @@ def test_generate_passphrases_exception(capture):
     # Decrypt using the wrong key to see to see the InvalidToken error
     with pytest.raises(fernet.InvalidToken):
         encryption.decrypt(enc_data, passphrase2, salt2)
-    capture.check(('pegleg.engine.util.encryption', 'ERROR',
-                   ('Signature verification to decrypt secrets failed. '
-                    'Please check your provided passphrase and salt and '
-                    'try again.')))
+    capture.check(
+        (
+            'pegleg.engine.util.encryption', 'ERROR', (
+                'Signature verification to decrypt secrets failed. '
+                'Please check your provided passphrase and salt and '
+                'try again.')))
 
 
 @mock.patch.object(
@@ -235,10 +248,13 @@ def test_generate_passphrases_exception(capture):
     'site_files',
     autospec=True,
     return_value=[
-        'cicd_global_repo/site/cicd/passphrases/passphrase-catalog.yaml', ])
-@mock.patch.dict(os.environ, {
-    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    'PEGLEG_SALT': 'MySecretSalt1234567890]['})
+        'cicd_global_repo/site/cicd/passphrases/passphrase-catalog.yaml',
+    ])
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
 def test_global_passphrase_catalog(*_):
     _dir = tempfile.mkdtemp()
     os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
@@ -246,9 +262,9 @@ def test_global_passphrase_catalog(*_):
 
     for passphrase in TEST_GLOBAL_PASSPHRASES_CATALOG['data']['passphrases']:
         passphrase_file_name = '{}.yaml'.format(passphrase['document_name'])
-        passphrase_file_path = os.path.join(_dir, 'site', 'cicd', 'secrets',
-                                            'passphrases',
-                                            passphrase_file_name)
+        passphrase_file_path = os.path.join(
+            _dir, 'site', 'cicd', 'secrets', 'passphrases',
+            passphrase_file_name)
         assert os.path.isfile(passphrase_file_path)
         with open(passphrase_file_path) as stream:
             doc = yaml.safe_load(stream)
@@ -260,7 +276,7 @@ def test_global_passphrase_catalog(*_):
             assert doc['data']['generated']['by'] == 'test_author'
             assert 'managedDocument' in doc['data']
             assert doc['data']['managedDocument']['metadata'][
-                       'storagePolicy'] == 'encrypted'
+                'storagePolicy'] == 'encrypted'
             decrypted_passphrase = encryption.decrypt(
                 doc['data']['managedDocument']['data'],
                 os.environ['PEGLEG_PASSPHRASE'].encode(),
@@ -284,10 +300,13 @@ def test_global_passphrase_catalog(*_):
     'site_files',
     autospec=True,
     return_value=[
-        'cicd_global_repo/site/cicd/passphrases/passphrase-catalog.yaml', ])
-@mock.patch.dict(os.environ, {
-    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    'PEGLEG_SALT': 'MySecretSalt1234567890]['})
+        'cicd_global_repo/site/cicd/passphrases/passphrase-catalog.yaml',
+    ])
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
 def test_base64_passphrase_catalog(*_):
     _dir = tempfile.mkdtemp()
     os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
@@ -295,9 +314,9 @@ def test_base64_passphrase_catalog(*_):
 
     for passphrase in TEST_BASE64_PASSPHRASES_CATALOG['data']['passphrases']:
         passphrase_file_name = '{}.yaml'.format(passphrase['document_name'])
-        passphrase_file_path = os.path.join(_dir, 'site', 'cicd', 'secrets',
-                                            'passphrases',
-                                            passphrase_file_name)
+        passphrase_file_path = os.path.join(
+            _dir, 'site', 'cicd', 'secrets', 'passphrases',
+            passphrase_file_name)
         assert os.path.isfile(passphrase_file_path)
         with open(passphrase_file_path) as stream:
             doc = yaml.safe_load(stream)
@@ -310,22 +329,22 @@ def test_base64_passphrase_catalog(*_):
                     base64.b64decode(decrypted_passphrase))
 
 
-@mock.patch.dict(os.environ, {
-    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    'PEGLEG_SALT': 'MySecretSalt1234567890]['})
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
 def test_crypt_coding_flow():
     cs_util = CryptoString()
     orig_passphrase = cs_util.get_crypto_string()
     bytes_passphrase = orig_passphrase.encode()
     b64_passphrase = base64.b64encode(bytes_passphrase)
-    encrypted = encryption.encrypt(b64_passphrase,
-                                   os.environ['PEGLEG_PASSPHRASE'].encode(),
-                                   os.environ['PEGLEG_SALT'].encode()
-                                   )
-    decrypted = encryption.decrypt(encrypted,
-                                   os.environ['PEGLEG_PASSPHRASE'].encode(),
-                                   os.environ['PEGLEG_SALT'].encode()
-                                   )
+    encrypted = encryption.encrypt(
+        b64_passphrase, os.environ['PEGLEG_PASSPHRASE'].encode(),
+        os.environ['PEGLEG_SALT'].encode())
+    decrypted = encryption.decrypt(
+        encrypted, os.environ['PEGLEG_PASSPHRASE'].encode(),
+        os.environ['PEGLEG_SALT'].encode())
     assert encrypted != decrypted
     assert decrypted == b64_passphrase
     assert base64.b64decode(decrypted) == bytes_passphrase

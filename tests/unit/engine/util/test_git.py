@@ -93,8 +93,8 @@ def test_git_clone_with_commit_reference():
     reason='git clone requires network connectivity.')
 def test_git_clone_with_patch_ref():
     ref = 'refs/changes/54/457754/73'
-    git_dir = git.git_handler('https://review.opendev.org/openstack/openstack-helm',
-                              ref)
+    git_dir = git.git_handler(
+        'https://review.opendev.org/openstack/openstack-helm', ref)
     _validate_git_clone(git_dir, ref)
 
 
@@ -110,8 +110,8 @@ def test_git_clone_behind_proxy(mock_log):
         git_dir = git.git_handler(url, commit, proxy_server=proxy_server)
         _validate_git_clone(git_dir, commit)
 
-        mock_log.debug.assert_any_call('Cloning [%s] with proxy [%s]', url,
-                                       proxy_server)
+        mock_log.debug.assert_any_call(
+            'Cloning [%s] with proxy [%s]', url, proxy_server)
         mock_log.debug.reset_mock()
 
 
@@ -443,8 +443,7 @@ def test_git_clone_fake_proxy():
 @mock.patch('os.path.exists', return_value=True, autospec=True)
 def test_git_clone_ssh_auth_method_fails_auth(_):
     fake_user = test_utils.rand_name('fake_user')
-    url = ('ssh://%s@review.opendev.org:29418/airship/armada' %
-           fake_user)
+    url = ('ssh://%s@review.opendev.org:29418/airship/armada' % fake_user)
     with pytest.raises(exceptions.GitAuthException):
         git._try_git_clone(
             url, ref='refs/changes/17/388517/5', auth_key='/home/user/.ssh/')
@@ -456,8 +455,7 @@ def test_git_clone_ssh_auth_method_fails_auth(_):
 @mock.patch('os.path.exists', return_value=False, autospec=True)
 def test_git_clone_ssh_auth_method_missing_ssh_key(_):
     fake_user = test_utils.rand_name('fake_user')
-    url = ('ssh://%s@review.opendev.org:29418/airship/armada' %
-           fake_user)
+    url = ('ssh://%s@review.opendev.org:29418/airship/armada' % fake_user)
     with pytest.raises(exceptions.GitSSHException):
         git.git_handler(
             url, ref='refs/changes/17/388517/5', auth_key='/home/user/.ssh/')

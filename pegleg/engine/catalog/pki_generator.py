@@ -42,8 +42,8 @@ class PKIGenerator(object):
 
     """
 
-    def __init__(self, sitename, block_strings=True, author=None,
-                 duration=365):
+    def __init__(
+            self, sitename, block_strings=True, author=None, duration=365):
         """Constructor for ``PKIGenerator``.
 
         :param int duration: Duration in days that generated certificates
@@ -61,8 +61,8 @@ class PKIGenerator(object):
         self._documents = util.definition.documents_for_site(sitename)
         self._author = author
 
-        self.keys = pki_utility.PKIUtility(block_strings=block_strings,
-                                           duration=duration)
+        self.keys = pki_utility.PKIUtility(
+            block_strings=block_strings, duration=duration)
         self.outputs = collections.defaultdict(dict)
 
         # Maps certificates to CAs in order to derive certificate paths.
@@ -119,10 +119,8 @@ class PKIGenerator(object):
     def gen_cert(self, document_name, *, ca_cert, ca_key, **kwargs):
         ca_cert_data = ca_cert['data']['managedDocument']['data']
         ca_key_data = ca_key['data']['managedDocument']['data']
-        return self.keys.generate_certificate(document_name,
-                                              ca_cert=ca_cert_data,
-                                              ca_key=ca_key_data,
-                                              **kwargs)
+        return self.keys.generate_certificate(
+            document_name, ca_cert=ca_cert_data, ca_key=ca_key_data, **kwargs)
 
     def gen_keypair(self, document_name):
         return self.keys.generate_keypair(document_name)
@@ -149,30 +147,31 @@ class PKIGenerator(object):
         docs = self._find_among_collected(schemas, document_name)
         if docs:
             if len(docs) == len(kinds):
-                LOG.debug('Found docs in input config named %s, kinds: %s',
-                          document_name, kinds)
+                LOG.debug(
+                    'Found docs in input config named %s, kinds: %s',
+                    document_name, kinds)
                 return docs
             else:
-                raise exceptions.IncompletePKIPairError(kinds=kinds,
-                                                        name=document_name)
+                raise exceptions.IncompletePKIPairError(
+                    kinds=kinds, name=document_name)
 
         else:
             docs = self._find_among_outputs(schemas, document_name)
             if docs:
-                LOG.debug('Found docs in current outputs named %s, kinds: %s',
-                          document_name, kinds)
+                LOG.debug(
+                    'Found docs in current outputs named %s, kinds: %s',
+                    document_name, kinds)
                 return docs
         # TODO(felipemonteiro): Should this be a critical error?
-        LOG.debug('No docs existing docs named %s, kinds: %s', document_name,
-                  kinds)
+        LOG.debug(
+            'No docs existing docs named %s, kinds: %s', document_name, kinds)
         return []
 
     def _find_among_collected(self, schemas, document_name):
         result = []
         for schema in schemas:
-            doc = _find_document_by(self._documents,
-                                    schema=schema,
-                                    name=document_name)
+            doc = _find_document_by(
+                self._documents, schema=schema, name=document_name)
             # If the document wasn't found, then means it needs to be
             # generated.
             if doc:
@@ -224,20 +223,21 @@ class PKIGenerator(object):
             document = PeglegSecretManagement(
                 docs=[document]).get_encrypted_secrets()[0][0]
 
-            util.files.dump(document,
-                            output_path,
-                            flag='a',
-                            default_flow_style=False,
-                            explicit_start=True,
-                            indent=2)
+            util.files.dump(
+                document,
+                output_path,
+                flag='a',
+                default_flow_style=False,
+                explicit_start=True,
+                indent=2)
 
             output_paths.add(output_path)
         return output_paths
 
     def get_documents(self):
         return list(
-            itertools.chain.from_iterable(v.values()
-                                          for v in self.outputs.values()))
+            itertools.chain.from_iterable(
+                v.values() for v in self.outputs.values()))
 
 
 def get_host_list(service_names):

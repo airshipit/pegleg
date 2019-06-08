@@ -71,9 +71,7 @@ class BaseGenerator(ABC):
 
     def get_save_path(self, passphrase_name):
         """Calculate and return the save path of the ``passphrase_name``."""
-        return os.path.abspath(os.path.join(self._save_location,
-                                            'site',
-                                            self._sitename,
-                                            'secrets',
-                                            self.kind_path,
-                                            '{}.yaml'.format(passphrase_name)))
+        return os.path.abspath(
+            os.path.join(
+                self._save_location, 'site', self._sitename, 'secrets',
+                self.kind_path, '{}.yaml'.format(passphrase_name)))

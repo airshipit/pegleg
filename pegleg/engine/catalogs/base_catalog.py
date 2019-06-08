@@ -50,8 +50,9 @@ class BaseCatalog(ABC):
             if schema == 'pegleg/%s/v1' % kind:
                 self._catalog_docs.append(document)
             elif schema == 'promenade/%s/v1' % kind:
-                LOG.warning('The schema promenade/%s/v1 is deprecated. Use '
-                            'pegleg/%s/v1 instead.', kind, kind)
+                LOG.warning(
+                    'The schema promenade/%s/v1 is deprecated. Use '
+                    'pegleg/%s/v1 instead.', kind, kind)
                 self._catalog_docs.append(document)
 
     @property
@@ -73,8 +74,9 @@ class BaseCatalog(ABC):
         if not self._catalog_path:
             # Cound not find the Catalog for this generated passphrase
             # raise an exception.
-            LOG.error('Catalog path: {} was not found in repo: {}'.format(
-                catalog_name, repo_name))
+            LOG.error(
+                'Catalog path: {} was not found in repo: {}'.format(
+                    catalog_name, repo_name))
             raise PassphraseCatalogNotFoundException()
 
     def _get_document_name(self, name):

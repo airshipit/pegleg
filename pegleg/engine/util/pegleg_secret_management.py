@@ -30,13 +30,14 @@ LOG = logging.getLogger(__name__)
 class PeglegSecretManagement(object):
     """An object to handle operations on of a pegleg managed file."""
 
-    def __init__(self,
-                 file_path=None,
-                 docs=None,
-                 generated=False,
-                 catalog=None,
-                 author=None,
-                 site_name=None):
+    def __init__(
+            self,
+            file_path=None,
+            docs=None,
+            generated=False,
+            catalog=None,
+            author=None,
+            site_name=None):
         """
         Read the source file and the environment data needed to wrap and
         process the file documents as pegleg managed document.
@@ -56,12 +57,14 @@ class PeglegSecretManagement(object):
                 config.set_global_enc_keys(site_name)
 
         if all([file_path, docs]) or not any([file_path, docs]):
-            raise ValueError('Either `file_path` or `docs` must be '
-                             'specified.')
+            raise ValueError(
+                'Either `file_path` or `docs` must be '
+                'specified.')
 
         if generated and not (catalog and author):
-            raise ValueError("If the document is generated, author and "
-                             "catalog must be specified.")
+            raise ValueError(
+                "If the document is generated, author and "
+                "catalog must be specified.")
 
         self.file_path = file_path
         self.documents = list()
@@ -70,10 +73,11 @@ class PeglegSecretManagement(object):
         if docs:
             for doc in docs:
                 self.documents.append(
-                    PeglegManagedSecret(doc,
-                                        generated=generated,
-                                        catalog=catalog,
-                                        author=author))
+                    PeglegManagedSecret(
+                        doc,
+                        generated=generated,
+                        catalog=catalog,
+                        author=author))
         else:
             self.file_path = file_path
             for doc in files.read(file_path):
@@ -109,9 +113,10 @@ class PeglegSecretManagement(object):
             files.write(doc_list, save_path)
             click.echo('Wrote encrypted data to: {}'.format(save_path))
         else:
-            LOG.debug('All documents in file: {} are either already encrypted '
-                      'or have cleartext storage policy. '
-                      'Skipping.'.format(self.file_path))
+            LOG.debug(
+                'All documents in file: {} are either already encrypted '
+                'or have cleartext storage policy. '
+                'Skipping.'.format(self.file_path))
 
     def get_encrypted_secrets(self):
         """
@@ -121,10 +126,11 @@ class PeglegSecretManagement(object):
         :rtype encrypted_docs: bool
         """
         if self._generated and not self._author:
-            raise ValueError("An author is needed to encrypt "
-                             "generated documents. "
-                             "Specify it when PeglegSecretManagement "
-                             "is initialized.")
+            raise ValueError(
+                "An author is needed to encrypt "
+                "generated documents. "
+                "Specify it when PeglegSecretManagement "
+                "is initialized.")
 
         encrypted_docs = False
         doc_list = []
@@ -165,10 +171,11 @@ class PeglegSecretManagement(object):
 
         secrets = self.get_decrypted_secrets()
 
-        return yaml.safe_dump_all(secrets,
-                                  explicit_start=True,
-                                  explicit_end=True,
-                                  default_flow_style=False)
+        return yaml.safe_dump_all(
+            secrets,
+            explicit_start=True,
+            explicit_end=True,
+            default_flow_style=False)
 
     def get_decrypted_secrets(self):
         """

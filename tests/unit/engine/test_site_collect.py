@@ -46,14 +46,12 @@ def _site_definition(site_name):
 
 def _expected_document_names(site_name):
     EXPECTED_DOCUMENT_NAMES = [
-        'global-common',
-        'global-v1.0',
+        'global-common', 'global-v1.0',
         '%s-type-common' % site_name,
         '%s-type-v1.0' % site_name,
         _site_definition(site_name)["metadata"]["name"],
         '%s-chart' % site_name,
-        '%s-passphrase' % site_name,
-        'deployment-version'
+        '%s-passphrase' % site_name, 'deployment-version'
     ]
     return EXPECTED_DOCUMENT_NAMES
 

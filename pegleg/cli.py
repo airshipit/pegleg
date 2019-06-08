@@ -126,11 +126,12 @@ SITE_REPOSITORY_ARGUMENT = click.argument(
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
-@click.option('-v',
-              '--verbose',
-              is_flag=True,
-              default=False,
-              help='Enable debug logging')
+@click.option(
+    '-v',
+    '--verbose',
+    is_flag=True,
+    default=False,
+    help='Enable debug logging')
 def main(*, verbose):
     """Main CLI meta-group, which includes the following groups:
 
@@ -167,19 +168,17 @@ def repo(*, site_repository, clone_path, repo_key, repo_username):
     config.set_umask()
 
 
-def _lint_helper(*,
-                 fail_on_missing_sub_src,
-                 exclude_lint,
-                 warn_lint,
-                 site_name=None):
+def _lint_helper(
+        *, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name=None):
     """Helper for executing lint on specific site or all sites in repo."""
     if site_name:
         func = functools.partial(engine.lint.site, site_name=site_name)
     else:
         func = engine.lint.full
-    warns = func(fail_on_missing_sub_src=fail_on_missing_sub_src,
-                 exclude_lint=exclude_lint,
-                 warn_lint=warn_lint)
+    warns = func(
+        fail_on_missing_sub_src=fail_on_missing_sub_src,
+        exclude_lint=exclude_lint,
+        warn_lint=warn_lint)
     if warns:
         click.echo("Linting passed, but produced some warnings.")
         for w in warns:
@@ -194,9 +193,10 @@ def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
     """Lint all sites using checks defined in :mod:`pegleg.engine.errorcodes`.
     """
     engine.repository.process_site_repository(update_config=True)
-    _lint_helper(fail_on_missing_sub_src=fail_on_missing_sub_src,
-                 exclude_lint=exclude_lint,
-                 warn_lint=warn_lint)
+    _lint_helper(
+        fail_on_missing_sub_src=fail_on_missing_sub_src,
+        exclude_lint=exclude_lint,
+        warn_lint=warn_lint)
 
 
 @main.group(help='Commands related to sites')
@@ -205,8 +205,9 @@ def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
 @EXTRA_REPOSITORY_OPTION
 @REPOSITORY_USERNAME_OPTION
 @REPOSITORY_KEY_OPTION
-def site(*, site_repository, clone_path, extra_repositories, repo_key,
-         repo_username):
+def site(
+        *, site_repository, clone_path, extra_repositories, repo_key,
+        repo_username):
     """Group for site-level actions, which include:
 
     * list: list available sites in a manifests repo
@@ -225,11 +226,12 @@ def site(*, site_repository, clone_path, extra_repositories, repo_key,
 
 
 @site.command(help='Output complete config for one site')
-@click.option('-s',
-              '--save-location',
-              'save_location',
-              help='Directory to output the complete site definition. Created '
-              'automatically if it does not already exist.')
+@click.option(
+    '-s',
+    '--save-location',
+    'save_location',
+    help='Directory to output the complete site definition. Created '
+    'automatically if it does not already exist.')
 @click.option(
     '--validate/--no-validate',
     'validate',
@@ -246,11 +248,12 @@ def site(*, site_repository, clone_path, extra_repositories, repo_key,
     multiple=True,
     help='Excludes specified linting checks. Warnings will still be issued. '
     '-w takes priority over -x.')
-@click.option('-w',
-              '--warn',
-              'warn_lint',
-              multiple=True,
-              help='Warn if linting check fails. -w takes priority over -x.')
+@click.option(
+    '-w',
+    '--warn',
+    'warn_lint',
+    multiple=True,
+    help='Warn if linting check fails. -w takes priority over -x.')
 @SITE_REPOSITORY_ARGUMENT
 def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     """Collects documents into a single site-definition.yaml file, which
@@ -265,10 +268,11 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     """
     if validate:
         # Lint the primary repo prior to document collection.
-        _lint_helper(site_name=site_name,
-                     fail_on_missing_sub_src=True,
-                     exclude_lint=exclude_lint,
-                     warn_lint=warn_lint)
+        _lint_helper(
+            site_name=site_name,
+            fail_on_missing_sub_src=True,
+            exclude_lint=exclude_lint,
+            warn_lint=warn_lint)
     engine.site.collect(site_name, save_location)
 
 
@@ -312,10 +316,11 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
     """Lint a given site using checks defined in
     :mod:`pegleg.engine.errorcodes`.
     """
-    _lint_helper(site_name=site_name,
-                 fail_on_missing_sub_src=fail_on_missing_sub_src,
-                 exclude_lint=exclude_lint,
-                 warn_lint=warn_lint)
+    _lint_helper(
+        site_name=site_name,
+        fail_on_missing_sub_src=fail_on_missing_sub_src,
+        exclude_lint=exclude_lint,
+        warn_lint=warn_lint)
 
 
 def collection_default_callback(ctx, param, value):
@@ -327,14 +332,16 @@ def collection_default_callback(ctx, param, value):
 
 @site.command('upload', help='Upload documents to Shipyard')
 # Keystone authentication parameters
-@click.option('--os-project-domain-name',
-              envvar='OS_PROJECT_DOMAIN_NAME',
-              required=False,
-              default='default')
-@click.option('--os-user-domain-name',
-              envvar='OS_USER_DOMAIN_NAME',
-              required=False,
-              default='default')
+@click.option(
+    '--os-project-domain-name',
+    envvar='OS_PROJECT_DOMAIN_NAME',
+    required=False,
+    default='default')
+@click.option(
+    '--os-user-domain-name',
+    envvar='OS_USER_DOMAIN_NAME',
+    required=False,
+    default='default')
 @click.option('--os-project-name', envvar='OS_PROJECT_NAME', required=False)
 @click.option('--os-username', envvar='OS_USERNAME', required=False)
 @click.option('--os-password', envvar='OS_PASSWORD', required=False)
@@ -362,16 +369,18 @@ def collection_default_callback(ctx, param, value):
     'collection does not already exist in the Shipyard buffer.\n'
     'replace: Clear the Shipyard Buffer before adding the specified '
     'collection.\n')
-@click.option('--collection',
-              'collection',
-              help='Specifies the name to use for the uploaded collection. '
-              'Defaults to the specified `site_name`.',
-              callback=collection_default_callback)
+@click.option(
+    '--collection',
+    'collection',
+    help='Specifies the name to use for the uploaded collection. '
+    'Defaults to the specified `site_name`.',
+    callback=collection_default_callback)
 @SITE_REPOSITORY_ARGUMENT
 @click.pass_context
-def upload(ctx, *, os_project_domain_name, os_user_domain_name,
-           os_project_name, os_username, os_password, os_auth_url,
-           os_auth_token, context_marker, site_name, buffer_mode, collection):
+def upload(
+        ctx, *, os_project_domain_name, os_user_domain_name, os_project_name,
+        os_username, os_password, os_auth_url, os_auth_token, context_marker,
+        site_name, buffer_mode, collection):
     if not ctx.obj:
         ctx.obj = {}
 
@@ -415,12 +424,13 @@ def secrets():
     'for tracking provenance information in the PeglegManagedDocuments. '
     'An attempt is made to automatically determine this value, '
     'but should be provided.')
-@click.option('-d',
-              '--days',
-              'days',
-              default=365,
-              show_default=True,
-              help='Duration in days generated certificates should be valid.')
+@click.option(
+    '-d',
+    '--days',
+    'days',
+    default=365,
+    show_default=True,
+    help='Duration in days generated certificates should be valid.')
 @click.argument('site_name')
 def generate_pki(site_name, author, days):
     """Generate certificates, certificate authorities and keypairs for a given
@@ -429,9 +439,8 @@ def generate_pki(site_name, author, days):
     """
 
     engine.repository.process_repositories(site_name, overwrite_existing=True)
-    pkigenerator = catalog.pki_generator.PKIGenerator(site_name,
-                                                      author=author,
-                                                      duration=days)
+    pkigenerator = catalog.pki_generator.PKIGenerator(
+        site_name, author=author, duration=days)
     output_paths = pkigenerator.generate()
 
     click.echo("Generated PKI files written to:\n%s" % '\n'.join(output_paths))
@@ -441,13 +450,12 @@ def generate_pki(site_name, author, days):
     'wrap',
     help='Wrap bare files (e.g. pem or crt) in a PeglegManagedDocument '
     'and encrypt them (by default).')
-@click.option('-a',
-              '--author',
-              'author',
-              help='Author for the new wrapped file.')
-@click.option('--filename',
-              'filename',
-              help='The relative file path for the file to be wrapped.')
+@click.option(
+    '-a', '--author', 'author', help='Author for the new wrapped file.')
+@click.option(
+    '--filename',
+    'filename',
+    help='The relative file path for the file to be wrapped.')
 @click.option(
     '-o',
     '--output-path',
@@ -455,53 +463,58 @@ def generate_pki(site_name, author, days):
     required=False,
     help='The output path for the wrapped file. (default: input path with '
     '.yaml)')
-@click.option('-s',
-              '--schema',
-              'schema',
-              help='The schema for the document to be wrapped, e.g. '
-              'deckhand/Certificate/v1')
-@click.option('-n',
-              '--name',
-              'name',
-              help='The name for the document to be wrapped, e.g. new-cert')
-@click.option('-l',
-              '--layer',
-              'layer',
-              help='The layer for the document to be wrapped., e.g. site.')
-@click.option('--encrypt/--no-encrypt',
-              'encrypt',
-              is_flag=True,
-              default=True,
-              show_default=True,
-              help='Whether to encrypt the wrapped file.')
+@click.option(
+    '-s',
+    '--schema',
+    'schema',
+    help='The schema for the document to be wrapped, e.g. '
+    'deckhand/Certificate/v1')
+@click.option(
+    '-n',
+    '--name',
+    'name',
+    help='The name for the document to be wrapped, e.g. new-cert')
+@click.option(
+    '-l',
+    '--layer',
+    'layer',
+    help='The layer for the document to be wrapped., e.g. site.')
+@click.option(
+    '--encrypt/--no-encrypt',
+    'encrypt',
+    is_flag=True,
+    default=True,
+    show_default=True,
+    help='Whether to encrypt the wrapped file.')
 @click.argument('site_name')
-def wrap_secret_cli(*, site_name, author, filename, output_path, schema, name,
-                    layer, encrypt):
+def wrap_secret_cli(
+        *, site_name, author, filename, output_path, schema, name, layer,
+        encrypt):
     """Wrap a bare secrets file in a YAML and ManagedDocument.
 
     """
 
     engine.repository.process_repositories(site_name, overwrite_existing=True)
-    wrap_secret(author,
-                filename,
-                output_path,
-                schema,
-                name,
-                layer,
-                encrypt,
-                site_name=site_name)
+    wrap_secret(
+        author,
+        filename,
+        output_path,
+        schema,
+        name,
+        layer,
+        encrypt,
+        site_name=site_name)
 
 
-@site.command('genesis_bundle',
-              help='Construct the genesis deployment bundle.')
-@click.option('-b',
-              '--build-dir',
-              'build_dir',
-              type=click.Path(file_okay=False,
-                              dir_okay=True,
-                              resolve_path=True),
-              required=True,
-              help='Destination directory to store the genesis bundle.')
+@site.command(
+    'genesis_bundle', help='Construct the genesis deployment bundle.')
+@click.option(
+    '-b',
+    '--build-dir',
+    'build_dir',
+    type=click.Path(file_okay=False, dir_okay=True, resolve_path=True),
+    required=True,
+    help='Destination directory to store the genesis bundle.')
 @click.option(
     '--include-validators',
     'validators',
@@ -512,8 +525,9 @@ def wrap_secret_cli(*, site_name, author, filename, output_path, schema, name,
 @SITE_REPOSITORY_ARGUMENT
 def genesis_bundle(*, build_dir, validators, site_name):
     encryption_key = os.environ.get("PROMENADE_ENCRYPTION_KEY")
-    bundle.build_genesis(build_dir, encryption_key, validators,
-                         logging.DEBUG == LOG.getEffectiveLevel(), site_name)
+    bundle.build_genesis(
+        build_dir, encryption_key, validators,
+        logging.DEBUG == LOG.getEffectiveLevel(), site_name)
 
 
 @secrets.command(
@@ -534,8 +548,9 @@ def check_pki_certs(site_name, days):
 
     cert_results = engine.secrets.check_cert_expiry(site_name, duration=days)
 
-    click.echo("The following certs will expire within {} days: \n{}".format(
-        days, cert_results))
+    click.echo(
+        "The following certs will expire within {} days: \n{}".format(
+            days, cert_results))
 
 
 @main.group(help='Commands related to types')
@@ -544,8 +559,9 @@ def check_pki_certs(site_name, days):
 @EXTRA_REPOSITORY_OPTION
 @REPOSITORY_USERNAME_OPTION
 @REPOSITORY_KEY_OPTION
-def type(*, site_repository, clone_path, extra_repositories, repo_key,
-         repo_username):
+def type(
+        *, site_repository, clone_path, extra_repositories, repo_key,
+        repo_username):
     """Group for repo-level actions, which include:
 
     * list: list all types across the repository
@@ -566,8 +582,8 @@ def list_types(*, output_stream):
     engine.type.list_types(output_stream)
 
 
-@secrets.group(name='generate',
-               help='Command group to generate site secrets documents.')
+@secrets.group(
+    name='generate', help='Command group to generate site secrets documents.')
 def generate():
     pass
 
@@ -591,12 +607,13 @@ def generate():
     required=True,
     help='Identifier for the program or person who is generating the secrets '
     'documents')
-@click.option('-i',
-              '--interactive',
-              'interactive',
-              is_flag=True,
-              default=False,
-              help='Generate passphrases interactively, not automatically')
+@click.option(
+    '-i',
+    '--interactive',
+    'interactive',
+    is_flag=True,
+    default=False,
+    help='Generate passphrases interactively, not automatically')
 @click.option(
     '--force-cleartext',
     'force_cleartext',
@@ -604,17 +621,18 @@ def generate():
     default=False,
     show_default=True,
     help='Force cleartext generation of passphrases. This is not recommended.')
-def generate_passphrases(*, site_name, save_location, author, interactive,
-                         force_cleartext):
+def generate_passphrases(
+        *, site_name, save_location, author, interactive, force_cleartext):
     engine.repository.process_repositories(site_name)
-    engine.secrets.generate_passphrases(site_name, save_location, author,
-                                        interactive, force_cleartext)
+    engine.secrets.generate_passphrases(
+        site_name, save_location, author, interactive, force_cleartext)
 
 
-@secrets.command('encrypt',
-                 help='Command to encrypt and wrap site secrets '
-                 'documents with metadata.storagePolicy set '
-                 'to encrypted, in pegleg managed documents.')
+@secrets.command(
+    'encrypt',
+    help='Command to encrypt and wrap site secrets '
+    'documents with metadata.storagePolicy set '
+    'to encrypted, in pegleg managed documents.')
 @click.option(
     '-s',
     '--save-location',
@@ -639,14 +657,16 @@ def encrypt(*, save_location, author, site_name):
     engine.secrets.encrypt(save_location, author, site_name=site_name)
 
 
-@secrets.command('decrypt',
-                 help='Command to unwrap and decrypt one site '
-                 'secrets document and print it to stdout.')
-@click.option('--path',
-              'path',
-              type=click.Path(exists=True, readable=True),
-              required=True,
-              help='The file or directory path to decrypt.')
+@secrets.command(
+    'decrypt',
+    help='Command to unwrap and decrypt one site '
+    'secrets document and print it to stdout.')
+@click.option(
+    '--path',
+    'path',
+    type=click.Path(exists=True, readable=True),
+    required=True,
+    help='The file or directory path to decrypt.')
 @click.option(
     '-s',
     '--save-location',
@@ -688,27 +708,31 @@ def generate():
 @generate.command(
     'passphrase',
     help='Command to generate a passphrase and print out to stdout')
-@click.option('-l',
-              '--length',
-              'length',
-              default=24,
-              show_default=True,
-              help='Generate a passphrase of the given length. '
-              'Length is >= 24, no maximum length.')
+@click.option(
+    '-l',
+    '--length',
+    'length',
+    default=24,
+    show_default=True,
+    help='Generate a passphrase of the given length. '
+    'Length is >= 24, no maximum length.')
 def generate_passphrase(length):
-    click.echo('Generated Passhprase: {}'.format(
-        engine.secrets.generate_crypto_string(length)))
+    click.echo(
+        'Generated Passhprase: {}'.format(
+            engine.secrets.generate_crypto_string(length)))
 
 
-@generate.command('salt',
-                  help='Command to generate a salt and print out to stdout')
-@click.option('-l',
-              '--length',
-              'length',
-              default=24,
-              show_default=True,
-              help='Generate a passphrase of the given length. '
-              'Length is >= 24, no maximum length.')
+@generate.command(
+    'salt', help='Command to generate a salt and print out to stdout')
+@click.option(
+    '-l',
+    '--length',
+    'length',
+    default=24,
+    show_default=True,
+    help='Generate a passphrase of the given length. '
+    'Length is >= 24, no maximum length.')
 def generate_salt(length):
-    click.echo("Generated Salt: {}".format(
-        engine.secrets.generate_crypto_string(length)))
+    click.echo(
+        "Generated Salt: {}".format(
+            engine.secrets.generate_crypto_string(length)))

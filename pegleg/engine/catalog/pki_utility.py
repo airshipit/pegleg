@@ -69,18 +69,18 @@ class PKIUtility(object):
             raise exceptions.PKICertificateInvalidDuration()
 
         if not self._ca_config_string:
-            self._ca_config_string = json.dumps({
-                'signing': {
-                    'default': {
-                        'expiry':
-                        str(24 * self.duration) + 'h',
-                        'usages': [
-                            'signing', 'key encipherment', 'server auth',
-                            'client auth'
-                        ],
+            self._ca_config_string = json.dumps(
+                {
+                    'signing': {
+                        'default': {
+                            'expiry': str(24 * self.duration) + 'h',
+                            'usages': [
+                                'signing', 'key encipherment', 'server auth',
+                                'client auth'
+                            ],
+                        },
                     },
-                },
-            })
+                })
         return self._ca_config_string
 
     def generate_ca(self, ca_name):
@@ -92,11 +92,13 @@ class PKIUtility(object):
 
         """
 
-        result = self._cfssl(['gencert', '-initca', 'csr.json'],
-                             files={'csr.json': self.csr(name=ca_name)})
+        result = self._cfssl(
+            ['gencert', '-initca', 'csr.json'],
+            files={'csr.json': self.csr(name=ca_name)})
 
-        return (self._wrap_ca(ca_name, result['cert']),
-                self._wrap_ca_key(ca_name, result['key']))
+        return (
+            self._wrap_ca(ca_name, result['cert']),
+            self._wrap_ca_key(ca_name, result['key']))
 
     def generate_keypair(self, name):
         """Generate keypair.
@@ -114,17 +116,12 @@ class PKIUtility(object):
                 'priv.pem': priv_result['priv.pem'],
             })
 
-        return (self._wrap_pub_key(name, pub_result['pub.pem']),
-                self._wrap_priv_key(name, priv_result['priv.pem']))
+        return (
+            self._wrap_pub_key(name, pub_result['pub.pem']),
+            self._wrap_priv_key(name, priv_result['priv.pem']))
 
-    def generate_certificate(self,
-                             name,
-                             *,
-                             ca_cert,
-                             ca_key,
-                             cn,
-                             groups=None,
-                             hosts=None):
+    def generate_certificate(
+            self, name, *, ca_cert, ca_key, cn, groups=None, hosts=None):
         """Generate certificate and associated key given CA cert and key.
 
         :param str name: Name of certificate in wrapped document.
@@ -155,10 +152,12 @@ class PKIUtility(object):
                 'csr.json': self.csr(name=cn, groups=groups, hosts=hosts),
             })
 
-        return (self._wrap_cert(name, result['cert']),
-                self._wrap_cert_key(name, result['key']))
+        return (
+            self._wrap_cert(name, result['cert']),
+            self._wrap_cert_key(name, result['key']))
 
-    def csr(self,
+    def csr(
+            self,
             *,
             name,
             groups=None,
@@ -172,14 +171,15 @@ class PKIUtility(object):
         if hosts is None:
             hosts = []
 
-        return json.dumps({
-            'CN': name,
-            'key': key,
-            'hosts': hosts,
-            'names': [{
-                'O': g
-            } for g in groups],
-        })
+        return json.dumps(
+            {
+                'CN': name,
+                'key': key,
+                'hosts': hosts,
+                'names': [{
+                    'O': g
+                } for g in groups],
+            })
 
     def cert_info(self, cert):
         """Retrieve certificate info via ``cfssl``.
@@ -190,8 +190,8 @@ class PKIUtility(object):
 
         """
 
-        return self._cfssl(['certinfo', '-cert', 'cert.pem'],
-                           files={'cert.pem': cert})
+        return self._cfssl(
+            ['certinfo', '-cert', 'cert.pem'], files={'cert.pem': cert})
 
     def check_expiry(self, cert):
         """Chek whether a given certificate is expired.
@@ -223,8 +223,8 @@ class PKIUtility(object):
             files = {}
         with tempfile.TemporaryDirectory() as tmp:
             for filename, data in files.items():
-                util.files.write(decode_bytes(data),
-                                 os.path.join(tmp, filename))
+                util.files.write(
+                    decode_bytes(data), os.path.join(tmp, filename))
 
             # Ignore bandit false positive:
             #   B603:subprocess_without_shell_equals_true
@@ -241,8 +241,8 @@ class PKIUtility(object):
 
         with tempfile.TemporaryDirectory() as tmp:
             for filename, data in files.items():
-                util.files.write(decode_bytes(data),
-                                 os.path.join(tmp, filename))
+                util.files.write(
+                    decode_bytes(data), os.path.join(tmp, filename))
 
             # Ignore bandit false positive:
             #   B603:subprocess_without_shell_equals_true
@@ -261,40 +261,46 @@ class PKIUtility(object):
             return result
 
     def _wrap_ca(self, name, data):
-        return self.wrap_document(kind='CertificateAuthority',
-                                  name=name,
-                                  data=data,
-                                  block_strings=self.block_strings)
+        return self.wrap_document(
+            kind='CertificateAuthority',
+            name=name,
+            data=data,
+            block_strings=self.block_strings)
 
     def _wrap_ca_key(self, name, data):
-        return self.wrap_document(kind='CertificateAuthorityKey',
-                                  name=name,
-                                  data=data,
-                                  block_strings=self.block_strings)
+        return self.wrap_document(
+            kind='CertificateAuthorityKey',
+            name=name,
+            data=data,
+            block_strings=self.block_strings)
 
     def _wrap_cert(self, name, data):
-        return self.wrap_document(kind='Certificate',
-                                  name=name,
-                                  data=data,
-                                  block_strings=self.block_strings)
+        return self.wrap_document(
+            kind='Certificate',
+            name=name,
+            data=data,
+            block_strings=self.block_strings)
 
     def _wrap_cert_key(self, name, data):
-        return self.wrap_document(kind='CertificateKey',
-                                  name=name,
-                                  data=data,
-                                  block_strings=self.block_strings)
+        return self.wrap_document(
+            kind='CertificateKey',
+            name=name,
+            data=data,
+            block_strings=self.block_strings)
 
     def _wrap_priv_key(self, name, data):
-        return self.wrap_document(kind='PrivateKey',
-                                  name=name,
-                                  data=data,
-                                  block_strings=self.block_strings)
+        return self.wrap_document(
+            kind='PrivateKey',
+            name=name,
+            data=data,
+            block_strings=self.block_strings)
 
     def _wrap_pub_key(self, name, data):
-        return self.wrap_document(kind='PublicKey',
-                                  name=name,
-                                  data=data,
-                                  block_strings=self.block_strings)
+        return self.wrap_document(
+            kind='PublicKey',
+            name=name,
+            data=data,
+            block_strings=self.block_strings)
 
     @staticmethod
     def wrap_document(kind, name, data, block_strings=True):
@@ -319,8 +325,8 @@ class PKIUtility(object):
             },
             'storagePolicy': 'cleartext'
         }
-        wrapped_data = PKIUtility._block_literal(data,
-                                                 block_strings=block_strings)
+        wrapped_data = PKIUtility._block_literal(
+            data, block_strings=block_strings)
 
         document = {
             "schema": wrapped_schema,

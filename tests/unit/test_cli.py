@@ -46,8 +46,9 @@ DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF
 """
 
 
-@pytest.mark.skipif(not test_utils.is_connected(),
-                    reason='git clone requires network connectivity.')
+@pytest.mark.skipif(
+    not test_utils.is_connected(),
+    reason='git clone requires network connectivity.')
 class BaseCLIActionTest(object):
     """Tests end-to-end flows for all Pegleg CLI actions, with minimal mocking.
 
@@ -73,8 +74,8 @@ class BaseCLIActionTest(object):
 
         cls.repo_rev = TEST_PARAMS["repo_rev"]
         cls.repo_name = TEST_PARAMS["repo_name"]
-        cls.treasuremap_path = git.git_handler(TEST_PARAMS["repo_url"],
-                                               ref=TEST_PARAMS["repo_rev"])
+        cls.treasuremap_path = git.git_handler(
+            TEST_PARAMS["repo_url"], ref=TEST_PARAMS["repo_rev"])
 
 
 class TestSiteCLIOptions(BaseCLIActionTest):
@@ -93,8 +94,8 @@ class TestSiteCLIOptions(BaseCLIActionTest):
         # 1) List sites (should clone repo automatically to `clone_path`
         #    location if `clone_path` is set)
 
-        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
-                                                          self.repo_rev)
+        repo_url = 'https://opendev.org/airship/%s@%s' % (
+            self.repo_name, self.repo_rev)
 
         # Note that the -p option is used to specify the clone_folder
         site_list = self.runner.invoke(
@@ -143,8 +144,8 @@ class TestSiteCLIOptionsNegative(BaseCLIActionTest):
         # 1) List sites (should clone repo automatically to `clone_path`
         #    location if `clone_path` is set)
 
-        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
-                                                          self.repo_rev)
+        repo_url = 'https://opendev.org/airship/%s@%s' % (
+            self.repo_name, self.repo_rev)
 
         # Note that the -p option is used to specify the clone_folder
         site_list = self.runner.invoke(
@@ -170,10 +171,11 @@ class TestSiteCliActions(BaseCLIActionTest):
     ### Collect tests ###
 
     def _validate_collect_site_action(self, repo_path_or_url, save_location):
-        result = self.runner.invoke(cli.site, [
-            '-r', repo_path_or_url, 'collect', self.site_name, '-s',
-            save_location
-        ])
+        result = self.runner.invoke(
+            cli.site, [
+                '-r', repo_path_or_url, 'collect', self.site_name, '-s',
+                save_location
+            ])
 
         collected_files = os.listdir(save_location)
 
@@ -191,8 +193,8 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 2) Collect into save location (should clone repo automatically)
         # 3) Check that expected file name is there
 
-        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
-                                                          self.repo_rev)
+        repo_url = 'https://opendev.org/airship/%s@%s' % (
+            self.repo_name, self.repo_rev)
         self._validate_collect_site_action(repo_url, temp_path)
 
     def test_collect_using_remote_repo_url_ending_with_dot_git(
@@ -204,8 +206,8 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 2) Collect into save location (should clone repo automatically)
         # 3) Check that expected file name is there
 
-        repo_url = 'https://opendev.org/airship/%s@%s.git' % (self.repo_name,
-                                                              self.repo_rev)
+        repo_url = 'https://opendev.org/airship/%s@%s.git' % (
+            self.repo_name, self.repo_rev)
         self._validate_collect_site_action(repo_url, temp_path)
 
     def test_collect_using_local_path(self, temp_path):
@@ -232,8 +234,8 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
             mock_deckhand.deckhand_render.return_value = ([], [])
-            result = self.runner.invoke(cli.site,
-                                        lint_command + exclude_lint_command)
+            result = self.runner.invoke(
+                cli.site, lint_command + exclude_lint_command)
 
         assert result.exit_code == 0, result.output
 
@@ -251,8 +253,8 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 1) Mock out Deckhand render (so we can ignore P005 issues)
         # 2) Lint site with exclude flags (should clone repo automatically)
 
-        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
-                                                          self.repo_rev)
+        repo_url = 'https://opendev.org/airship/%s@%s' % (
+            self.repo_name, self.repo_rev)
         self._test_lint_site_action(repo_url, exclude=True)
 
     def test_lint_site_using_local_path_with_exclude(self):
@@ -294,8 +296,8 @@ class TestSiteCliActions(BaseCLIActionTest):
         #
         # 1) List sites (should clone repo automatically)
 
-        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
-                                                          self.repo_rev)
+        repo_url = 'https://opendev.org/airship/%s@%s' % (
+            self.repo_name, self.repo_rev)
 
         self._validate_list_site_action(repo_url, temp_path)
 
@@ -312,9 +314,11 @@ class TestSiteCliActions(BaseCLIActionTest):
 
     def _validate_site_show_action(self, repo_path_or_url, temp_path):
         mock_output = os.path.join(temp_path, 'output')
-        result = self.runner.invoke(cli.site, [
-            '-r', repo_path_or_url, 'show', self.site_name, '-o', mock_output
-        ])
+        result = self.runner.invoke(
+            cli.site, [
+                '-r', repo_path_or_url, 'show', self.site_name, '-o',
+                mock_output
+            ])
 
         assert result.exit_code == 0, result.output
         with open(mock_output, 'r') as f:
@@ -327,8 +331,8 @@ class TestSiteCliActions(BaseCLIActionTest):
         #
         # 1) Show site (should clone repo automatically)
 
-        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
-                                                          self.repo_rev)
+        repo_url = 'https://opendev.org/airship/%s@%s' % (
+            self.repo_name, self.repo_rev)
         self._validate_site_show_action(repo_url, temp_path)
 
     def test_show_site_using_local_path(self, temp_path):
@@ -361,8 +365,8 @@ class TestSiteCliActions(BaseCLIActionTest):
         # 1) Mock out Deckhand render (so we can ignore P005 issues)
         # 2) Render site (should clone repo automatically)
 
-        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
-                                                          self.repo_rev)
+        repo_url = 'https://opendev.org/airship/%s@%s' % (
+            self.repo_name, self.repo_rev)
         self._validate_render_site_action(repo_url)
 
     def test_render_site_using_local_path(self):
@@ -387,10 +391,11 @@ class TestSiteCliActions(BaseCLIActionTest):
         repo_path = self.treasuremap_path
 
         with mock.patch('pegleg.cli.ShipyardHelper') as mock_obj:
-            result = self.runner.invoke(cli.site, [
-                '-r', repo_path, 'upload', self.site_name, '--collection',
-                'collection'
-            ])
+            result = self.runner.invoke(
+                cli.site, [
+                    '-r', repo_path, 'upload', self.site_name, '--collection',
+                    'collection'
+                ])
 
         assert result.exit_code == 0
         mock_obj.assert_called_once()
@@ -435,8 +440,8 @@ class TestRepoCliActions(BaseCLIActionTest):
         # 1) Mock out Deckhand render (so we can ignore P005 issues)
         # 2) Lint repo with exclude flags (should clone repo automatically)
 
-        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
-                                                          self.repo_rev)
+        repo_url = 'https://opendev.org/airship/%s@%s' % (
+            self.repo_name, self.repo_rev)
 
         lint_command = ['-r', repo_url, 'lint']
         exclude_lint_command = [
@@ -446,8 +451,8 @@ class TestRepoCliActions(BaseCLIActionTest):
 
         with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
             mock_deckhand.deckhand_render.return_value = ([], [])
-            result = self.runner.invoke(cli.repo,
-                                        lint_command + exclude_lint_command)
+            result = self.runner.invoke(
+                cli.repo, lint_command + exclude_lint_command)
 
         assert result.exit_code == 0, result.output
         # A successful result (while setting lint checks to exclude) should
@@ -470,8 +475,8 @@ class TestRepoCliActions(BaseCLIActionTest):
 
         with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
             mock_deckhand.deckhand_render.return_value = ([], [])
-            result = self.runner.invoke(cli.repo,
-                                        lint_command + exclude_lint_command)
+            result = self.runner.invoke(
+                cli.repo, lint_command + exclude_lint_command)
 
         assert result.exit_code == 0, result.output
         # A successful result (while setting lint checks to exclude) should
@@ -506,26 +511,26 @@ class TestSiteSecretsActions(BaseCLIActionTest):
                 result = yaml.safe_load_all(f)  # Validate valid YAML.
                 assert list(result), "%s file is empty" % generated_file
 
-    @pytest.mark.skipif(not pki_utility.PKIUtility.cfssl_exists(),
-                        reason='cfssl must be installed to execute these tests'
-                        )
+    @pytest.mark.skipif(
+        not pki_utility.PKIUtility.cfssl_exists(),
+        reason='cfssl must be installed to execute these tests')
     def test_site_secrets_generate_pki_using_remote_repo_url(self):
         """Validates ``generate-pki`` action using remote repo URL."""
         # Scenario:
         #
         # 1) Generate PKI using remote repo URL
 
-        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
-                                                          self.repo_rev)
+        repo_url = 'https://opendev.org/airship/%s@%s' % (
+            self.repo_name, self.repo_rev)
 
         secrets_opts = ['secrets', 'generate-pki', self.site_name]
 
         result = self.runner.invoke(cli.site, ['-r', repo_url] + secrets_opts)
         self._validate_generate_pki_action(result)
 
-    @pytest.mark.skipif(not pki_utility.PKIUtility.cfssl_exists(),
-                        reason='cfssl must be installed to execute these tests'
-                        )
+    @pytest.mark.skipif(
+        not pki_utility.PKIUtility.cfssl_exists(),
+        reason='cfssl must be installed to execute these tests')
     def test_site_secrets_generate_pki_using_local_repo_path(self):
         """Validates ``generate-pki`` action using local repo path."""
         # Scenario:
@@ -538,9 +543,9 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
         self._validate_generate_pki_action(result)
 
-    @pytest.mark.skipif(not pki_utility.PKIUtility.cfssl_exists(),
-                        reason='cfssl must be installed to execute these tests'
-                        )
+    @pytest.mark.skipif(
+        not pki_utility.PKIUtility.cfssl_exists(),
+        reason='cfssl must be installed to execute these tests')
     @mock.patch.dict(
         os.environ, {
             "PEGLEG_PASSPHRASE": "123456789012345678901234567890",
@@ -553,8 +558,9 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         # 1) Encrypt a file in a local repo
 
         repo_path = self.treasuremap_path
-        file_path = os.path.join(repo_path, "site", "airship-seaworthy",
-                                 "secrets", "passphrases", "ceph_fsid.yaml")
+        file_path = os.path.join(
+            repo_path, "site", "airship-seaworthy", "secrets", "passphrases",
+            "ceph_fsid.yaml")
         with open(file_path, "r") as ceph_fsid_fi:
             ceph_fsid = yaml.safe_load(ceph_fsid_fi)
             ceph_fsid["metadata"]["storagePolicy"] = "encrypted"
@@ -582,9 +588,9 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
         assert result.exit_code == 0, result.output
 
-    @pytest.mark.skipif(not pki_utility.PKIUtility.cfssl_exists(),
-                        reason='cfssl must be installed to execute these tests'
-                        )
+    @pytest.mark.skipif(
+        not pki_utility.PKIUtility.cfssl_exists(),
+        reason='cfssl must be installed to execute these tests')
     def test_check_pki_certs(self):
         repo_path = self.treasuremap_path
         secrets_opts = ['secrets', 'check-pki-certs', self.site_name]
@@ -603,8 +609,8 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         # 1) Encrypt a file in a local repo
 
         repo_path = self.treasuremap_path
-        file_dir = os.path.join(repo_path, "site", "airship-seaworthy",
-                                "secrets", "certificates")
+        file_dir = os.path.join(
+            repo_path, "site", "airship-seaworthy", "secrets", "certificates")
         file_path = os.path.join(file_dir, "test.crt")
         output_path = os.path.join(file_dir, "test.yaml")
 
@@ -671,8 +677,8 @@ class TestTypeCliActions(BaseCLIActionTest):
         #
         # 1) List types (should clone repo automatically)
 
-        repo_url = 'https://opendev.org/airship/%s@%s' % (self.repo_name,
-                                                          self.repo_rev)
+        repo_url = 'https://opendev.org/airship/%s@%s' % (
+            self.repo_name, self.repo_rev)
         self._validate_type_list_action(repo_url, temp_path)
 
     def test_list_types_using_local_repo_path(self, temp_path):

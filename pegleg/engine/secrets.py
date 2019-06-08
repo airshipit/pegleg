@@ -61,11 +61,10 @@ def encrypt(save_location, author, site_name):
     secrets_found = False
     for repo_base, file_path in definition.site_files_by_repo(site_name):
         secrets_found = True
-        PeglegSecretManagement(file_path=file_path,
-                               author=author,
-                               site_name=site_name).encrypt_secrets(
-                                   _get_dest_path(repo_base, file_path,
-                                                  save_location))
+        PeglegSecretManagement(
+            file_path=file_path, author=author,
+            site_name=site_name).encrypt_secrets(
+                _get_dest_path(repo_base, file_path, save_location))
     if secrets_found:
         LOG.info('Encryption of all secret files was completed.')
     else:
@@ -91,8 +90,9 @@ def decrypt(path, site_name=None):
     file_dict = {}
 
     if not os.path.exists(path):
-        LOG.error('Path: {} was not found. Check your path and site name, '
-                  'and try again.'.format(path))
+        LOG.error(
+            'Path: {} was not found. Check your path and site name, '
+            'and try again.'.format(path))
         return file_dict
 
     if os.path.isfile(path):
@@ -136,11 +136,9 @@ def _get_dest_path(repo_base, file_path, save_location):
         return file_path
 
 
-def generate_passphrases(site_name,
-                         save_location,
-                         author,
-                         interactive=False,
-                         force_cleartext=False):
+def generate_passphrases(
+        site_name, save_location, author, interactive=False,
+        force_cleartext=False):
     """
     Look for the site passphrase catalogs, and for every passphrase entry in
     the passphrase catalog generate a passphrase document, wrap the
@@ -154,9 +152,8 @@ def generate_passphrases(site_name,
     :param bool force_cleartext: Whether to generate results in clear text
     """
 
-    PassphraseGenerator(site_name, save_location,
-                        author).generate(interactive=interactive,
-                                         force_cleartext=force_cleartext)
+    PassphraseGenerator(site_name, save_location, author).generate(
+        interactive=interactive, force_cleartext=force_cleartext)
 
 
 def generate_crypto_string(length):
@@ -170,14 +167,15 @@ def generate_crypto_string(length):
     return CryptoString().get_crypto_string(length)
 
 
-def wrap_secret(author,
-                filename,
-                output_path,
-                schema,
-                name,
-                layer,
-                encrypt,
-                site_name=None):
+def wrap_secret(
+        author,
+        filename,
+        output_path,
+        schema,
+        name,
+        layer,
+        encrypt,
+        site_name=None):
     """Wrap a bare secrets file in a YAML and ManagedDocument.
 
     :param author: author for ManagedDocument
@@ -210,9 +208,8 @@ def wrap_secret(author,
     }
     managed_secret = PeglegManagedSecret(inner_doc, author=author)
     if encrypt:
-        psm = PeglegSecretManagement(docs=[inner_doc],
-                                     author=author,
-                                     site_name=site_name)
+        psm = PeglegSecretManagement(
+            docs=[inner_doc], author=author, site_name=site_name)
         output_doc = psm.get_encrypted_secrets()[0][0]
     else:
         output_doc = managed_secret.pegleg_document

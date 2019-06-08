@@ -28,8 +28,9 @@ EXPECTED_DIR_PERM = '0o750'
 
 class TestFileHelpers(object):
     def test_read_compatible_file(self, create_tmp_deployment_files):
-        path = os.path.join(config.get_site_repo(), 'site', 'cicd', 'secrets',
-                            'passphrases', 'cicd-passphrase.yaml')
+        path = os.path.join(
+            config.get_site_repo(), 'site', 'cicd', 'secrets', 'passphrases',
+            'cicd-passphrase.yaml')
         documents = files.read(path)
         assert 1 == len(documents)
 
@@ -38,15 +39,16 @@ class TestFileHelpers(object):
         # Deckhand-formatted document currently but probably shouldn't be,
         # because it has no business being in Deckhand. As such, validate that
         # it is ignored.
-        path = os.path.join(config.get_site_repo(), 'site', 'cicd',
-                            'site-definition.yaml')
+        path = os.path.join(
+            config.get_site_repo(), 'site', 'cicd', 'site-definition.yaml')
         documents = files.read(path)
-        assert not documents, ("Documents returned should be empty for "
-                               "site-definition.yaml")
+        assert not documents, (
+            "Documents returned should be empty for "
+            "site-definition.yaml")
 
     def test_write(self, create_tmp_deployment_files):
-        path = os.path.join(config.get_site_repo(), 'site', 'cicd',
-                            'test_out.yaml')
+        path = os.path.join(
+            config.get_site_repo(), 'site', 'cicd', 'test_out.yaml')
         files.write("test text", path)
         with open(path, "r") as out_fi:
             assert out_fi.read() == "test text"
@@ -63,8 +65,8 @@ class TestFileHelpers(object):
             files.write(object(), path)
 
     def test_file_permissions(self, create_tmp_deployment_files):
-        path = os.path.join(config.get_site_repo(), 'site', 'cicd',
-                            'test_out.yaml')
+        path = os.path.join(
+            config.get_site_repo(), 'site', 'cicd', 'test_out.yaml')
         files.write("test text", path)
         assert oct(os.stat(path).st_mode & 0o777) == EXPECTED_FILE_PERM
 

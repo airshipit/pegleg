@@ -19,7 +19,6 @@ __all__ = ['CryptoString']
 
 
 class CryptoString(object):
-
     def __init__(self):
         punctuation = '@#&-+=?'
         self._pool = string.ascii_letters + string.digits + punctuation
@@ -96,8 +95,9 @@ class CryptoString(object):
         """
 
         while True:
-            crypto_str = ''.join(self._random.choice(self._pool)
-                                 for _ in range(max(24, length)))
+            crypto_str = ''.join(
+                self._random.choice(self._pool)
+                for _ in range(max(24, length)))
             if self.validate_crypto_str(crypto_str):
                 break
 

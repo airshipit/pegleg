@@ -33,8 +33,9 @@ class TestSiteDefinitionHelpers(object):
             elif name.startswith(sitename):
                 site_documents.append(document)
             else:
-                raise AssertionError("Unexpected document retrieved by "
-                                     "`documents_for_site`: %s" % document)
+                raise AssertionError(
+                    "Unexpected document retrieved by "
+                    "`documents_for_site`: %s" % document)
 
         # Assert that documents from both levels appear.
         assert global_documents
@@ -60,7 +61,9 @@ class TestSiteDefinitionHelpers(object):
 
         # Validate that each set of site documents matches the same set of
         # documents returned by ``documents_for_site`` for that site.
-        assert (sorted(cicd_documents, key=sort_func) == sorted(
-            documents_by_site["cicd"], key=sort_func))
-        assert (sorted(lab_documents, key=sort_func) == sorted(
-            documents_by_site["lab"], key=sort_func))
+        assert (
+            sorted(cicd_documents, key=sort_func) == sorted(
+                documents_by_site["cicd"], key=sort_func))
+        assert (
+            sorted(lab_documents, key=sort_func) == sorted(
+                documents_by_site["lab"], key=sort_func))

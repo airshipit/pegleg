@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
 import logging
 import os
-import pkg_resources
 import shutil
 import textwrap
 
+import click
+import pkg_resources
 from prettytable import PrettyTable
 
 from pegleg import config
@@ -84,10 +84,11 @@ def full(fail_on_missing_sub_src=False, exclude_lint=None, warn_lint=None):
         messages=messages, exclude_lint=exclude_lint, warn_lint=warn_lint)
 
 
-def site(site_name,
-         fail_on_missing_sub_src=False,
-         exclude_lint=None,
-         warn_lint=None):
+def site(
+        site_name,
+        fail_on_missing_sub_src=False,
+        exclude_lint=None,
+        warn_lint=None):
     """Lint ``site_name``.
 
     :param str site_name: Name of site to lint.
@@ -133,10 +134,8 @@ def site(site_name,
         messages=messages, exclude_lint=exclude_lint, warn_lint=warn_lint)
 
 
-def _filter_messages_by_warn_and_error_lint(*,
-                                            messages=None,
-                                            exclude_lint=None,
-                                            warn_lint=None):
+def _filter_messages_by_warn_and_error_lint(
+        *, messages=None, exclude_lint=None, warn_lint=None):
     """Helper that only filters messages depending on whether or not they
     are present in ``exclude_lint`` or ``warn_lint``.
 
@@ -171,8 +170,8 @@ def _filter_messages_by_warn_and_error_lint(*,
 
     if errors:
         raise click.ClickException(
-            'Linting failed:\n' + errors_table.get_string() +
-            '\nLinting warnings:\n' + warnings_table.get_string())
+            'Linting failed:\n' + errors_table.get_string()
+            + '\nLinting warnings:\n' + warnings_table.get_string())
     return warns
 
 
@@ -189,14 +188,18 @@ def _verify_no_unexpected_files(*, sitenames=None):
 
     errors = []
     for unused_dir in sorted(found_directories - expected_directories):
-        errors.append((REPOS_MISSING_DIRECTORIES_FLAG,
-                       '%s exists, but is unused' % unused_dir))
+        errors.append(
+            (
+                REPOS_MISSING_DIRECTORIES_FLAG,
+                '%s exists, but is unused' % unused_dir))
 
     for missing_dir in sorted(expected_directories - found_directories):
         if not missing_dir.endswith('common'):
             errors.append(
-                (REPOS_MISSING_DIRECTORIES_FLAG,
-                 '%s was not found, but expected by manifest' % missing_dir))
+                (
+                    REPOS_MISSING_DIRECTORIES_FLAG,
+                    '%s was not found, but expected by manifest'
+                    % missing_dir))
 
     return errors
 
@@ -219,16 +222,20 @@ def _verify_single_file(filename, schemas):
     LOG.debug("Validating file %s.", filename)
     with open(filename, 'r') as f:
         if not f.read(4) == '---\n':
-            errors.append((FILE_MISSING_YAML_DOCUMENT_HEADER,
-                           '%s does not begin with YAML beginning of document '
-                           'marker "---".' % filename))
+            errors.append(
+                (
+                    FILE_MISSING_YAML_DOCUMENT_HEADER,
+                    '%s does not begin with YAML beginning of document '
+                    'marker "---".' % filename))
 
     documents = []
     try:
         documents = util.files.read(filename)
     except Exception as e:
-        errors.append((FILE_CONTAINS_INVALID_YAML,
-                       '%s is not valid yaml: %s' % (filename, e)))
+        errors.append(
+            (
+                FILE_CONTAINS_INVALID_YAML, '%s is not valid yaml: %s' %
+                (filename, e)))
 
     for document in documents:
         errors.extend(_verify_document(document, schemas, filename))
@@ -245,18 +252,20 @@ MANDATORY_ENCRYPTED_TYPES = {
 
 
 def _verify_document(document, schemas, filename):
-    name = ':'.join([
-        document.get('schema', ''),
-        document.get('metadata', {}).get('name', '')
-    ])
+    name = ':'.join(
+        [
+            document.get('schema', ''),
+            document.get('metadata', {}).get('name', '')
+        ])
     errors = []
 
     layer = _layer(document)
     if layer is not None and layer != _expected_layer(filename):
         errors.append(
-            (DOCUMENT_LAYER_MISMATCH,
-             '%s (document %s) had unexpected layer "%s", expected "%s"' %
-             (filename, name, layer, _expected_layer(filename))))
+            (
+                DOCUMENT_LAYER_MISMATCH,
+                '%s (document %s) had unexpected layer "%s", expected "%s"' %
+                (filename, name, layer, _expected_layer(filename))))
 
     # secrets must live in the appropriate directory, and must be
     # "storagePolicy: encrypted".
@@ -264,16 +273,19 @@ def _verify_document(document, schemas, filename):
         storage_policy = document.get('metadata', {}).get('storagePolicy')
 
         if (storage_policy != 'encrypted'):
-            errors.append((SCHEMA_STORAGE_POLICY_MISMATCH_FLAG,
-                           '%s (document %s) is a secret, but has unexpected '
-                           'storagePolicy: "%s"' % (filename, name,
-                                                    storage_policy)))
+            errors.append(
+                (
+                    SCHEMA_STORAGE_POLICY_MISMATCH_FLAG,
+                    '%s (document %s) is a secret, but has unexpected '
+                    'storagePolicy: "%s"' % (filename, name, storage_policy)))
 
         # Check if the file is in a secrets directory
         if not util.files.file_in_subdir(filename, 'secrets'):
-            errors.append((SECRET_NOT_ENCRYPTED_POLICY,
-                           '%s (document %s) is a secret, is not stored in a'
-                           ' secrets path' % (filename, name)))
+            errors.append(
+                (
+                    SECRET_NOT_ENCRYPTED_POLICY,
+                    '%s (document %s) is a secret, is not stored in a'
+                    ' secrets path' % (filename, name)))
     return errors
 
 
@@ -303,8 +315,10 @@ def _verify_deckhand_render(*, sitename=None, fail_on_missing_sub_src=False):
     all_errors = []
 
     if sitename:
-        documents_to_render = [_handle_managed_document(doc) for doc in
-                               util.definition.documents_for_site(sitename)]
+        documents_to_render = [
+            _handle_managed_document(doc)
+            for doc in util.definition.documents_for_site(sitename)
+        ]
 
         LOG.debug('Rendering documents for site: %s.', sitename)
         _, errors = util.deckhand.deckhand_render(
@@ -312,23 +326,26 @@ def _verify_deckhand_render(*, sitename=None, fail_on_missing_sub_src=False):
             fail_on_missing_sub_src=fail_on_missing_sub_src,
             validate=True,
         )
-        LOG.debug('Generated %d rendering errors for site: %s.', len(errors),
-                  sitename)
+        LOG.debug(
+            'Generated %d rendering errors for site: %s.', len(errors),
+            sitename)
         all_errors.extend(errors)
     else:
         documents_to_render = util.definition.documents_for_each_site()
 
         for site_name, documents in documents_to_render.items():
-            clean_documents = [_handle_managed_document(doc) for doc
-                               in documents]
+            clean_documents = [
+                _handle_managed_document(doc) for doc in documents
+            ]
             LOG.debug('Rendering documents for site: %s.', site_name)
             _, errors = util.deckhand.deckhand_render(
                 documents=clean_documents,
                 fail_on_missing_sub_src=fail_on_missing_sub_src,
                 validate=True,
             )
-            LOG.debug('Generated %d rendering errors for site: %s.',
-                      len(errors), site_name)
+            LOG.debug(
+                'Generated %d rendering errors for site: %s.', len(errors),
+                site_name)
             all_errors.extend(errors)
 
     return list(set(all_errors))

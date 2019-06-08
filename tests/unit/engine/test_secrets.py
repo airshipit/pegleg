@@ -106,8 +106,9 @@ data: h3=DQ#GNYEuCvybgpfW7ZxAP
 
 
 def test_encrypt_and_decrypt():
-    data = test_utils.rand_name("this is an example of un-encrypted "
-                                "data.", "pegleg").encode()
+    data = test_utils.rand_name(
+        "this is an example of un-encrypted "
+        "data.", "pegleg").encode()
     passphrase = test_utils.rand_name("passphrase1", "pegleg").encode()
     salt = test_utils.rand_name("salt1", "pegleg").encode()
     enc1 = crypt.encrypt(data, passphrase, salt)
@@ -177,8 +178,9 @@ data: {0}-password
     assert len(encrypted_files) > 0
 
     encrypted_path = str(
-        save_location.join("site/cicd/secrets/passphrases/"
-                           "cicd-passphrase-encrypted.yaml"))
+        save_location.join(
+            "site/cicd/secrets/passphrases/"
+            "cicd-passphrase-encrypted.yaml"))
     decrypted = secrets.decrypt(encrypted_path)
     assert yaml.safe_load(
         decrypted[encrypted_path]) == yaml.safe_load(passphrase_doc)
@@ -211,9 +213,8 @@ def test_pegleg_secret_management_constructor_with_invalid_arguments():
     assert 'Either `file_path` or `docs` must be specified.' in str(
         err_info.value)
     with pytest.raises(ValueError) as err_info:
-        PeglegSecretManagement(file_path='file_path',
-                               generated=True,
-                               author='test_author')
+        PeglegSecretManagement(
+            file_path='file_path', generated=True, author='test_author')
     assert 'If the document is generated, author and catalog must be ' \
            'specified.' in str(err_info.value)
     with pytest.raises(ValueError) as err_info:
@@ -221,9 +222,8 @@ def test_pegleg_secret_management_constructor_with_invalid_arguments():
     assert 'If the document is generated, author and catalog must be ' \
            'specified.' in str(err_info.value)
     with pytest.raises(ValueError) as err_info:
-        PeglegSecretManagement(docs=['doc'],
-                               generated=True,
-                               author='test_author')
+        PeglegSecretManagement(
+            docs=['doc'], generated=True, author='test_author')
     assert 'If the document is generated, author and catalog must be ' \
            'specified.' in str(err_info.value)
     with pytest.raises(ValueError) as err_info:
@@ -306,8 +306,9 @@ def test_encrypt_decrypt_using_docs(temp_path):
         'metadata']['storagePolicy']
 
 
-@pytest.mark.skipif(not pki_utility.PKIUtility.cfssl_exists(),
-                    reason='cfssl must be installed to execute these tests')
+@pytest.mark.skipif(
+    not pki_utility.PKIUtility.cfssl_exists(),
+    reason='cfssl must be installed to execute these tests')
 @mock.patch.dict(
     os.environ, {
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
@@ -322,8 +323,8 @@ def test_generate_pki_using_local_repo_path(create_tmp_deployment_files):
     repo_path = str(
         git.git_handler(TEST_PARAMS["repo_url"], ref=TEST_PARAMS["repo_rev"]))
     with mock.patch.dict(config.GLOBAL_CONTEXT, {"site_repo": repo_path}):
-        pki_generator = PKIGenerator(duration=365,
-                                     sitename=TEST_PARAMS["site_name"])
+        pki_generator = PKIGenerator(
+            duration=365, sitename=TEST_PARAMS["site_name"])
         generated_files = pki_generator.generate()
 
         assert len(generated_files), 'No secrets were generated'
@@ -333,8 +334,9 @@ def test_generate_pki_using_local_repo_path(create_tmp_deployment_files):
                 assert list(result), "%s file is empty" % generated_file.name
 
 
-@pytest.mark.skipif(not pki_utility.PKIUtility.cfssl_exists(),
-                    reason='cfssl must be installed to execute these tests')
+@pytest.mark.skipif(
+    not pki_utility.PKIUtility.cfssl_exists(),
+    reason='cfssl must be installed to execute these tests')
 @mock.patch.dict(
     os.environ, {
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
@@ -345,8 +347,8 @@ def test_check_expiry(create_tmp_deployment_files):
     repo_path = str(
         git.git_handler(TEST_PARAMS["repo_url"], ref=TEST_PARAMS["repo_rev"]))
     with mock.patch.dict(config.GLOBAL_CONTEXT, {"site_repo": repo_path}):
-        pki_generator = PKIGenerator(duration=365,
-                                     sitename=TEST_PARAMS["site_name"])
+        pki_generator = PKIGenerator(
+            duration=365, sitename=TEST_PARAMS["site_name"])
         generated_files = pki_generator.generate()
 
         pki_util = pki_utility.PKIUtility(duration=0)
@@ -398,10 +400,9 @@ def test_get_global_creds_missing_pass(create_tmp_deployment_files, tmpdir):
     site_dir = tmpdir.join("deployment_files", "site", "cicd")
 
     # Create global salt file
-    with open(
-            os.path.join(str(site_dir), 'secrets', 'passphrases',
-                         'cicd-global-passphrase-encrypted.yaml'),
-            "w") as outfile:
+    with open(os.path.join(str(site_dir), 'secrets', 'passphrases',
+                           'cicd-global-passphrase-encrypted.yaml'),
+              "w") as outfile:
         outfile.write(GLOBAL_SALT_DOC)
 
     save_location = tmpdir.mkdir("encrypted_site_files")
@@ -466,23 +467,21 @@ def test_global_encrypt_decrypt(create_tmp_deployment_files, tmpdir):
     secrets.encrypt(save_location_str, "pytest", "cicd")
 
     # Create and encrypt a global type document
-    global_doc_path = os.path.join(str(site_dir), 'secrets', 'passphrases',
-                                   'globally_encrypted_doc.yaml')
+    global_doc_path = os.path.join(
+        str(site_dir), 'secrets', 'passphrases', 'globally_encrypted_doc.yaml')
     with open(global_doc_path, "w") as outfile:
         outfile.write(TEST_GLOBAL_DATA)
 
     # encrypt documents and validate that they were encrypted
-    doc_mgr = PeglegSecretManagement(file_path=global_doc_path,
-                                     author='pytest',
-                                     site_name='cicd')
+    doc_mgr = PeglegSecretManagement(
+        file_path=global_doc_path, author='pytest', site_name='cicd')
     doc_mgr.encrypt_secrets(global_doc_path)
     doc = doc_mgr.documents[0]
     assert doc.is_encrypted()
     assert doc.data['encrypted']['by'] == 'pytest'
 
-    doc_mgr = PeglegSecretManagement(file_path=global_doc_path,
-                                     author='pytest',
-                                     site_name='cicd')
+    doc_mgr = PeglegSecretManagement(
+        file_path=global_doc_path, author='pytest', site_name='cicd')
     decrypted_data = doc_mgr.get_decrypted_secrets()
     test_data = list(yaml.safe_load_all(TEST_GLOBAL_DATA))
     assert test_data[0]['data'] == decrypted_data[0]['data']

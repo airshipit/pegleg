@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Utility functions for site-definition.yaml files."""
 
 import os
@@ -55,8 +56,8 @@ def path(site_name, primary_repo_base=None):
     """Retrieve path to the site-definition.yaml file for ``site_name``."""
     if not primary_repo_base:
         primary_repo_base = config.get_site_repo()
-    return os.path.join(primary_repo_base, 'site', site_name,
-                        'site-definition.yaml')
+    return os.path.join(
+        primary_repo_base, 'site', site_name, 'site-definition.yaml')
 
 
 def pluck(site_definition, key):
@@ -64,8 +65,9 @@ def pluck(site_definition, key):
         return site_definition['data'][key]
     except Exception as e:
         site_name = site_definition.get('metadata', {}).get('name')
-        raise click.ClickException('failed to get "%s" from site definition '
-                                   '"%s": %s' % (key, site_name, e))
+        raise click.ClickException(
+            'failed to get "%s" from site definition '
+            '"%s": %s' % (key, site_name, e))
 
 
 def site_files(site_name):

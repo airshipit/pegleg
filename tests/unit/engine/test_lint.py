@@ -37,9 +37,8 @@ def test_verify_deckhand_render_site_documents_separately(
         ],
     }
 
-    with mock.patch(
-            'pegleg.engine.util.deckhand.deckhand_render',
-            autospec=True) as mock_render:
+    with mock.patch('pegleg.engine.util.deckhand.deckhand_render',
+                    autospec=True) as mock_render:
         mock_render.return_value = (None, [])
 
         result = lint._verify_deckhand_render()
@@ -55,79 +54,81 @@ def test_verify_deckhand_render_site_documents_separately(
 
         expected_documents = []
         for sitename in expected_sitenames:
-            documents = [{
-                'data': 'global-common-password',
-                'metadata': {
-                    'layeringDefinition': {
-                        'abstract': False,
-                        'layer': 'global'
+            documents = [
+                {
+                    'data': 'global-common-password',
+                    'metadata': {
+                        'layeringDefinition': {
+                            'abstract': False,
+                            'layer': 'global'
+                        },
+                        'name': 'global-common',
+                        'schema': 'metadata/Document/v1',
+                        'storagePolicy': 'cleartext'
                     },
-                    'name': 'global-common',
-                    'schema': 'metadata/Document/v1',
-                    'storagePolicy': 'cleartext'
-                },
-                'schema': 'deckhand/Passphrase/v1'
-            }, {
-                'data': 'global-v1.0-password',
-                'metadata': {
-                    'layeringDefinition': {
-                        'abstract': False,
-                        'layer': 'global'
+                    'schema': 'deckhand/Passphrase/v1'
+                }, {
+                    'data': 'global-v1.0-password',
+                    'metadata': {
+                        'layeringDefinition': {
+                            'abstract': False,
+                            'layer': 'global'
+                        },
+                        'name': 'global-v1.0',
+                        'schema': 'metadata/Document/v1',
+                        'storagePolicy': 'cleartext'
                     },
-                    'name': 'global-v1.0',
-                    'schema': 'metadata/Document/v1',
-                    'storagePolicy': 'cleartext'
-                },
-                'schema': 'deckhand/Passphrase/v1'
-            }, {
-                'data': '%s-type-common-password' % sitename,
-                'metadata': {
-                    'layeringDefinition': {
-                        'abstract': False,
-                        'layer': 'type'
+                    'schema': 'deckhand/Passphrase/v1'
+                }, {
+                    'data': '%s-type-common-password' % sitename,
+                    'metadata': {
+                        'layeringDefinition': {
+                            'abstract': False,
+                            'layer': 'type'
+                        },
+                        'name': '%s-type-common' % sitename,
+                        'schema': 'metadata/Document/v1',
+                        'storagePolicy': 'cleartext'
                     },
-                    'name': '%s-type-common' % sitename,
-                    'schema': 'metadata/Document/v1',
-                    'storagePolicy': 'cleartext'
-                },
-                'schema': 'deckhand/Passphrase/v1'
-            }, {
-                'data': '%s-type-v1.0-password' % sitename,
-                'metadata': {
-                    'layeringDefinition': {
-                        'abstract': False,
-                        'layer': 'type'
+                    'schema': 'deckhand/Passphrase/v1'
+                }, {
+                    'data': '%s-type-v1.0-password' % sitename,
+                    'metadata': {
+                        'layeringDefinition': {
+                            'abstract': False,
+                            'layer': 'type'
+                        },
+                        'name': '%s-type-v1.0' % sitename,
+                        'schema': 'metadata/Document/v1',
+                        'storagePolicy': 'cleartext'
                     },
-                    'name': '%s-type-v1.0' % sitename,
-                    'schema': 'metadata/Document/v1',
-                    'storagePolicy': 'cleartext'
-                },
-                'schema': 'deckhand/Passphrase/v1'
-            }, {
-                'data': '%s-chart-password' % sitename,
-                'metadata': {
-                    'layeringDefinition': {
-                        'abstract': False,
-                        'layer': 'site'
+                    'schema': 'deckhand/Passphrase/v1'
+                }, {
+                    'data': '%s-chart-password' % sitename,
+                    'metadata': {
+                        'layeringDefinition': {
+                            'abstract': False,
+                            'layer': 'site'
+                        },
+                        'name': '%s-chart' % sitename,
+                        'schema': 'metadata/Document/v1',
+                        'storagePolicy': 'cleartext'
                     },
-                    'name': '%s-chart' % sitename,
-                    'schema': 'metadata/Document/v1',
-                    'storagePolicy': 'cleartext'
-                },
-                'schema': 'deckhand/Passphrase/v1'
-            }, {
-                'data': '%s-passphrase-password' % sitename,
-                'metadata': {
-                    'layeringDefinition': {
-                        'abstract': False,
-                        'layer': 'site'
+                    'schema': 'deckhand/Passphrase/v1'
+                }, {
+                    'data': '%s-passphrase-password' % sitename,
+                    'metadata': {
+                        'layeringDefinition': {
+                            'abstract': False,
+                            'layer': 'site'
+                        },
+                        'name': '%s-passphrase' % sitename,
+                        'schema': 'metadata/Document/v1',
+                        'storagePolicy': 'cleartext'
                     },
-                    'name': '%s-passphrase' % sitename,
-                    'schema': 'metadata/Document/v1',
-                    'storagePolicy': 'cleartext'
-                },
-                'schema': 'deckhand/Passphrase/v1'
-            }]
+                    'schema': 'deckhand/Passphrase/v1'
+                }
+            ]
             expected_documents.extend(documents)
 
         mock_calls = list(mock_render.mock_calls)
@@ -151,13 +152,10 @@ def test_verify_deckhand_render_error_handling(mock_render):
         mock_render: Mock render object.
     """
     exp_dict = {
-        'exp1':
-        DECKHAND_DUPLICATE_SCHEMA + ": Duplicate schema specified.\n",
-        'exp2':
-        DECKHAND_RENDER_EXCEPTION +
+        'exp1': DECKHAND_DUPLICATE_SCHEMA + ": Duplicate schema specified.\n",
+        'exp2': DECKHAND_RENDER_EXCEPTION +
         ": An unknown Deckhand exception occurred while trying to render documents\n",
-        'exp3':
-        "Generic Error\n"
+        'exp3': "Generic Error\n"
     }
     # No exception raised
     mock_render.return_value = _return_deckhand_render_errors()
@@ -231,12 +229,14 @@ def _return_deckhand_render_errors(error_count=0):
     """
     errors = []
     if error_count >= 1:
-        errors.append((DECKHAND_DUPLICATE_SCHEMA,
-                       'Duplicate schema specified.'))
+        errors.append(
+            (DECKHAND_DUPLICATE_SCHEMA, 'Duplicate schema specified.'))
     if error_count >= 2:
-        errors.append((DECKHAND_RENDER_EXCEPTION,
-                       'An unknown Deckhand exception occurred while '
-                       'trying to render documents'))
+        errors.append(
+            (
+                DECKHAND_RENDER_EXCEPTION,
+                'An unknown Deckhand exception occurred while '
+                'trying to render documents'))
     if error_count >= 3:
         errors.append(('Generic Error'))
     return errors

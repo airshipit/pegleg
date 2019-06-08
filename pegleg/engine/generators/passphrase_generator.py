@@ -46,10 +46,10 @@ class PassphraseGenerator(BaseGenerator):
         certificates.
         """
 
-        super(PassphraseGenerator, self).__init__(sitename, save_location,
-                                                  author)
-        self._catalog = PassphraseCatalog(self._sitename,
-                                          documents=self._documents)
+        super(PassphraseGenerator,
+              self).__init__(sitename, save_location, author)
+        self._catalog = PassphraseCatalog(
+            self._sitename, documents=self._documents)
         self._pass_util = CryptoString()
 
     def generate(self, interactive=False, force_cleartext=False):
@@ -81,8 +81,9 @@ class PassphraseGenerator(BaseGenerator):
             docs = list()
             if force_cleartext:
                 storage_policy = passphrase_catalog.P_CLEARTEXT
-                LOG.warning("Passphrases for {} will be "
-                            "generated in clear text.".format(p_name))
+                LOG.warning(
+                    "Passphrases for {} will be "
+                    "generated in clear text.".format(p_name))
             else:
                 storage_policy = self._catalog.get_storage_policy(p_name)
 

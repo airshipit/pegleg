@@ -81,14 +81,14 @@ def create_tmp_deployment_files(tmpdir):
             'directories': {
                 'common': {
                     'files': {
-                        'global-common.yaml':
-                        _gen_document(name="global-common", layer='global')
+                        'global-common.yaml': _gen_document(
+                            name="global-common", layer='global')
                     }
                 },
                 'v1.0': {
                     'files': {
-                        'global-v1.0.yaml':
-                        _gen_document(name="global-v1.0", layer='global')
+                        'global-v1.0.yaml': _gen_document(
+                            name="global-v1.0", layer='global')
                     }
                 }
             }
@@ -103,15 +103,13 @@ def create_tmp_deployment_files(tmpdir):
                     'directories': {
                         'common': {
                             'files': {
-                                '%s-type-common.yaml' % site:
-                                _gen_document(
+                                '%s-type-common.yaml' % site: _gen_document(
                                     name="%s-type-common" % site, layer='type')
                             }
                         },
                         'v1.0': {
                             'files': {
-                                '%s-type-v1.0.yaml' % site:
-                                _gen_document(
+                                '%s-type-v1.0.yaml' % site: _gen_document(
                                     name="%s-type-v1.0" % site, layer='type')
                             }
                         }
@@ -142,13 +140,13 @@ schema: pegleg/SiteDefinition/v1
         test_structure = SITE_TEST_STRUCTURE.copy()
         test_structure['directories']['secrets']['directories']['passphrases'][
             'files'] = {
-                '%s-passphrase.yaml' % site:
-                _gen_document(name="%s-passphrase" % site, layer='site')
+                '%s-passphrase.yaml' % site: _gen_document(
+                    name="%s-passphrase" % site, layer='site')
             }
         test_structure['directories']['software']['directories']['charts'][
             'files'] = {
-                '%s-chart.yaml' % site:
-                _gen_document(name="%s-chart" % site, layer='site')
+                '%s-chart.yaml' % site: _gen_document(
+                    name="%s-chart" % site, layer='site')
             }
         test_structure['files']['site-definition.yaml'] = yaml.safe_load(
             site_definition)

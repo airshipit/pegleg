@@ -23,7 +23,7 @@ from pegleg.engine import exceptions
 from pegleg.engine import repository
 from pegleg.engine import util
 
-REPO_USERNAME="test_username"
+REPO_USERNAME = "test_username"
 
 TEST_REPOSITORIES = {
     'repositories': {
@@ -32,10 +32,10 @@ TEST_REPOSITORIES = {
             'url': 'ssh://REPO_USERNAME@gerrit:29418/aic-clcp-manifests.git'
         },
         'secrets': {
-            'revision':
-            'master',
-            'url': ('ssh://REPO_USERNAME@gerrit:29418/aic-clcp-security-'
-                    'manifests.git')
+            'revision': 'master',
+            'url': (
+                'ssh://REPO_USERNAME@gerrit:29418/aic-clcp-security-'
+                'manifests.git')
         }
     }
 }
@@ -48,15 +48,16 @@ FORMATTED_REPOSITORIES = {
                 REPO_USERNAME)
         },
         'secrets': {
-            'revision':
-            'master',
-            'url': ('ssh://{}@gerrit:29418/aic-clcp-security-'
-                    'manifests.git'.format(REPO_USERNAME))
+            'revision': 'master',
+            'url': (
+                'ssh://{}@gerrit:29418/aic-clcp-security-'
+                'manifests.git'.format(REPO_USERNAME))
         }
     }
 }
 
 config.set_repo_username(REPO_USERNAME)
+
 
 @pytest.fixture(autouse=True)
 def clean_temp_folders():
@@ -90,8 +91,8 @@ def _repo_name(repo_url):
     return repo_name
 
 
-def _test_process_repositories_inner(site_name="test_site",
-                                     expected_extra_repos=None):
+def _test_process_repositories_inner(
+        site_name="test_site", expected_extra_repos=None):
     repository.process_repositories(site_name)
     actual_repo_list = config.get_extra_repo_list()
     expected_repos = expected_extra_repos.get('repositories', {})
@@ -102,12 +103,13 @@ def _test_process_repositories_inner(site_name="test_site",
         assert any(repo_name in r for r in actual_repo_list)
 
 
-def _test_process_repositories(site_repo=None,
-                               repo_username=None,
-                               repo_overrides=None,
-                               expected_repo_url=None,
-                               expected_repo_revision=None,
-                               expected_repo_overrides=None):
+def _test_process_repositories(
+        site_repo=None,
+        repo_username=None,
+        repo_overrides=None,
+        expected_repo_url=None,
+        expected_repo_revision=None,
+        expected_repo_overrides=None):
     """Validate :func:`repository.process_repositories`.
 
     :param site_repo: Primary site repository.
@@ -144,21 +146,23 @@ def _test_process_repositories(site_repo=None,
                     ref=expected_repo_revision,
                     auth_key=None)
             ]
-            mock_calls.extend([
-                mock.call(r['url'], ref=r['revision'], auth_key=None)
-                for r in FORMATTED_REPOSITORIES['repositories'].values()
-            ])
+            mock_calls.extend(
+                [
+                    mock.call(r['url'], ref=r['revision'], auth_key=None)
+                    for r in FORMATTED_REPOSITORIES['repositories'].values()
+                ])
             m_clone_repo.assert_has_calls(mock_calls)
         elif repo_username:
             # Validate that the REPO_USERNAME placeholder is replaced by
             # repo_username.
-            m_clone_repo.assert_has_calls([
-                mock.call(
-                    r['url'].replace('REPO_USERNAME', repo_username),
-                    ref=r['revision'],
-                    auth_key=None)
-                for r in FORMATTED_REPOSITORIES['repositories'].values()
-            ])
+            m_clone_repo.assert_has_calls(
+                [
+                    mock.call(
+                        r['url'].replace('REPO_USERNAME', repo_username),
+                        ref=r['revision'],
+                        auth_key=None)
+                    for r in FORMATTED_REPOSITORIES['repositories'].values()
+                ])
         elif repo_overrides:
             # This is computed from: len(cloned extra repos) +
             # len(cloned primary repo), which is len(cloned extra repos) + 1
@@ -176,31 +180,26 @@ def _test_process_repositories(site_repo=None,
                     ref = r['revision']
                 m_clone_repo.assert_any_call(repo_url, ref=ref, auth_key=None)
         else:
-            m_clone_repo.assert_has_calls([
-                mock.call(r['url'], ref=r['revision'], auth_key=None)
-                for r in FORMATTED_REPOSITORIES['repositories'].values()
-            ])
+            m_clone_repo.assert_has_calls(
+                [
+                    mock.call(r['url'], ref=r['revision'], auth_key=None)
+                    for r in FORMATTED_REPOSITORIES['repositories'].values()
+                ])
 
     if site_repo:
         # Set a test site repo, call the test and clean up.
-        with mock.patch.object(
-                config, 'get_site_repo', autospec=True,
-                return_value=site_repo):
+        with mock.patch.object(config, 'get_site_repo', autospec=True,
+                               return_value=site_repo):
             do_test()
     elif repo_username:
         # Set a test repo username, call the test and clean up.
-        with mock.patch.object(
-                config,
-                'get_repo_username',
-                autospec=True,
-                return_value=repo_username):
+        with mock.patch.object(config, 'get_repo_username', autospec=True,
+                               return_value=repo_username):
             do_test()
     elif repo_overrides:
-        with mock.patch.object(
-                config,
-                'get_extra_repo_overrides',
-                autospec=True,
-                return_value=list(repo_overrides.values())):
+        with mock.patch.object(config, 'get_extra_repo_overrides',
+                               autospec=True,
+                               return_value=list(repo_overrides.values())):
             do_test()
     else:
         do_test()
@@ -263,8 +262,7 @@ def test_process_repositories_with_repo_username():
 def test_process_repositories_with_repo_overrides_remote_urls():
     # Same URL, different revision (than TEST_REPOSITORIES).
     overrides = {
-        'global':
-        'global=ssh://REPO_USERNAME@gerrit:29418/aic-clcp-manifests.git@12345'
+        'global': 'global=ssh://REPO_USERNAME@gerrit:29418/aic-clcp-manifests.git@12345'
     }
     expected_repo_overrides = {
         'global': {
@@ -320,10 +318,8 @@ def test_process_repositories_with_repo_overrides_local_paths():
 
 def test_process_repositories_with_multiple_repo_overrides_remote_urls():
     overrides = {
-        'global':
-        'global=ssh://gerrit:29418/aic-clcp-manifests.git@12345',
-        'secrets':
-        'secrets=ssh://gerrit:29418/aic-clcp-security-manifests.git@54321'
+        'global': 'global=ssh://gerrit:29418/aic-clcp-manifests.git@12345',
+        'secrets': 'secrets=ssh://gerrit:29418/aic-clcp-security-manifests.git@54321'
     }
     expected_repo_overrides = {
         'global': {
@@ -376,23 +372,17 @@ def test_process_repositiories_extraneous_user_repo_value(m_log, *_):
     repo_overrides = ['global=ssh://gerrit:29418/aic-clcp-manifests.git']
 
     # Provide a repo user value.
-    with mock.patch.object(
-            config,
-            'get_repo_username',
-            autospec=True,
-            return_value='test_username'):
+    with mock.patch.object(config, 'get_repo_username', autospec=True,
+                           return_value='test_username'):
         # Get rid of REPO_USERNAME through an override.
-        with mock.patch.object(
-                config,
-                'get_extra_repo_overrides',
-                autospec=True,
-                return_value=repo_overrides):
+        with mock.patch.object(config, 'get_extra_repo_overrides',
+                               autospec=True, return_value=repo_overrides):
             _test_process_repositories_inner(
                 expected_extra_repos=TEST_REPOSITORIES)
 
-    msg = ("A repository username was specified but no REPO_USERNAME "
-           "string found in repository url %s",
-           repo_overrides[0].split('=')[-1])
+    msg = (
+        "A repository username was specified but no REPO_USERNAME "
+        "string found in repository url %s", repo_overrides[0].split('=')[-1])
     m_log.warning.assert_any_call(*msg)
 
 
@@ -436,19 +426,18 @@ def test_process_repositiories_no_site_def_repos_with_extraneous_overrides(
     }
 
     # Provide repo overrides.
-    with mock.patch.object(
-            config,
-            'get_extra_repo_overrides',
-            autospec=True,
-            return_value=repo_overrides):
+    with mock.patch.object(config, 'get_extra_repo_overrides', autospec=True,
+                           return_value=repo_overrides):
         _test_process_repositories_inner(
             site_name=site_name, expected_extra_repos=expected_overrides)
 
-    debug_msg = ("Repo override: %s not found under `repositories` for "
-                 "site-definition.yaml. Site def repositories: %s",
-                 repo_overrides[0], "")
-    info_msg = ("No repositories found in site-definition.yaml for site: %s. "
-                "Defaulting to specified repository overrides.", site_name)
+    debug_msg = (
+        "Repo override: %s not found under `repositories` for "
+        "site-definition.yaml. Site def repositories: %s", repo_overrides[0],
+        "")
+    info_msg = (
+        "No repositories found in site-definition.yaml for site: %s. "
+        "Defaulting to specified repository overrides.", site_name)
     m_log.debug.assert_any_call(*debug_msg)
     m_log.info.assert_any_call(*info_msg)
 
@@ -462,12 +451,13 @@ def test_process_repositories_without_repositories_key_in_site_definition(
         m_log, *_):
     # Stub this out since default config site repo is '.' and local repo might
     # be dirty.
-    with mock.patch.object(
-            repository, '_handle_repository', autospec=True, return_value=''):
+    with mock.patch.object(repository, '_handle_repository', autospec=True,
+                           return_value=''):
         _test_process_repositories_inner(
             site_name=mock.sentinel.site, expected_extra_repos={})
-    msg = ("The repository for site_name: %s does not contain a "
-           "site-definition.yaml with a 'repositories' key")
+    msg = (
+        "The repository for site_name: %s does not contain a "
+        "site-definition.yaml with a 'repositories' key")
     assert any(msg in x[1][0] for x in m_log.info.mock_calls)
 
 
@@ -483,13 +473,14 @@ def test_process_extra_repositories_malformed_format_raises_exception(
     # Will fail since it doesn't contain "=".
     broken_repo_url = 'broken_url'
     m_get_extra_repo_overrides.return_value = [broken_repo_url]
-    error = ("The repository %s must be in the form of "
-             "name=repoUrl[@revision]" % broken_repo_url)
+    error = (
+        "The repository %s must be in the form of "
+        "name=repoUrl[@revision]" % broken_repo_url)
 
     # Stub this out since default config site repo is '.' and local repo might
     # be dirty.
-    with mock.patch.object(
-            repository, '_handle_repository', autospec=True, return_value=''):
+    with mock.patch.object(repository, '_handle_repository', autospec=True,
+                           return_value=''):
         with pytest.raises(click.ClickException) as exc:
             repository.process_repositories(mock.sentinel.site)
         assert error == str(exc.value)
@@ -500,11 +491,8 @@ def test_process_site_repository(_):
     def _do_test(site_repo, expected):
         config.set_site_repo(site_repo)
 
-        with mock.patch.object(
-                repository,
-                '_handle_repository',
-                autospec=True,
-                side_effect=lambda x, *a, **k: x):
+        with mock.patch.object(repository, '_handle_repository', autospec=True,
+                               side_effect=lambda x, *a, **k: x):
             result = repository.process_site_repository()
         assert os.path.normpath(expected) == os.path.normpath(result)
 
@@ -532,21 +520,14 @@ def test_process_site_repository(_):
 def test_format_url_with_repo_username():
     TEST_URL = 'ssh://REPO_USERNAME@gerrit:29418/airship/pegleg'
 
-    with mock.patch.object(
-            config,
-            'get_repo_username',
-            autospec=True,
-            return_value=REPO_USERNAME):
+    with mock.patch.object(config, 'get_repo_username', autospec=True,
+                           return_value=REPO_USERNAME):
         res = repository._format_url_with_repo_username(TEST_URL)
         assert res == 'ssh://{}@gerrit:29418/airship/pegleg'.format(
             REPO_USERNAME)
 
-    with mock.patch.object(
-            config,
-            'get_repo_username',
-            autospec=True,
-            return_value=''):
+    with mock.patch.object(config, 'get_repo_username', autospec=True,
+                           return_value=''):
         pytest.raises(
             exceptions.GitMissingUserException,
-            repository._format_url_with_repo_username,
-            TEST_URL)
+            repository._format_url_with_repo_username, TEST_URL)

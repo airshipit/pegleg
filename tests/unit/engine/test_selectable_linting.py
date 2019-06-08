@@ -60,9 +60,8 @@ class TestSelectableLinting(object):
         msg_2 = 'test msg'
         msgs = [(code_1, msg_1), (code_2, msg_2)]
 
-        with mock.patch.object(
-                lint, '_verify_file_contents',
-                return_value=msgs) as mock_methed:
+        with mock.patch.object(lint, '_verify_file_contents',
+                               return_value=msgs) as mock_methed:
             with pytest.raises(click.ClickException) as expected_exc:
                 lint.full(False, exclude_lint, [])
                 assert msg_1 in expected_exc
@@ -75,10 +74,9 @@ class TestSelectableLinting(object):
         directories.
         """
         exclude_lint = ['P003']
-        with mock.patch.object(
-                lint,
-                '_verify_no_unexpected_files',
-                return_value=[('P003', 'test message')]) as mock_method:
+        with mock.patch.object(lint, '_verify_no_unexpected_files',
+                               return_value=[('P003', 'test message')
+                                             ]) as mock_method:
             result = lint.full(False, exclude_lint, [])
         mock_method.assert_called()
         assert not result  # Exclude doesn't return anything.
@@ -99,9 +97,8 @@ class TestSelectableLinting(object):
         msg_2 = 'test msg'
         msgs = [(code_1, msg_1), (code_2, msg_2)]
 
-        with mock.patch.object(
-                lint, '_verify_file_contents',
-                return_value=msgs) as mock_methed:
+        with mock.patch.object(lint, '_verify_file_contents',
+                               return_value=msgs) as mock_methed:
             with pytest.raises(click.ClickException) as expected_exc:
                 lint.full(
                     False, exclude_lint=exclude_lint, warn_lint=warn_lint)
@@ -137,20 +134,21 @@ class TestSelectableLinting(object):
         config.set_site_repo(self.site_yaml_path)
 
         documents = {
-            mock.sentinel.site: [{
-                # Create 2 duplicate DataSchema documents.
-                "schema": "deckhand/DataSchema/v1",
-                "metadata": {
-                    "name": mock.sentinel.document_name
-                },
-                "data": {}
-            }] * 2
+            mock.sentinel.site: [
+                {
+                    # Create 2 duplicate DataSchema documents.
+                    "schema": "deckhand/DataSchema/v1",
+                    "metadata": {
+                        "name": mock.sentinel.document_name
+                    },
+                    "data": {}
+                }
+            ] * 2
         }
 
         with mock.patch(
                 'pegleg.engine.util.definition.documents_for_each_site',
-                autospec=True,
-                return_value=documents):
+                autospec=True, return_value=documents):
             result = lint.full(
                 False, exclude_lint=exclude_lint, warn_lint=warn_lint)
         assert len(result) == 1
@@ -168,19 +166,20 @@ class TestSelectableLinting(object):
         config.set_site_repo(self.site_yaml_path)
 
         documents = {
-            mock.sentinel.site: [{
-                "schema": "deckhand/DataSchema/v1",
-                "metadata": {
-                    "name": mock.sentinel.document_name
-                },
-                "data": {}
-            }]
+            mock.sentinel.site: [
+                {
+                    "schema": "deckhand/DataSchema/v1",
+                    "metadata": {
+                        "name": mock.sentinel.document_name
+                    },
+                    "data": {}
+                }
+            ]
         }
 
         with mock.patch(
                 'pegleg.engine.util.definition.documents_for_each_site',
-                autospec=True,
-                return_value=documents):
+                autospec=True, return_value=documents):
             result = lint.full(
                 False, exclude_lint=exclude_lint, warn_lint=warn_lint)
         assert len(result) == 1
@@ -196,10 +195,8 @@ class TestSelectableLinting(object):
         p = tmpdir.mkdir(self.__class__.__name__).join("test.yaml")
         p.write("foo: bar")
 
-        with mock.patch(
-                'pegleg.engine.util.files.all',
-                autospec=True,
-                return_value=[p.strpath]):
+        with mock.patch('pegleg.engine.util.files.all', autospec=True,
+                        return_value=[p.strpath]):
             result = lint.full(
                 False, exclude_lint=exclude_lint, warn_lint=warn_lint)
         assert len(result) == 1
@@ -216,10 +213,8 @@ class TestSelectableLinting(object):
         # Invalid YAML - will trigger error.
         p.write("---\nfoo: bar: baz")
 
-        with mock.patch(
-                'pegleg.engine.util.files.all',
-                autospec=True,
-                return_value=[p.strpath]):
+        with mock.patch('pegleg.engine.util.files.all', autospec=True,
+                        return_value=[p.strpath]):
             result = lint.full(
                 False, exclude_lint=exclude_lint, warn_lint=warn_lint)
         assert len(result) == 1

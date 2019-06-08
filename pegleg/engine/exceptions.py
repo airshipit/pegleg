@@ -14,9 +14,10 @@
 
 import logging
 
-__all__ = ('PeglegBaseException', 'GitException', 'GitAuthException',
-           'GitProxyException', 'GitSSHException', 'GitConfigException',
-           'GitInvalidRepoException')
+__all__ = (
+    'PeglegBaseException', 'GitException', 'GitAuthException',
+    'GitProxyException', 'GitSSHException', 'GitConfigException',
+    'GitInvalidRepoException')
 
 LOG = logging.getLogger(__name__)
 
@@ -37,14 +38,16 @@ class PeglegBaseException(Exception):
 
 class GitException(PeglegBaseException):
     """Exception when an error occurs cloning a Git repository."""
-    message = ('Git exception occurred: [%(location)s] may not be a valid '
-               'git repository. Details: %(details)s')
+    message = (
+        'Git exception occurred: [%(location)s] may not be a valid '
+        'git repository. Details: %(details)s')
 
 
 class GitAuthException(PeglegBaseException):
     """Exception that occurs when authentication fails for cloning a repo."""
-    message = ('Failed to authenticate for repo %(repo_url)s with ssh-key '
-               'at path %(ssh_key_path)s')
+    message = (
+        'Failed to authenticate for repo %(repo_url)s with ssh-key '
+        'at path %(ssh_key_path)s')
 
 
 class GitProxyException(PeglegBaseException):
@@ -84,8 +87,9 @@ class IncompletePKIPairError(PeglegBaseException):
 
 class PassphraseCatalogNotFoundException(PeglegBaseException):
     """Failed to find Catalog for Passphrases generation."""
-    message = ('Could not find the Passphrase Catalog to generate '
-               'the site Passphrases!')
+    message = (
+        'Could not find the Passphrase Catalog to generate '
+        'the site Passphrases!')
 
 
 class GenesisBundleEncryptionException(PeglegBaseException):
@@ -106,8 +110,9 @@ class GenesisBundleGenerateException(PeglegBaseException):
 
 class PKICertificateInvalidDuration(PeglegBaseException):
     """Exception for invalid duration of PKI Certificate."""
-    message = ('Provided duration is invalid. Certificate durations must be '
-               'a positive integer.')
+    message = (
+        'Provided duration is invalid. Certificate durations must be '
+        'a positive integer.')
 
 
 #
@@ -142,8 +147,9 @@ class SaltInsufficientLengthException(PeglegBaseException):
 class GlobalCredentialsNotFound(PeglegBaseException):
     """Exception raised when global_passphrase or global_salt are not found."""
 
-    message = ('global_salt and global_passphrase must either both be '
-               'defined, or neither can be defined in site documents.')
+    message = (
+        'global_salt and global_passphrase must either both be '
+        'defined, or neither can be defined in site documents.')
 
 
 #

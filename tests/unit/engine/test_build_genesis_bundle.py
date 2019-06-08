@@ -104,16 +104,18 @@ def test_no_encryption_key(temp_path):
     os.makedirs(config_dir)
 
     files.write(config_data, config_path)
-    files.write(yaml.safe_load_all(SITE_DEFINITION),
-                os.path.join(config_dir, "site-definition.yaml"))
+    files.write(
+        yaml.safe_load_all(SITE_DEFINITION),
+        os.path.join(config_dir, "site-definition.yaml"))
 
     with pytest.raises(GenesisBundleEncryptionException,
                        match=r'.*no encryption policy or key is specified.*'):
-        bundle.build_genesis(build_path=build_dir,
-                             encryption_key=None,
-                             validators=False,
-                             debug=logging.ERROR,
-                             site_name="test_site")
+        bundle.build_genesis(
+            build_path=build_dir,
+            encryption_key=None,
+            validators=False,
+            debug=logging.ERROR,
+            site_name="test_site")
 
 
 @mock.patch.dict(
@@ -132,13 +134,15 @@ def test_failed_deckhand_validation(temp_path):
     build_dir = os.path.join(temp_path, 'build_dir')
     os.makedirs(config_dir)
     files.write(config_data, config_path)
-    files.write(yaml.safe_load_all(SITE_DEFINITION),
-                os.path.join(config_dir, "site-definition.yaml"))
+    files.write(
+        yaml.safe_load_all(SITE_DEFINITION),
+        os.path.join(config_dir, "site-definition.yaml"))
     key = 'MyverYSecretEncryptionKey382803'
     with pytest.raises(GenesisBundleGenerateException,
                        match=r'.*failed on deckhand validation.*'):
-        bundle.build_genesis(build_path=build_dir,
-                             encryption_key=key,
-                             validators=False,
-                             debug=logging.ERROR,
-                             site_name="test_site")
+        bundle.build_genesis(
+            build_path=build_dir,
+            encryption_key=key,
+            validators=False,
+            debug=logging.ERROR,
+            site_name="test_site")

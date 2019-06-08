@@ -28,8 +28,9 @@ from pegleg.engine import util
 __all__ = ('process_repositories', 'process_site_repository')
 
 __REPO_FOLDERS = {}
-_INVALID_FORMAT_MSG = ("The repository %s must be in the form of "
-                       "name=repoUrl[@revision]")
+_INVALID_FORMAT_MSG = (
+    "The repository %s must be in the form of "
+    "name=repoUrl[@revision]")
 
 LOG = logging.getLogger(__name__)
 
@@ -64,8 +65,9 @@ def process_repositories(site_name, overwrite_existing=False):
     # Dict mapping repository names to associated URL/revision info for clone.
     repo_overrides = _process_repository_overrides(site_def_repos)
     if not site_def_repos:
-        LOG.info('No repositories found in site-definition.yaml for site: %s. '
-                 'Defaulting to specified repository overrides.', site_name)
+        LOG.info(
+            'No repositories found in site-definition.yaml for site: %s. '
+            'Defaulting to specified repository overrides.', site_name)
         site_def_repos = repo_overrides
 
     # Extract user/key that we will use for all repositories.
@@ -74,10 +76,10 @@ def process_repositories(site_name, overwrite_existing=False):
 
     for repo_alias in site_def_repos.keys():
         if repo_alias == "site":
-            LOG.warning("The primary site repository path must be specified "
-                        "via the -r flag. Ignoring the provided "
-                        "site-definition entry: %s",
-                        site_def_repos[repo_alias])
+            LOG.warning(
+                "The primary site repository path must be specified "
+                "via the -r flag. Ignoring the provided "
+                "site-definition entry: %s", site_def_repos[repo_alias])
             continue
 
         # Extract URL and revision, prioritizing overrides over the defaults in
@@ -91,19 +93,22 @@ def process_repositories(site_name, overwrite_existing=False):
 
         repo_url_or_path = _format_url_with_repo_username(repo_url_or_path)
 
-        LOG.info("Processing repository %s with url=%s, repo_key=%s, "
-                 "repo_username=%s, revision=%s", repo_alias, repo_url_or_path,
-                 repo_key, repo_user, repo_revision)
+        LOG.info(
+            "Processing repository %s with url=%s, repo_key=%s, "
+            "repo_username=%s, revision=%s", repo_alias, repo_url_or_path,
+            repo_key, repo_user, repo_revision)
 
         temp_extra_repo = _process_repository(
-            repo_url_or_path, repo_revision,
+            repo_url_or_path,
+            repo_revision,
             overwrite_existing=overwrite_existing)
         extra_repos.append(temp_extra_repo)
 
     # Overwrite the site repo and extra repos in the config because further
     # processing will fail if they contain revision info in their paths.
-    LOG.debug("Updating site_repo=%s extra_repo_list=%s in config", site_repo,
-              extra_repos)
+    LOG.debug(
+        "Updating site_repo=%s extra_repo_list=%s in config", site_repo,
+        extra_repos)
     config.set_site_repo(site_repo)
     config.set_extra_repo_list(extra_repos)
 
@@ -121,15 +126,16 @@ def process_site_repository(update_config=False, overwrite_existing=False):
     # Retrieve the main site repository and validate it.
     site_repo_or_path = config.get_site_repo()
     if not site_repo_or_path:
-        raise ValueError("Site repository directory (%s) must be specified" %
-                         site_repo_or_path)
+        raise ValueError(
+            "Site repository directory (%s) must be specified"
+            % site_repo_or_path)
 
     repo_url_or_path, repo_revision = _extract_repo_url_and_revision(
         site_repo_or_path)
     config.set_site_rev(repo_revision)
     repo_url_or_path = _format_url_with_repo_username(repo_url_or_path)
-    new_repo_path = _process_repository(repo_url_or_path, repo_revision,
-                                        overwrite_existing=overwrite_existing)
+    new_repo_path = _process_repository(
+        repo_url_or_path, repo_revision, overwrite_existing=overwrite_existing)
 
     if update_config:
         # Overwrite the site repo in the config because further processing will
@@ -140,8 +146,8 @@ def process_site_repository(update_config=False, overwrite_existing=False):
     return new_repo_path
 
 
-def _process_repository(repo_url_or_path, repo_revision,
-                        overwrite_existing=False):
+def _process_repository(
+        repo_url_or_path, repo_revision, overwrite_existing=False):
     """Process a repository located at ``repo_url_or_path``.
 
     :param str repo_url_or_path: Path to local repo or URL of remote URL.
@@ -191,9 +197,10 @@ def _process_site_repository(repo_url_or_path, repo_revision):
     repo_key = config.get_repo_key()
     repo_user = config.get_repo_username()
 
-    LOG.info("Processing repository %s with url=%s, repo_key=%s, "
-             "repo_username=%s, revision=%s", repo_alias, repo_url_or_path,
-             repo_key, repo_user, repo_revision)
+    LOG.info(
+        "Processing repository %s with url=%s, repo_key=%s, "
+        "repo_username=%s, revision=%s", repo_alias, repo_url_or_path,
+        repo_key, repo_user, repo_revision)
     return _handle_repository(
         repo_url_or_path, ref=repo_revision, auth_key=repo_key)
 
@@ -201,10 +208,11 @@ def _process_site_repository(repo_url_or_path, repo_revision):
 def _get_and_validate_site_repositories(site_name, site_data):
     """Validate that repositories entry exists in ``site_data``."""
     if 'repositories' not in site_data:
-        LOG.info("The repository for site_name: %s does not contain a "
-                 "site-definition.yaml with a 'repositories' key. Ensure "
-                 "your repository is self-contained and doesn't require "
-                 "extra repositories for correct rendering.", site_name)
+        LOG.info(
+            "The repository for site_name: %s does not contain a "
+            "site-definition.yaml with a 'repositories' key. Ensure "
+            "your repository is self-contained and doesn't require "
+            "extra repositories for correct rendering.", site_name)
     return site_data.get('repositories', {})
 
 
@@ -249,9 +257,10 @@ def _process_repository_overrides(site_def_repos):
             raise click.ClickException(_INVALID_FORMAT_MSG % repo_override)
 
         if repo_alias == "site":
-            LOG.warning("The primary site repository path must be specified "
-                        "via the -r flag. Ignoring the provided override: %s",
-                        repo_override)
+            LOG.warning(
+                "The primary site repository path must be specified "
+                "via the -r flag. Ignoring the provided override: %s",
+                repo_override)
             continue
 
         if repo_alias not in site_def_repos:
@@ -259,9 +268,10 @@ def _process_repository_overrides(site_def_repos):
             # site-definition.yaml make a note of it in case the override
             # is something bogus, but we won't make this a hard requirement,
             # so just log the discrepancy.
-            LOG.debug("Repo override: %s not found under `repositories` for "
-                      "site-definition.yaml. Site def repositories: %s",
-                      repo_override, ", ".join(site_def_repos.keys()))
+            LOG.debug(
+                "Repo override: %s not found under `repositories` for "
+                "site-definition.yaml. Site def repositories: %s",
+                repo_override, ", ".join(site_def_repos.keys()))
 
         repo_url, revision = _extract_repo_url_and_revision(repo_url_or_path)
 
@@ -286,7 +296,7 @@ def _extract_repo_url_and_revision(repo_url_or_path):
 
     """
 
-    ssh_username_pattern = re.compile('ssh:\/\/.+@.+\/.+')
+    ssh_username_pattern = re.compile(r'ssh:\/\/.+@.+\/.+')
 
     def has_revision(repo_url_or_path):
         if repo_url_or_path.lower().startswith('ssh'):
@@ -348,7 +358,8 @@ def _handle_repository(repo_url_or_path, *args, **kwargs):
     except exceptions.GitException as e:
         raise click.ClickException(e)
     except Exception as e:
-        LOG.exception('Unknown exception was raised during git clone/checkout:'
-                      ' %s', e)
+        LOG.exception(
+            'Unknown exception was raised during git clone/checkout:'
+            ' %s', e)
         # TODO(felipemonteiro): Use internal exceptions for this.
         raise click.ClickException(e)

@@ -57,9 +57,9 @@ class PassphraseCatalog(BaseCatalog):
     @property
     def get_passphrase_names(self):
         """Return the list of passphrases in the catalog."""
-        return (passphrase[P_DOCUMENT_NAME]
-                for catalog in self._catalog_docs
-                for passphrase in catalog['data']['passphrases'])
+        return (
+            passphrase[P_DOCUMENT_NAME] for catalog in self._catalog_docs
+            for passphrase in catalog['data']['passphrases'])
 
     def get_length(self, passphrase_name):
         """

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from deckhand.engine import document_validation
 from deckhand.engine import layering
 from deckhand import errors as dh_errors
@@ -34,17 +33,18 @@ def load_schemas_from_docs(documents):
         if document.get('schema', '') == SCHEMA_SCHEMA:
             name = document['metadata']['name']
             if name in schema_set:
-                errors.append((DECKHAND_DUPLICATE_SCHEMA,
-                               'Duplicate schema specified for: %s' % name))
+                errors.append(
+                    (
+                        DECKHAND_DUPLICATE_SCHEMA,
+                        'Duplicate schema specified for: %s' % name))
 
             schema_set[name] = document['data']
 
     return schema_set, errors
 
 
-def deckhand_render(documents=None,
-                    fail_on_missing_sub_src=False,
-                    validate=True):
+def deckhand_render(
+        documents=None, fail_on_missing_sub_src=False, validate=True):
     documents = documents or []
     errors = []
     rendered_documents = []
@@ -65,15 +65,17 @@ def deckhand_render(documents=None,
             for result in results:
                 if result['errors']:
                     errors.append(
-                        (DECKHAND_RENDER_EXCEPTION,
-                         'During rendering Deckhand was unable to validate '
-                         'the following document, details: %s.' % (
-                             result['errors'])))
+                        (
+                            DECKHAND_RENDER_EXCEPTION,
+                            'During rendering Deckhand was unable to validate '
+                            'the following document, details: %s.' %
+                            (result['errors'])))
     except dh_errors.DeckhandException as e:
         errors.append(
-            (DECKHAND_RENDER_EXCEPTION,
-             'An unknown Deckhand exception occurred while trying'
-             ' to render documents: %s. Details: %s.' % (str(e),
-                                                         e.error_list)))
+            (
+                DECKHAND_RENDER_EXCEPTION,
+                'An unknown Deckhand exception occurred while trying'
+                ' to render documents: %s. Details: %s.' %
+                (str(e), e.error_list)))
 
     return rendered_documents, errors

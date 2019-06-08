@@ -53,10 +53,11 @@ DIR_DEPTHS = {
 
 
 def all():
-    return search([
-        os.path.join(r, k) for r in config.all_repos()
-        for k in DIR_DEPTHS.keys()
-    ])
+    return search(
+        [
+            os.path.join(r, k) for r in config.all_repos()
+            for k in DIR_DEPTHS.keys()
+        ])
 
 
 def create_global_directories():
@@ -183,8 +184,8 @@ def list_sites(primary_repo_base=None):
     """Get a list of site definition directories in the primary repo."""
     if not primary_repo_base:
         primary_repo_base = config.get_site_repo()
-    full_site_path = os.path.join(primary_repo_base,
-                                  config.get_rel_site_path())
+    full_site_path = os.path.join(
+        primary_repo_base, config.get_rel_site_path())
     for path in os.listdir(full_site_path):
         joined_path = os.path.join(full_site_path, path)
         if os.path.isdir(joined_path):
@@ -195,8 +196,8 @@ def list_types(primary_repo_base=None):
     """Get a list of type directories in the primary repo."""
     if not primary_repo_base:
         primary_repo_base = config.get_site_repo()
-    full_type_path = os.path.join(primary_repo_base,
-                                  config.get_rel_type_path())
+    full_type_path = os.path.join(
+        primary_repo_base, config.get_rel_type_path())
     for path in os.listdir(full_type_path):
         joined_path = os.path.join(full_type_path, path)
         if os.path.isdir(joined_path):
@@ -327,17 +328,19 @@ def write(data, file_path):
             elif isinstance(data, (dict, collections.abc.Iterable)):
                 if isinstance(data, dict):
                     data = [data]
-                yaml.safe_dump_all(data,
-                                   stream,
-                                   explicit_start=True,
-                                   explicit_end=True,
-                                   default_flow_style=False)
+                yaml.safe_dump_all(
+                    data,
+                    stream,
+                    explicit_start=True,
+                    explicit_end=True,
+                    default_flow_style=False)
             else:
-                raise ValueError('data must be str or dict, '
-                                 'not {}'.format(type(data)))
+                raise ValueError(
+                    'data must be str or dict, '
+                    'not {}'.format(type(data)))
     except EnvironmentError as e:
-        raise click.ClickError("Couldn't write data to {}: {}".format(
-            file_path, e))
+        raise click.ClickError(
+            "Couldn't write data to {}: {}".format(file_path, e))
 
 
 def _recurse_subdirs(search_path, depth):
@@ -349,8 +352,8 @@ def _recurse_subdirs(search_path, depth):
                 if depth == 1:
                     directories.add(joined_path)
                 else:
-                    directories.update(_recurse_subdirs(
-                        joined_path, depth - 1))
+                    directories.update(
+                        _recurse_subdirs(joined_path, depth - 1))
     except FileNotFoundError:
         pass
     return directories

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Utility functions for catalog files such as pki-catalog.yaml."""
 
 import logging
@@ -63,6 +64,7 @@ def iterate(kind, sitename=None, documents=None):
         if schema == 'pegleg/%s/v1' % kind:
             yield document
         elif schema == 'promenade/%s/v1' % kind:
-            LOG.warning('The schema promenade/%s/v1 is deprecated. Use '
-                        'pegleg/%s/v1 instead.', kind, kind)
+            LOG.warning(
+                'The schema promenade/%s/v1 is deprecated. Use '
+                'pegleg/%s/v1 instead.', kind, kind)
             yield document

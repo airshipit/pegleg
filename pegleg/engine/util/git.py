@@ -26,15 +26,13 @@ from pegleg.engine import exceptions
 
 LOG = logging.getLogger(__name__)
 
-__all__ = ('git_handler', 'is_repository', 'is_equal', 'repo_url', 'repo_name',
-           'normalize_repo_path')
+__all__ = (
+    'git_handler', 'is_repository', 'is_equal', 'repo_url', 'repo_name',
+    'normalize_repo_path')
 
 
-def git_handler(repo_url,
-                ref=None,
-                proxy_server=None,
-                auth_key=None,
-                clone_path=None):
+def git_handler(
+        repo_url, ref=None, proxy_server=None, auth_key=None, clone_path=None):
     """Handle directories that are Git repositories.
 
     If ``repo_url`` is a valid URL for which a local repository doesn't
@@ -80,12 +78,13 @@ def git_handler(repo_url,
         # we need to clone the repo_url first since it doesn't exist and then
         # checkout the appropriate reference - and return the tmpdir
         if parsed_url.scheme in supported_clone_protocols:
-            return _try_git_clone(repo_url, ref, proxy_server, auth_key,
-                                  clone_path)
+            return _try_git_clone(
+                repo_url, ref, proxy_server, auth_key, clone_path)
         else:
-            raise ValueError('repo_url=%s must use one of the following '
-                             'protocols: %s' %
-                             (repo_url, ', '.join(supported_clone_protocols)))
+            raise ValueError(
+                'repo_url=%s must use one of the following '
+                'protocols: %s' %
+                (repo_url, ', '.join(supported_clone_protocols)))
     # otherwise, we're dealing with a local directory so although
     # we do not need to clone, we may need to process the reference
     # by checking that out and returning the directory they passed in
@@ -112,8 +111,9 @@ def git_handler(repo_url,
 
         try:
             # Check whether the ref exists locally.
-            LOG.info('Attempting to checkout ref=%s from repo_url=%s locally',
-                     ref, repo_url)
+            LOG.info(
+                'Attempting to checkout ref=%s from repo_url=%s locally', ref,
+                repo_url)
             _try_git_checkout(repo, repo_url, ref, fetch=False)
         except exceptions.GitException:
             # Otherwise, attempt to fetch and checkout the missing ref.
@@ -155,11 +155,8 @@ def get_remote_url(repo_url):
         return None
 
 
-def _try_git_clone(repo_url,
-                   ref=None,
-                   proxy_server=None,
-                   auth_key=None,
-                   clone_path=None):
+def _try_git_clone(
+        repo_url, ref=None, proxy_server=None, auth_key=None, clone_path=None):
     """Try cloning Git repo from ``repo_url`` using the reference ``ref``.
 
     :param repo_url: URL of remote Git repo or path to local Git repo.
@@ -202,27 +199,28 @@ def _try_git_clone(repo_url,
             LOG.debug('Cloning [%s] with proxy [%s]', repo_url, proxy_server)
             # TODO(felipemonteiro): proxy_server can be finicky. Need a config
             # option to retry up to N times.
-            repo = Repo.clone_from(repo_url,
-                                   temp_dir,
-                                   config='http.proxy=%s' % proxy_server,
-                                   env=env_vars)
+            repo = Repo.clone_from(
+                repo_url,
+                temp_dir,
+                config='http.proxy=%s' % proxy_server,
+                env=env_vars)
         else:
             LOG.debug('Cloning [%s]', repo_url)
             repo = Repo.clone_from(repo_url, temp_dir, env=env_vars)
     except git_exc.GitCommandError as e:
-        LOG.exception('Failed to clone repo_url=%s using ref=%s.', repo_url,
-                      ref)
+        LOG.exception(
+            'Failed to clone repo_url=%s using ref=%s.', repo_url, ref)
         if (ssh_cmd and ssh_cmd in e.stderr
                 or 'permission denied' in e.stderr.lower()):
-            raise exceptions.GitAuthException(repo_url=repo_url,
-                                              ssh_key_path=auth_key)
+            raise exceptions.GitAuthException(
+                repo_url=repo_url, ssh_key_path=auth_key)
         elif 'could not resolve proxy' in e.stderr.lower():
             raise exceptions.GitProxyException(location=proxy_server)
         else:
             raise exceptions.GitException(location=repo_url, details=e)
     except Exception as e:
-        LOG.exception('Encountered unknown Exception during clone of %s',
-                      repo_url)
+        LOG.exception(
+            'Encountered unknown Exception during clone of %s', repo_url)
         raise exceptions.GitException(location=repo_url, details=e)
 
     _try_git_checkout(repo=repo, repo_url=repo_url, ref=ref)
@@ -296,32 +294,28 @@ def _try_git_checkout(repo, repo_url, ref=None, fetch=True):
             # for each so that future checkouts can be performed using either
             # format. This way, no future processing is required to figure
             # out whether a refpath/hexsha exists within the repo.
-            _create_local_ref(g,
-                              branches,
-                              ref=ref,
-                              newref=hexsha,
-                              reftype='hexsha')
-            _create_local_ref(g,
-                              branches,
-                              ref=ref,
-                              newref=ref_path,
-                              reftype='refpath')
+            _create_local_ref(
+                g, branches, ref=ref, newref=hexsha, reftype='hexsha')
+            _create_local_ref(
+                g, branches, ref=ref, newref=ref_path, reftype='refpath')
             _create_or_checkout_local_ref(g, branches, ref=ref)
         else:
-            LOG.debug('Checking out ref=%s from local repo_url=%s', ref,
-                      repo_url)
+            LOG.debug(
+                'Checking out ref=%s from local repo_url=%s', ref, repo_url)
             # Expect the reference to exist if checking out locally.
             g.checkout(ref)
 
-        LOG.debug('Successfully checked out ref=%s for repo_url=%s', ref,
-                  repo_url)
+        LOG.debug(
+            'Successfully checked out ref=%s for repo_url=%s', ref, repo_url)
     except git_exc.GitCommandError as e:
-        LOG.exception('Failed to checkout ref=%s from repo_url=%s.', ref,
-                      repo_url)
+        LOG.exception(
+            'Failed to checkout ref=%s from repo_url=%s.', ref, repo_url)
         raise exceptions.GitException(location=repo_url, details=e)
     except Exception as e:
-        LOG.exception(('Encountered unknown Exception during checkout of '
-                       'ref=%s for repo_url=%s'), ref, repo_url)
+        LOG.exception(
+            (
+                'Encountered unknown Exception during checkout of '
+                'ref=%s for repo_url=%s'), ref, repo_url)
         raise exceptions.GitException(location=repo_url, details=e)
 
 
@@ -338,8 +332,9 @@ def _create_or_checkout_local_ref(g, branches, ref):
 def _create_local_ref(g, branches, ref, newref, reftype=None):
     if newref not in branches:
         if newref and ref != newref:
-            LOG.debug('Creating local branch for ref=%s (%s for %s)', newref,
-                      reftype, ref)
+            LOG.debug(
+                'Creating local branch for ref=%s (%s for %s)', newref,
+                reftype, ref)
             g.checkout('FETCH_HEAD', b=newref)
             branches.append(newref)
 

@@ -127,8 +127,8 @@ class TestPKIUtility(object):
         ca_config['signing']['default']['expiry'] = '1h'
 
         m_callable = mock.PropertyMock(return_value=json.dumps(ca_config))
-        with mock.patch.object(
-                pki_utility.PKIUtility, 'ca_config', new_callable=m_callable):
+        with mock.patch.object(pki_utility.PKIUtility, 'ca_config',
+                               new_callable=m_callable):
             ca_cert_wrapper, ca_key_wrapper = pki_obj.generate_ca(
                 self.__class__.__name__)
             ca_cert = ca_cert_wrapper['data']['managedDocument']
@@ -155,8 +155,8 @@ class TestPKIUtility(object):
         ca_config['signing']['default']['expiry'] = '1s'
 
         m_callable = mock.PropertyMock(return_value=json.dumps(ca_config))
-        with mock.patch.object(
-                pki_utility.PKIUtility, 'ca_config', new_callable=m_callable):
+        with mock.patch.object(pki_utility.PKIUtility, 'ca_config',
+                               new_callable=m_callable):
             ca_cert_wrapper, ca_key_wrapper = pki_obj.generate_ca(
                 self.__class__.__name__)
             ca_cert = ca_cert_wrapper['data']['managedDocument']

@@ -22,12 +22,10 @@ import requests
 import uuid
 
 _PROXY_SERVERS = {
-    'http':
-    os.getenv('HTTP_PROXY', os.getenv('http_proxy',
-                                      'http://proxy.example.com')),
-    'https':
-    os.getenv('HTTPS_PROXY',
-              os.getenv('https_proxy', 'https://proxy.example.com'))
+    'http': os.getenv(
+        'HTTP_PROXY', os.getenv('http_proxy', 'http://proxy.example.com')),
+    'https': os.getenv(
+        'HTTPS_PROXY', os.getenv('https_proxy', 'https://proxy.example.com'))
 }
 
 

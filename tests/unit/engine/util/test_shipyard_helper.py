@@ -24,33 +24,60 @@ from pegleg.engine.util.shipyard_helper import ShipyardClient
 
 # Dummy data to be used as collected documents
 DATA = {
-    'test-repo':
-        [{'schema': 'pegleg/SiteDefinition/v1',
-          'metadata': {'schema': 'metadata/Document/v1',
-                       'layeringDefinition': {'abstract': False,
-                                              'layer': 'site'},
-                       'name': 'site-name',
-                       'storagePolicy': 'cleartext'},
-          'data': {'site_type': 'foundry'}}]}
+    'test-repo': [
+        {
+            'schema': 'pegleg/SiteDefinition/v1',
+            'metadata': {
+                'schema': 'metadata/Document/v1',
+                'layeringDefinition': {
+                    'abstract': False,
+                    'layer': 'site'
+                },
+                'name': 'site-name',
+                'storagePolicy': 'cleartext'
+            },
+            'data': {
+                'site_type': 'foundry'
+            }
+        }
+    ]
+}
 
 MULTI_REPO_DATA = {
-    'repo1':
-        [{'schema': 'pegleg/SiteDefinition/v1',
-          'metadata': {'schema': 'metadata/Document/v1',
-                       'layeringDefinition': {'abstract': False,
-                                              'layer': 'site'},
-                       'name': 'site-name',
-                       'storagePolicy': 'cleartext'},
-          'data': {'site_type': 'foundry'}}],
-    'repo2':
-        [{'schema': 'pegleg/SiteDefinition/v1',
-          'metadata': {'schema': 'metadata/Document/v1',
-                       'layeringDefinition': {'abstract': False,
-                                              'layer': 'site'},
-                       'name': 'site-name',
-                       'storagePolicy': 'cleartext'},
-          'data': {'site_type': 'foundry'}}]
-
+    'repo1': [
+        {
+            'schema': 'pegleg/SiteDefinition/v1',
+            'metadata': {
+                'schema': 'metadata/Document/v1',
+                'layeringDefinition': {
+                    'abstract': False,
+                    'layer': 'site'
+                },
+                'name': 'site-name',
+                'storagePolicy': 'cleartext'
+            },
+            'data': {
+                'site_type': 'foundry'
+            }
+        }
+    ],
+    'repo2': [
+        {
+            'schema': 'pegleg/SiteDefinition/v1',
+            'metadata': {
+                'schema': 'metadata/Document/v1',
+                'layeringDefinition': {
+                    'abstract': False,
+                    'layer': 'site'
+                },
+                'name': 'site-name',
+                'storagePolicy': 'cleartext'
+            },
+            'data': {
+                'site_type': 'foundry'
+            }
+        }
+    ]
 }
 
 
@@ -79,9 +106,7 @@ def _get_context():
         'password': 'passwordTest',
         'auth_url': 'urlTest'
     }
-    ctx.obj['API_PARAMETERS'] = {
-        'auth_vars': auth_vars
-    }
+    ctx.obj['API_PARAMETERS'] = {'auth_vars': auth_vars}
     ctx.obj['context_marker'] = '88888888-4444-4444-4444-121212121212'
     ctx.obj['site_name'] = 'test-site'
     ctx.obj['collection'] = 'test-site'
@@ -99,9 +124,7 @@ def _get_bad_context():
         'password': 'passwordTest',
         'auth_url': None
     }
-    ctx.obj['API_PARAMETERS'] = {
-        'auth_vars': auth_vars
-    }
+    ctx.obj['API_PARAMETERS'] = {'auth_vars': auth_vars}
     ctx.obj['context_marker'] = '88888888-4444-4444-4444-121212121212'
     ctx.obj['site_name'] = 'test-site'
     ctx.obj['collection'] = None
@@ -131,14 +154,20 @@ def test_shipyard_helper_init_():
     assert isinstance(shipyard_helper.api_client, ShipyardClient)
 
 
-@mock.patch('pegleg.engine.util.files.collect_files_by_repo', autospec=True,
-            return_value=MULTI_REPO_DATA)
-@mock.patch.object(ShipyardHelper, 'formatted_response_handler',
-                   autospec=True, return_value=None)
-@mock.patch.dict(os.environ, {
-    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    'PEGLEG_SALT': 'MySecretSalt1234567890]['
-})
+@mock.patch(
+    'pegleg.engine.util.files.collect_files_by_repo',
+    autospec=True,
+    return_value=MULTI_REPO_DATA)
+@mock.patch.object(
+    ShipyardHelper,
+    'formatted_response_handler',
+    autospec=True,
+    return_value=None)
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
 def test_upload_documents(*args):
     """ Tests upload document """
     # Scenario:
@@ -164,14 +193,20 @@ def test_upload_documents(*args):
         mock_api_client.post_configdocs.assert_called_once()
 
 
-@mock.patch('pegleg.engine.util.files.collect_files_by_repo', autospec=True,
-            return_value=DATA)
-@mock.patch.object(ShipyardHelper, 'formatted_response_handler',
-                   autospec=True, return_value=None)
-@mock.patch.dict(os.environ, {
-    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    'PEGLEG_SALT': 'MySecretSalt1234567890]['
-})
+@mock.patch(
+    'pegleg.engine.util.files.collect_files_by_repo',
+    autospec=True,
+    return_value=DATA)
+@mock.patch.object(
+    ShipyardHelper,
+    'formatted_response_handler',
+    autospec=True,
+    return_value=None)
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
 def test_upload_documents_fail(*args):
     """ Tests Document upload error """
     # Scenario:
@@ -191,10 +226,15 @@ def test_upload_documents_fail(*args):
             ShipyardHelper(context).upload_documents()
 
 
-@mock.patch('pegleg.engine.util.files.collect_files_by_repo', autospec=True,
-            return_value=DATA)
-@mock.patch.object(ShipyardHelper, 'formatted_response_handler',
-                   autospec=True, return_value=None)
+@mock.patch(
+    'pegleg.engine.util.files.collect_files_by_repo',
+    autospec=True,
+    return_value=DATA)
+@mock.patch.object(
+    ShipyardHelper,
+    'formatted_response_handler',
+    autospec=True,
+    return_value=None)
 def test_fail_auth(*args):
     """ Tests Auth Failure """
     # Scenario:
@@ -209,8 +249,11 @@ def test_fail_auth(*args):
         ShipyardHelper(context).validate_auth_vars()
 
 
-@mock.patch.object(ShipyardHelper, 'formatted_response_handler',
-                   autospec=True, return_value=None)
+@mock.patch.object(
+    ShipyardHelper,
+    'formatted_response_handler',
+    autospec=True,
+    return_value=None)
 def test_commit_documents(*args):
     """Tests commit document """
     # Scenario:

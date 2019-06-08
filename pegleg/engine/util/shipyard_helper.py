@@ -16,15 +16,14 @@ import json
 import logging
 import uuid
 
+from shipyard_client.api_client.shipyard_api_client import ShipyardClient
+from shipyard_client.api_client.shipyardclient_context import \
+    ShipyardClientContext
 import yaml
 
 from pegleg.engine import exceptions
 from pegleg.engine.util import files
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
-
-from shipyard_client.api_client.shipyard_api_client import ShipyardClient
-from shipyard_client.api_client.shipyardclient_context import \
-    ShipyardClientContext
 
 LOG = logging.getLogger(__name__)
 
@@ -87,8 +86,8 @@ class ShipyardHelper(object):
                 docs=collected_documents[document])
             decrypted_documents = pegleg_secret_mgmt.get_decrypted_secrets()
             collection_data.extend(decrypted_documents)
-        collection_as_yaml = yaml.dump_all(collection_data,
-                                           Dumper=yaml.SafeDumper)
+        collection_as_yaml = yaml.dump_all(
+            collection_data, Dumper=yaml.SafeDumper)
 
         # Append flag is not required for the first
         # collection being uploaded to Shipyard. It
@@ -103,16 +102,14 @@ class ShipyardHelper(object):
             resp_text = self.api_client.post_configdocs(
                 collection_id=self.collection,
                 buffer_mode=buffer_mode,
-                document_data=collection_as_yaml
-            )
+                document_data=collection_as_yaml)
 
         except AuthValuesError as ave:
             resp_text = "Error: {}".format(ave.diagnostic)
             raise DocumentUploadError(resp_text)
         except Exception as ex:
             resp_text = (
-                "Error: Unable to invoke action due to: {}"
-                .format(str(ex)))
+                "Error: Unable to invoke action due to: {}".format(str(ex)))
             LOG.debug(resp_text, exc_info=True)
             raise DocumentUploadError(resp_text)
 
@@ -143,8 +140,7 @@ class ShipyardHelper(object):
 
         try:
             resp_text = self.formatted_response_handler(
-                self.api_client.commit_configdocs()
-            )
+                self.api_client.commit_configdocs())
         except Exception as ex:
             resp_text = (
                 "Error: Unable to invoke action due to: {}".format(str(ex)))
@@ -162,10 +158,11 @@ class ShipyardHelper(object):
                     '--os-{}'.format(var.replace('_', '-')))
         if err_txt:
             for var in self.auth_vars:
-                if (self.auth_vars.get(var) is None and
-                        var not in required_auth_vars):
-                    err_txt.append('- Also not set: --os-{}'.format(
-                        var.replace('_', '-')))
+                if (self.auth_vars.get(var) is None
+                        and var not in required_auth_vars):
+                    err_txt.append(
+                        '- Also not set: --os-{}'.format(
+                            var.replace('_', '-')))
             raise AuthValuesError(diagnostic='\n'.join(err_txt))
 
     def formatted_response_handler(self, response):
@@ -176,6 +173,5 @@ class ShipyardHelper(object):
                 return json.dumps(response.json(), indent=4)
             except ValueError:
                 return (
-                    "This is not json and could not be printed as such. \n" +
-                    response.text
-                )
+                    "This is not json and could not be printed as such. \n"
+                    + response.text)

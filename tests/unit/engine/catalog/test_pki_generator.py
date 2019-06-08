@@ -46,7 +46,8 @@ _SITE_TEST_STRUCTURE = {
     'files': {}
 }
 
-_SITE_DEFINITION = textwrap.dedent("""
+_SITE_DEFINITION = textwrap.dedent(
+    """
     ---
     schema: pegleg/SiteDefinition/v1
     metadata:
@@ -67,7 +68,8 @@ _CA_KEY_NAME = "kubernetes"
 _CERT_KEY_NAME = "kubelet-n3"
 _KEYPAIR_KEY_NAME = "service-account"
 
-_PKI_CATALOG_CAS = textwrap.dedent("""
+_PKI_CATALOG_CAS = textwrap.dedent(
+    """
     ---
     schema: pegleg/PKICatalog/v1
     metadata:
@@ -84,7 +86,8 @@ _PKI_CATALOG_CAS = textwrap.dedent("""
     ...
     """ % _CA_KEY_NAME)
 
-_PKI_CATALOG_CERTS = textwrap.dedent("""
+_PKI_CATALOG_CERTS = textwrap.dedent(
+    """
     ---
     schema: pegleg/PKICatalog/v1
     metadata:
@@ -109,7 +112,8 @@ _PKI_CATALOG_CERTS = textwrap.dedent("""
     ...
     """ % (_CA_KEY_NAME, _CERT_KEY_NAME))
 
-_PKI_CATALOG_KEYPAIRS = textwrap.dedent("""
+_PKI_CATALOG_KEYPAIRS = textwrap.dedent(
+    """
     ---
     schema: pegleg/PKICatalog/v1
     metadata:
@@ -128,7 +132,8 @@ _PKI_CATALOG_KEYPAIRS = textwrap.dedent("""
     ...
     """ % _KEYPAIR_KEY_NAME)
 
-_PKI_CATALOG_EVERYTHING = textwrap.dedent("""
+_PKI_CATALOG_EVERYTHING = textwrap.dedent(
+    """
     ---
     schema: pegleg/PKICatalog/v1
     metadata:
@@ -273,8 +278,9 @@ class TestPKIGenerator(object):
         ]
 
         def _filter_keypairs(x):
-            return (x['data']['managedDocument']['schema'] in
-                    valid_keypair_schemas)
+            return (
+                x['data']['managedDocument']['schema'] in valid_keypair_schemas
+            )
 
         keypairs = list(filter(_filter_keypairs, documents))
         self._validate_documents(

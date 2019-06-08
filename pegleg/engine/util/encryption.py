@@ -27,11 +27,12 @@ LOG = logging.getLogger(__name__)
 __all__ = ('encrypt', 'decrypt')
 
 
-def encrypt(unencrypted_data,
-            passphrase,
-            salt,
-            key_length=KEY_LENGTH,
-            iterations=ITERATIONS):
+def encrypt(
+        unencrypted_data,
+        passphrase,
+        salt,
+        key_length=KEY_LENGTH,
+        iterations=ITERATIONS):
     """
     Encrypt the data, using the provided passphrase and salt,
     and return the encrypted data.
@@ -56,15 +57,17 @@ def encrypt(unencrypted_data,
     :rtype: bytes
     """
 
-    return fernet.Fernet(_generate_key(
-        passphrase, salt, key_length, iterations)).encrypt(unencrypted_data)
+    return fernet.Fernet(
+        _generate_key(passphrase, salt, key_length,
+                      iterations)).encrypt(unencrypted_data)
 
 
-def decrypt(encrypted_data,
-            passphrase,
-            salt,
-            key_length=KEY_LENGTH,
-            iterations=ITERATIONS):
+def decrypt(
+        encrypted_data,
+        passphrase,
+        salt,
+        key_length=KEY_LENGTH,
+        iterations=ITERATIONS):
     """
     Decrypt the data, using the provided passphrase and salt,
     and return the decrypted data.
@@ -92,11 +95,13 @@ def decrypt(encrypted_data,
     """
 
     try:
-        return fernet.Fernet(_generate_key(
-            passphrase, salt, key_length, iterations)).decrypt(encrypted_data)
+        return fernet.Fernet(
+            _generate_key(passphrase, salt, key_length,
+                          iterations)).decrypt(encrypted_data)
     except fernet.InvalidToken:
-        LOG.error('Signature verification to decrypt secrets failed. Please '
-                  'check your provided passphrase and salt and try again.')
+        LOG.error(
+            'Signature verification to decrypt secrets failed. Please '
+            'check your provided passphrase and salt and try again.')
         raise
 
 
