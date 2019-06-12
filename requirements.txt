@@ -5,6 +5,9 @@ pyyaml==5.1
 cryptography==2.3.1
 python-dateutil==2.7.3
 docker==3.7.2
+requests==2.20.0
+urllib3==1.24.3
+chardet==3.0.4
 
 # External dependencies
 git+https://opendev.org/airship/deckhand.git@a76ffb66ae809c19281a6cf5c9414ed197d249b7
