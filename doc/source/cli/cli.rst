@@ -685,7 +685,7 @@ repository folder structure. This is used to ensure the correct revision of
 the site and global repositories are used, as specified in the site's
 :file:`site-definition.yaml`.
 
-**-p / --path** (Required).
+**--path** (Required).
 
 Path to pegleg managed encrypted secrets file or directory of files.
 
@@ -703,7 +703,7 @@ Usage:
 
 ::
 
-    ./pegleg.sh site <options> secrets decrypt <site_name> -p <path>
+    ./pegleg.sh site <options> secrets decrypt <site_name> --path <path>
       [-s <output_path>]
 
 Examples
@@ -735,7 +735,7 @@ for tracking provenance information in the PeglegManagedDocuments.
 An attempt is made to automatically determine this value,
 but should be provided.
 
-**-f / --filename**
+**--filename**
 
 The relative path to the file to be wrapped.
 
@@ -766,7 +766,7 @@ Examples
 ::
 
   ./pegleg.sh site -r /home/myuser/myrepo \
-    secrets wrap -a myuser -f secrets/certificates/new_cert.crt \
+    secrets wrap -a myuser --filename secrets/certificates/new_cert.crt \
     -o secrets/certificates/new_cert.yaml -s "deckhand/Certificate/v1" \
     -n "new-cert" -l site mysite
 
