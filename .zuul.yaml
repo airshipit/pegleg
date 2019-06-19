@@ -75,6 +75,7 @@
 
 - job:
     name: airship-pegleg-docker-build-gate-opensuse
+    voting: false
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node
@@ -127,6 +128,7 @@
 
 - job:
     name: airship-pegleg-docker-publish-opensuse
+    voting: false
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node
