@@ -34,8 +34,14 @@ except NameError:
         'passphrase': None,
         'salt': None,
         'salt_min_length': 24,
-        'passphrase_min_length': 24
+        'passphrase_min_length': 24,
+        'default_umask': 0o027
     }
+
+
+def set_umask():
+    """Set the umask for Pegleg to use when creating files/folders."""
+    os.umask(GLOBAL_CONTEXT['default_umask'])
 
 
 def get_site_repo():

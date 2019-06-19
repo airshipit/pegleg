@@ -34,6 +34,8 @@ __all__ = [
     'directories_for',
     'directory_for',
     'dump',
+    'safe_dump',
+    'dump_all',
     'read',
     'write',
     'existing_directories',
@@ -116,7 +118,7 @@ FULL_STRUCTURE = {
 def _create_tree(root_path, *, tree=FULL_STRUCTURE):
     for name, data in tree.get('directories', {}).items():
         path = os.path.join(root_path, name)
-        os.makedirs(path, mode=0o775, exist_ok=True)
+        os.makedirs(path, exist_ok=True)
         _create_tree(path, tree=data)
 
     for filename, yaml_data in tree.get('files', {}).items():
@@ -226,7 +228,7 @@ def slurp(path):
             '%s not found. Pegleg must be run from the root of a configuration'
             ' repository.' % path)
 
-    with open(path) as f:
+    with open(path, 'r') as f:
         try:
             # Ignore YAML tags, only construct dicts
             SafeConstructor.add_multi_constructor(
@@ -236,14 +238,34 @@ def slurp(path):
             raise click.ClickException('Failed to parse %s:\n%s' % (path, e))
 
 
-def dump(path, data):
-    if os.path.exists(path):
+def dump(data, path, flag='w', **kwargs):
+    if flag == 'w' and os.path.exists(path):
         raise click.ClickException('%s already exists, aborting' % path)
 
-    os.makedirs(os.path.dirname(path), mode=0o775, exist_ok=True)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, flag) as f:
 
-    with open(path, 'w') as f:
-        yaml.dump(data, f, explicit_start=True)
+        yaml.dump(data, f, **kwargs)
+
+
+def safe_dump(data, path, flag='w', **kwargs):
+    if flag == 'w' and os.path.exists(path):
+        raise click.ClickException('%s already exists, aborting' % path)
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, flag) as f:
+
+        yaml.safe_dump(data, f, **kwargs)
+
+
+def dump_all(data, path, flag='w', **kwargs):
+    if flag == 'w' and os.path.exists(path):
+        raise click.ClickException('%s already exists, aborting' % path)
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, flag) as f:
+
+        yaml.dump_all(data, f, **kwargs)
 
 
 def read(path):
@@ -272,29 +294,29 @@ def read(path):
             if any(schema.startswith(x) for x in valid_schemas):
                 return True
             else:
-                LOG.debug('Document with schema=%s is not a valid Deckhand '
-                          'schema. Ignoring it.', schema)
+                LOG.debug(
+                    'Document with schema=%s is not a valid Deckhand '
+                    'schema. Ignoring it.', schema)
         return False
 
     def is_pegleg_managed_document(document):
         return md.PeglegManagedSecretsDocument.is_pegleg_managed_secret(
             document)
 
-    with open(path) as stream:
+    with open(path, 'r') as stream:
         # Ignore YAML tags, only construct dicts
         SafeConstructor.add_multi_constructor(
             '', lambda loader, suffix, node: None)
         try:
             return [
-                d for d in yaml.safe_load_all(stream)
-                if d and (is_deckhand_document(d) or
-                          is_pegleg_managed_document(d))
+                d for d in yaml.safe_load_all(stream) if d and
+                (is_deckhand_document(d) or is_pegleg_managed_document(d))
             ]
         except yaml.YAMLError as e:
             raise click.ClickException('Failed to parse %s:\n%s' % (path, e))
 
 
-def write(file_path, data):
+def write(data, file_path):
     """
     Write the data to destination file_path.
 
@@ -306,28 +328,25 @@ def write(file_path, data):
     :param data: data to be written to the destination file
     :type data: str, dict, or a list of dicts
     """
-
     try:
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
         with open(file_path, 'w') as stream:
             if isinstance(data, str):
                 stream.write(data)
             elif isinstance(data, (dict, collections.abc.Iterable)):
                 if isinstance(data, dict):
                     data = [data]
-                yaml.safe_dump_all(
-                    data,
-                    stream,
-                    explicit_start=True,
-                    explicit_end=True,
-                    default_flow_style=False)
+                yaml.safe_dump_all(data,
+                                   stream,
+                                   explicit_start=True,
+                                   explicit_end=True,
+                                   default_flow_style=False)
             else:
                 raise ValueError('data must be str or dict, '
                                  'not {}'.format(type(data)))
     except EnvironmentError as e:
-        raise click.ClickError(
-            "Couldn't write data to {}: {}".format(file_path, e))
+        raise click.ClickError("Couldn't write data to {}: {}".format(
+            file_path, e))
 
 
 def _recurse_subdirs(search_path, depth):
@@ -339,8 +358,8 @@ def _recurse_subdirs(search_path, depth):
                 if depth == 1:
                     directories.add(joined_path)
                 else:
-                    directories.update(
-                        _recurse_subdirs(joined_path, depth - 1))
+                    directories.update(_recurse_subdirs(
+                        joined_path, depth - 1))
     except FileNotFoundError:
         pass
     return directories
@@ -382,8 +401,9 @@ def check_file_save_location(save_location):
 
     if save_location:
         if not os.path.exists(save_location):
-            LOG.debug("Save location %s does not exist. Creating "
-                      "automatically.", save_location)
+            LOG.debug(
+                "Save location %s does not exist. Creating "
+                "automatically.", save_location)
             os.makedirs(save_location)
         # In case save_location already exists and isn't a directory.
         if not os.path.isdir(save_location):
@@ -396,8 +416,7 @@ def collect_files_by_repo(site_name):
     """Collects file by repo name in memory."""
 
     collected_files_by_repo = collections.defaultdict(list)
-    for repo_base, filename in util.definition.site_files_by_repo(
-            site_name):
+    for repo_base, filename in util.definition.site_files_by_repo(site_name):
         repo_name = os.path.normpath(repo_base).split(os.sep)[-1]
         documents = util.files.read(filename)
         collected_files_by_repo[repo_name].extend(documents)
@@ -411,8 +430,7 @@ def file_in_subdir(filename, _dir):
     :return: Whether _dir is a parent of the file
     :rtype: bool
     """
-    file_path, filename = os.path.split(
-        os.path.realpath(filename))
+    file_path, filename = os.path.split(os.path.realpath(filename))
     return _dir in file_path.split(os.path.sep)
 
 
@@ -425,8 +443,7 @@ def path_leaf(path):
     :return: the last non-empty element of a string
     :rtype: str
     """
-    split_path = [i for i in path.split(os.sep)
-                  if i]
+    split_path = [i for i in path.split(os.sep) if i]
     if split_path:
         return split_path[-1]
     else:

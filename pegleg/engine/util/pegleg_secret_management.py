@@ -100,7 +100,7 @@ class PeglegSecretManagement(object):
 
         doc_list, encrypted_docs = self.get_encrypted_secrets()
         if encrypted_docs:
-            files.write(save_path, doc_list)
+            files.write(doc_list, save_path)
             click.echo('Wrote encrypted data to: {}'.format(save_path))
         else:
             LOG.debug('All documents in file: {} are either already encrypted '

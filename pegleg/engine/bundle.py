@@ -14,7 +14,6 @@
 
 import logging
 import os
-import stat
 
 import click
 
@@ -64,8 +63,6 @@ def build_genesis(build_path, encryption_key, validators, debug, site_name):
 
     # Copy the site config, and site secrets to build directory
     os.mkdir(build_path)
-    os.chmod(build_path, os.stat(build_path).st_mode | stat.S_IRWXU |
-             stat.S_IRWXG | stat.S_IROTH | stat.S_IXOTH)
     documents = util.definition.documents_for_site(site_name)
     secret_manager = PeglegSecretManagement(docs=documents)
     documents = secret_manager.get_decrypted_secrets()

@@ -14,9 +14,11 @@
 
 import logging
 
+import click
 from prettytable import PrettyTable
 
 from pegleg.engine import util
+from pegleg.engine.util import files
 
 __all__ = ('list_types', )
 
@@ -32,4 +34,8 @@ def list_types(output_stream):
     for type_name in util.files.list_types():
         type_table.add_row([type_name])
     # Write table to specified output_stream
-    output_stream.write(type_table.get_string() + "\n")
+    msg = type_table.get_string()
+    if output_stream:
+        files.write(msg + "\n", output_stream)
+    else:
+        click.echo(msg)

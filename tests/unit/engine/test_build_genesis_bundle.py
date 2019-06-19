@@ -87,10 +87,11 @@ data: ABAgagajajkb839215387
 """
 
 
-@mock.patch.dict(os.environ, {
-    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    'PEGLEG_SALT': 'MySecretSalt1234567890]['
-})
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
 def test_no_encryption_key(temp_path):
     # Write the test data to temp file
     config_data = list(yaml.safe_load_all(SITE_CONFIG_DATA))
@@ -102,9 +103,9 @@ def test_no_encryption_key(temp_path):
     build_dir = os.path.join(temp_path, 'build_dir')
     os.makedirs(config_dir)
 
-    files.write(config_path, config_data)
-    files.write(os.path.join(config_dir, "site-definition.yaml"),
-                yaml.safe_load_all(SITE_DEFINITION))
+    files.write(config_data, config_path)
+    files.write(yaml.safe_load_all(SITE_DEFINITION),
+                os.path.join(config_dir, "site-definition.yaml"))
 
     with pytest.raises(GenesisBundleEncryptionException,
                        match=r'.*no encryption policy or key is specified.*'):
@@ -115,10 +116,11 @@ def test_no_encryption_key(temp_path):
                              site_name="test_site")
 
 
-@mock.patch.dict(os.environ, {
-    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    'PEGLEG_SALT': 'MySecretSalt1234567890]['
-})
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
 def test_failed_deckhand_validation(temp_path):
     # Write the test data to temp file
     config_data = list(yaml.safe_load_all(SITE_CONFIG_DATA))
@@ -129,9 +131,9 @@ def test_failed_deckhand_validation(temp_path):
     config_path = os.path.join(config_dir, 'config_file.yaml')
     build_dir = os.path.join(temp_path, 'build_dir')
     os.makedirs(config_dir)
-    files.write(config_path, config_data)
-    files.write(os.path.join(config_dir, "site-definition.yaml"),
-                yaml.safe_load_all(SITE_DEFINITION))
+    files.write(config_data, config_path)
+    files.write(yaml.safe_load_all(SITE_DEFINITION),
+                os.path.join(config_dir, "site-definition.yaml"))
     key = 'MyverYSecretEncryptionKey382803'
     with pytest.raises(GenesisBundleGenerateException,
                        match=r'.*failed on deckhand validation.*'):

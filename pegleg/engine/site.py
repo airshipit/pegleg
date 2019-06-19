@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 
 
 def _read_and_format_yaml(filename):
-    with open(filename) as f:
+    with open(filename, 'r') as f:
         lines_to_write = f.readlines()
         if lines_to_write[0] != '---\n':
             lines_to_write = ['---\n'] + lines_to_write
@@ -78,12 +78,14 @@ def _collect_to_file(site_name, save_location):
             repo_name = os.path.normpath(repo_base).split(os.sep)[-1]
             save_file = os.path.join(save_location, repo_name + '.yaml')
             if repo_name not in save_files:
-                save_files[repo_name] = open(save_file, "w")
+                save_files[repo_name] = open(save_file, 'w')
             LOG.debug("Collecting file %s to file %s", filename, save_file)
             save_files[repo_name].writelines(_read_and_format_yaml(filename))
-        save_files[curr_site_repo].writelines(yaml.safe_dump(
-            _get_deployment_data_doc(), default_flow_style=False,
-            explicit_start=True, explicit_end=True))
+        save_files[curr_site_repo].writelines(
+            yaml.safe_dump(_get_deployment_data_doc(),
+                           default_flow_style=False,
+                           explicit_start=True,
+                           explicit_end=True))
     except Exception as ex:
         raise click.ClickException("Error saving output: %s" % str(ex))
     finally:
@@ -104,7 +106,7 @@ def render(site_name, output_stream, validate):
     SafeConstructor.add_multi_constructor(
         '', lambda loader, suffix, node: None)
     for filename in util.definition.site_files(site_name):
-        with open(filename) as f:
+        with open(filename, 'r') as f:
             documents.extend(list(yaml.safe_load_all(f)))
 
     rendered_documents, errors = util.deckhand.deckhand_render(
@@ -117,12 +119,19 @@ def render(site_name, output_stream, validate):
             else:
                 err_msg += str(err) + '\n'
         raise click.ClickException(err_msg)
-    yaml.dump_all(
-        rendered_documents,
-        output_stream,
-        default_flow_style=False,
-        explicit_start=True,
-        explicit_end=True)
+
+    if output_stream:
+        files.dump_all(rendered_documents,
+                       output_stream,
+                       default_flow_style=False,
+                       explicit_start=True,
+                       explicit_end=True)
+    else:
+        yaml.dump_all(rendered_documents,
+                      output_stream,
+                      default_flow_style=False,
+                      explicit_start=True,
+                      explicit_end=True)
 
 
 def list_(output_stream):
@@ -137,7 +146,11 @@ def list_(output_stream):
         params = util.definition.load_as_params(site_name, *field_names)
         site_table.add_row(list(map(lambda k: params[k], field_names)))
     # Write table to specified output_stream
-    output_stream.write(site_table.get_string() + "\n")
+    msg = site_table.get_string()
+    if output_stream:
+        files.write(msg + "\n", output_stream)
+    else:
+        click.echo(msg)
 
 
 def show(site_name, output_stream):
@@ -157,12 +170,18 @@ def show(site_name, output_stream):
             site_table.add_row(
                 ["", data['site_name'], data['site_type'], file])
     # Write tables to specified output_stream
-    output_stream.write(site_table.get_string() + "\n")
+    msg = site_table.get_string()
+    if output_stream:
+        files.write(msg + "\n", output_stream)
+    else:
+        click.echo(msg)
 
 
 def _get_deployment_data_doc():
-    stanzas = {files.path_leaf(repo): _get_repo_deployment_data_stanza(repo)
-               for repo in config.all_repos()}
+    stanzas = {
+        files.path_leaf(repo): _get_repo_deployment_data_stanza(repo)
+        for repo in config.all_repos()
+    }
     return {
         "schema": "pegleg/DeploymentData/v1",
         "metadata": {
@@ -186,8 +205,7 @@ def _get_repo_deployment_data_stanza(repo_path):
         commit = repo.commit()
 
         # If we're at a particular tag, reference it
-        tag = [tag.name for tag in
-               repo.tags if tag.commit == commit]
+        tag = [tag.name for tag in repo.tags if tag.commit == commit]
         if tag:
             tag == ", ".join(tag)
         else:
@@ -199,14 +217,6 @@ def _get_repo_deployment_data_stanza(repo_path):
                     tag = "Detached HEAD"
                 else:
                     raise e
-        return {
-            "commit": commit.hexsha,
-            "tag": tag,
-            "dirty": repo.is_dirty()
-        }
+        return {"commit": commit.hexsha, "tag": tag, "dirty": repo.is_dirty()}
     except git.InvalidGitRepositoryError:
-        return {
-            "commit": "None",
-            "tag": "None",
-            "dirty": "None"
-        }
+        return {"commit": "None", "tag": "None", "dirty": "None"}

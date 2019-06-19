@@ -17,8 +17,6 @@ import itertools
 import logging
 import os
 
-import yaml
-
 from pegleg import config
 from pegleg.engine.catalog import pki_utility
 from pegleg.engine.common import managed_document as md
@@ -71,8 +69,8 @@ class PKIGenerator(object):
         self._cert_to_ca_map = {}
 
     def generate(self):
-        for catalog in util.catalog.iterate(
-                documents=self._documents, kind='PKICatalog'):
+        for catalog in util.catalog.iterate(documents=self._documents,
+                                            kind='PKICatalog'):
             for ca_name, ca_def in catalog['data'].get(
                     'certificate_authorities', {}).items():
                 ca_cert, ca_key = self.get_or_gen_ca(ca_name)
@@ -121,8 +119,10 @@ class PKIGenerator(object):
     def gen_cert(self, document_name, *, ca_cert, ca_key, **kwargs):
         ca_cert_data = ca_cert['data']['managedDocument']['data']
         ca_key_data = ca_key['data']['managedDocument']['data']
-        return self.keys.generate_certificate(
-            document_name, ca_cert=ca_cert_data, ca_key=ca_key_data, **kwargs)
+        return self.keys.generate_certificate(document_name,
+                                              ca_cert=ca_cert_data,
+                                              ca_key=ca_key_data,
+                                              **kwargs)
 
     def gen_keypair(self, document_name):
         return self.keys.generate_keypair(document_name)
@@ -132,8 +132,7 @@ class PKIGenerator(object):
         if not docs:
             docs = generator(document_name, *args, **kwargs)
         else:
-            docs = PeglegSecretManagement(
-                docs=docs)
+            docs = PeglegSecretManagement(docs=docs)
 
         # Adding these to output should be idempotent, so we use a dict.
 
@@ -154,8 +153,8 @@ class PKIGenerator(object):
                           document_name, kinds)
                 return docs
             else:
-                raise exceptions.IncompletePKIPairError(
-                    kinds=kinds, name=document_name)
+                raise exceptions.IncompletePKIPairError(kinds=kinds,
+                                                        name=document_name)
 
         else:
             docs = self._find_among_outputs(schemas, document_name)
@@ -171,8 +170,9 @@ class PKIGenerator(object):
     def _find_among_collected(self, schemas, document_name):
         result = []
         for schema in schemas:
-            doc = _find_document_by(
-                self._documents, schema=schema, name=document_name)
+            doc = _find_document_by(self._documents,
+                                    schema=schema,
+                                    name=document_name)
             # If the document wasn't found, then means it needs to be
             # generated.
             if doc:
@@ -221,26 +221,23 @@ class PKIGenerator(object):
             # Encrypt the document
             document['data']['managedDocument']['metadata']['storagePolicy']\
                 = 'encrypted'
-            document = PeglegSecretManagement(docs=[
-                document]).get_encrypted_secrets()[0][0]
+            document = PeglegSecretManagement(
+                docs=[document]).get_encrypted_secrets()[0][0]
 
-            with open(output_path, 'a') as f:
-                # Don't use safe_dump so we can block format certificate
-                # data.
-                yaml.dump(
-                    document,
-                    stream=f,
-                    default_flow_style=False,
-                    explicit_start=True,
-                    indent=2)
+            util.files.dump(document,
+                            output_path,
+                            flag='a',
+                            default_flow_style=False,
+                            explicit_start=True,
+                            indent=2)
 
             output_paths.add(output_path)
         return output_paths
 
     def get_documents(self):
         return list(
-            itertools.chain.from_iterable(
-                v.values() for v in self.outputs.values()))
+            itertools.chain.from_iterable(v.values()
+                                          for v in self.outputs.values()))
 
 
 def get_host_list(service_names):
@@ -288,9 +285,10 @@ def _matches_filter(document, *, schema, labels, name):
             document_metadata = document['metadata']
             document_labels = document_metadata.get('labels', {})
             document_name = document_metadata['name']
-            LOG.warning('Detected deprecated unmanaged document during PKI '
-                        'generation. Details: schema=%s, name=%s, labels=%s.',
-                        document_schema, document_labels, document_name)
+            LOG.warning(
+                'Detected deprecated unmanaged document during PKI '
+                'generation. Details: schema=%s, name=%s, labels=%s.',
+                document_schema, document_labels, document_name)
 
     if schema is not None and not document.get('schema',
                                                '').startswith(schema):

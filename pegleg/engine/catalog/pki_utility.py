@@ -26,6 +26,7 @@ import pytz
 import yaml
 
 from pegleg.engine import exceptions
+from pegleg.engine import util
 from pegleg.engine.util.catalog import decode_bytes
 from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument
@@ -33,7 +34,6 @@ from pegleg.engine.util.pegleg_managed_document import \
 LOG = logging.getLogger(__name__)
 
 __all__ = ['PKIUtility']
-
 
 # TODO(felipemonteiro): Create an abstract base class for other future Catalog
 # classes.
@@ -73,10 +73,11 @@ class PKIUtility(object):
                 'signing': {
                     'default': {
                         'expiry':
-                            str(24 * self.duration) + 'h',
+                        str(24 * self.duration) + 'h',
                         'usages': [
                             'signing', 'key encipherment', 'server auth',
-                            'client auth'],
+                            'client auth'
+                        ],
                     },
                 },
             })
@@ -91,11 +92,8 @@ class PKIUtility(object):
 
         """
 
-        result = self._cfssl(
-            ['gencert', '-initca', 'csr.json'],
-            files={
-                'csr.json': self.csr(name=ca_name),
-            })
+        result = self._cfssl(['gencert', '-initca', 'csr.json'],
+                             files={'csr.json': self.csr(name=ca_name)})
 
         return (self._wrap_ca(ca_name, result['cert']),
                 self._wrap_ca_key(ca_name, result['key']))
@@ -192,10 +190,8 @@ class PKIUtility(object):
 
         """
 
-        return self._cfssl(
-            ['certinfo', '-cert', 'cert.pem'], files={
-                'cert.pem': cert,
-            })
+        return self._cfssl(['certinfo', '-cert', 'cert.pem'],
+                           files={'cert.pem': cert})
 
     def check_expiry(self, cert):
         """Chek whether a given certificate is expired.
@@ -227,8 +223,8 @@ class PKIUtility(object):
             files = {}
         with tempfile.TemporaryDirectory() as tmp:
             for filename, data in files.items():
-                with open(os.path.join(tmp, filename), 'w') as f:
-                    f.write(decode_bytes(data))
+                util.files.write(decode_bytes(data),
+                                 os.path.join(tmp, filename))
 
             # Ignore bandit false positive:
             #   B603:subprocess_without_shell_equals_true
@@ -245,8 +241,8 @@ class PKIUtility(object):
 
         with tempfile.TemporaryDirectory() as tmp:
             for filename, data in files.items():
-                with open(os.path.join(tmp, filename), 'w') as f:
-                    f.write(decode_bytes(data))
+                util.files.write(decode_bytes(data),
+                                 os.path.join(tmp, filename))
 
             # Ignore bandit false positive:
             #   B603:subprocess_without_shell_equals_true
@@ -259,33 +255,45 @@ class PKIUtility(object):
             result = {}
             for filename in os.listdir(tmp):
                 if filename not in files:
-                    with open(os.path.join(tmp, filename)) as f:
+                    with open(os.path.join(tmp, filename), 'r') as f:
                         result[filename] = f.read()
 
             return result
 
     def _wrap_ca(self, name, data):
-        return self.wrap_document(kind='CertificateAuthority', name=name,
-                                  data=data, block_strings=self.block_strings)
+        return self.wrap_document(kind='CertificateAuthority',
+                                  name=name,
+                                  data=data,
+                                  block_strings=self.block_strings)
 
     def _wrap_ca_key(self, name, data):
-        return self.wrap_document(kind='CertificateAuthorityKey', name=name,
-                                  data=data, block_strings=self.block_strings)
+        return self.wrap_document(kind='CertificateAuthorityKey',
+                                  name=name,
+                                  data=data,
+                                  block_strings=self.block_strings)
 
     def _wrap_cert(self, name, data):
-        return self.wrap_document(kind='Certificate', name=name, data=data,
+        return self.wrap_document(kind='Certificate',
+                                  name=name,
+                                  data=data,
                                   block_strings=self.block_strings)
 
     def _wrap_cert_key(self, name, data):
-        return self.wrap_document(kind='CertificateKey', name=name, data=data,
+        return self.wrap_document(kind='CertificateKey',
+                                  name=name,
+                                  data=data,
                                   block_strings=self.block_strings)
 
     def _wrap_priv_key(self, name, data):
-        return self.wrap_document(kind='PrivateKey', name=name, data=data,
+        return self.wrap_document(kind='PrivateKey',
+                                  name=name,
+                                  data=data,
                                   block_strings=self.block_strings)
 
     def _wrap_pub_key(self, name, data):
-        return self.wrap_document(kind='PublicKey', name=name, data=data,
+        return self.wrap_document(kind='PublicKey',
+                                  name=name,
+                                  data=data,
                                   block_strings=self.block_strings)
 
     @staticmethod
@@ -311,8 +319,8 @@ class PKIUtility(object):
             },
             'storagePolicy': 'cleartext'
         }
-        wrapped_data = PKIUtility._block_literal(
-            data, block_strings=block_strings)
+        wrapped_data = PKIUtility._block_literal(data,
+                                                 block_strings=block_strings)
 
         document = {
             "schema": wrapped_schema,

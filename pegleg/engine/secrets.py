@@ -59,9 +59,10 @@ def encrypt(save_location, author, site_name):
     secrets_found = False
     for repo_base, file_path in definition.site_files_by_repo(site_name):
         secrets_found = True
-        PeglegSecretManagement(
-            file_path=file_path, author=author).encrypt_secrets(
-            _get_dest_path(repo_base, file_path, save_location))
+        PeglegSecretManagement(file_path=file_path,
+                               author=author).encrypt_secrets(
+                                   _get_dest_path(repo_base, file_path,
+                                                  save_location))
     if secrets_found:
         LOG.info('Encryption of all secret files was completed.')
     else:
@@ -97,8 +98,8 @@ def decrypt(path):
         match = os.path.join(path, '**', '*.yaml')
         file_list = glob(match, recursive=True)
         if not file_list:
-            LOG.warning('No YAML files were discovered in path: {}'
-                        .format(path))
+            LOG.warning(
+                'No YAML files were discovered in path: {}'.format(path))
         for file_path in file_list:
             file_dict[file_path] = PeglegSecretManagement(
                 file_path).decrypt_secrets()
@@ -131,7 +132,10 @@ def _get_dest_path(repo_base, file_path, save_location):
         return file_path
 
 
-def generate_passphrases(site_name, save_location, author, interactive=False,
+def generate_passphrases(site_name,
+                         save_location,
+                         author,
+                         interactive=False,
                          force_cleartext=False):
     """
     Look for the site passphrase catalogs, and for every passphrase entry in
@@ -146,9 +150,9 @@ def generate_passphrases(site_name, save_location, author, interactive=False,
     :param bool force_cleartext: Whether to generate results in clear text
     """
 
-    PassphraseGenerator(
-        site_name, save_location, author).generate(
-            interactive=interactive, force_cleartext=force_cleartext)
+    PassphraseGenerator(site_name, save_location,
+                        author).generate(interactive=interactive,
+                                         force_cleartext=force_cleartext)
 
 
 def generate_crypto_string(length):
@@ -162,8 +166,7 @@ def generate_crypto_string(length):
     return CryptoString().get_crypto_string(length)
 
 
-def wrap_secret(author, filename, output_path, schema,
-                name, layer, encrypt):
+def wrap_secret(author, filename, output_path, schema, name, layer, encrypt):
     """Wrap a bare secrets file in a YAML and ManagedDocument.
 
     :param author: author for ManagedDocument
@@ -178,7 +181,7 @@ def wrap_secret(author, filename, output_path, schema,
     if not output_path:
         output_path = os.path.splitext(filename)[0] + ".yaml"
 
-    with open(filename, "r") as in_fi:
+    with open(filename, 'r') as in_fi:
         data = in_fi.read()
 
     inner_doc = {
@@ -200,8 +203,7 @@ def wrap_secret(author, filename, output_path, schema,
         output_doc = psm.get_encrypted_secrets()[0][0]
     else:
         output_doc = managed_secret.pegleg_document
-    with open(output_path, "w") as output_fi:
-        yaml.safe_dump(output_doc, output_fi)
+    files.safe_dump(output_doc, output_path)
 
 
 def check_cert_expiry(site_name, duration=60):

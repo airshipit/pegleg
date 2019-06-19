@@ -201,7 +201,7 @@ def test_encrypt_decrypt_using_file_path(temp_path):
     # write the test data to temp file
     test_data = list(yaml.safe_load_all(TEST_DATA))
     file_path = os.path.join(temp_path, 'secrets_file.yaml')
-    files.write(file_path, test_data)
+    files.write(test_data, file_path)
     save_path = os.path.join(temp_path, 'encrypted_secrets_file.yaml')
 
     # encrypt documents and validate that they were encrypted

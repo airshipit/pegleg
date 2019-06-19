@@ -217,7 +217,7 @@ def _verify_file_contents(*, sitename=None):
 def _verify_single_file(filename, schemas):
     errors = []
     LOG.debug("Validating file %s.", filename)
-    with open(filename) as f:
+    with open(filename, 'r') as f:
         if not f.read(4) == '---\n':
             errors.append((FILE_MISSING_YAML_DOCUMENT_HEADER,
                            '%s does not begin with YAML beginning of document '

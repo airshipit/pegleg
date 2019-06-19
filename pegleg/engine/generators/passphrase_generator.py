@@ -46,10 +46,10 @@ class PassphraseGenerator(BaseGenerator):
         certificates.
         """
 
-        super(PassphraseGenerator, self).__init__(
-            sitename, save_location, author)
-        self._catalog = PassphraseCatalog(
-            self._sitename, documents=self._documents)
+        super(PassphraseGenerator, self).__init__(sitename, save_location,
+                                                  author)
+        self._catalog = PassphraseCatalog(self._sitename,
+                                          documents=self._documents)
         self._pass_util = CryptoString()
 
     def generate(self, interactive=False, force_cleartext=False):
@@ -69,7 +69,7 @@ class PassphraseGenerator(BaseGenerator):
             if interactive:
                 passphrase = getpass(
                     prompt="Input passphrase for {}. Leave blank to "
-                           "auto-generate:\n".format(p_name))
+                    "auto-generate:\n".format(p_name))
             if not passphrase:
                 passphrase = self._pass_util.get_crypto_string(
                     self._catalog.get_length(p_name))
@@ -86,19 +86,17 @@ class PassphraseGenerator(BaseGenerator):
             else:
                 storage_policy = self._catalog.get_storage_policy(p_name)
 
-            docs.append(self.generate_doc(
-                KIND,
-                p_name,
-                storage_policy,
-                passphrase))
+            docs.append(
+                self.generate_doc(KIND, p_name, storage_policy, passphrase))
             save_path = self.get_save_path(p_name)
             if storage_policy == passphrase_catalog.P_ENCRYPTED:
                 PeglegSecretManagement(
-                    docs=docs, generated=True, author=self._author,
-                    catalog=self._catalog).encrypt_secrets(
-                    save_path)
+                    docs=docs,
+                    generated=True,
+                    author=self._author,
+                    catalog=self._catalog).encrypt_secrets(save_path)
             else:
-                files.write(save_path, docs)
+                files.write(docs, save_path)
 
     @property
     def kind_path(self):

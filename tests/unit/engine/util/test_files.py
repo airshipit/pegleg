@@ -22,6 +22,9 @@ from pegleg.engine.util import files
 from tests.unit.fixtures import create_tmp_deployment_files
 from tests.unit.fixtures import temp_path
 
+EXPECTED_FILE_PERM = '0o640'
+EXPECTED_DIR_PERM = '0o750'
+
 
 class TestFileHelpers(object):
     def test_read_compatible_file(self, create_tmp_deployment_files):
@@ -44,20 +47,31 @@ class TestFileHelpers(object):
     def test_write(self, create_tmp_deployment_files):
         path = os.path.join(config.get_site_repo(), 'site', 'cicd',
                             'test_out.yaml')
-        files.write(path, "test text")
+        files.write("test text", path)
         with open(path, "r") as out_fi:
             assert out_fi.read() == "test text"
 
-        files.write(path, {"a": 1})
+        files.write({"a": 1}, path)
         with open(path, "r") as out_fi:
             assert yaml.safe_load(out_fi) == {"a": 1}
 
-        files.write(path, [{"a": 1}])
+        files.write([{"a": 1}], path)
         with open(path, "r") as out_fi:
             assert list(yaml.safe_load_all(out_fi)) == [{"a": 1}]
 
         with pytest.raises(ValueError) as _:
-            files.write(path, object())
+            files.write(object(), path)
+
+    def test_file_permissions(self, create_tmp_deployment_files):
+        path = os.path.join(config.get_site_repo(), 'site', 'cicd',
+                            'test_out.yaml')
+        files.write("test text", path)
+        assert oct(os.stat(path).st_mode & 0o777) == EXPECTED_FILE_PERM
+
+    def test_dir_permissions(self, create_tmp_deployment_files):
+        path = os.path.join(config.get_site_repo(), 'site', 'cicd', 'test_dir')
+        os.makedirs(path)
+        assert oct(os.stat(path).st_mode & 0o777) == EXPECTED_DIR_PERM
 
 
 def test_file_in_subdir():
