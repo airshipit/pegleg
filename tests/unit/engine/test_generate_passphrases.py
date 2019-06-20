@@ -28,8 +28,6 @@ from pegleg.engine.util.cryptostring import CryptoString
 from pegleg.engine.util import encryption
 from pegleg.engine import util
 import pegleg
-from pegleg.engine.util.pegleg_secret_management import ENV_PASSPHRASE
-from pegleg.engine.util.pegleg_secret_management import ENV_SALT
 
 TEST_PASSPHRASES_CATALOG = yaml.safe_load("""
 ---
@@ -166,8 +164,8 @@ TEST_BASE64_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_BASE64_PASSPHRASES_CATA
     return_value=[
         'cicd_site_repo/site/cicd/passphrases/passphrase-catalog.yaml', ])
 @mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt1234567890]['})
+    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    'PEGLEG_SALT': 'MySecretSalt1234567890]['})
 def test_generate_passphrases(*_):
     _dir = tempfile.mkdtemp()
     os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
@@ -239,8 +237,8 @@ def test_generate_passphrases_exception(capture):
     return_value=[
         'cicd_global_repo/site/cicd/passphrases/passphrase-catalog.yaml', ])
 @mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt1234567890]['})
+    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    'PEGLEG_SALT': 'MySecretSalt1234567890]['})
 def test_global_passphrase_catalog(*_):
     _dir = tempfile.mkdtemp()
     os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
@@ -288,8 +286,8 @@ def test_global_passphrase_catalog(*_):
     return_value=[
         'cicd_global_repo/site/cicd/passphrases/passphrase-catalog.yaml', ])
 @mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt1234567890]['})
+    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    'PEGLEG_SALT': 'MySecretSalt1234567890]['})
 def test_base64_passphrase_catalog(*_):
     _dir = tempfile.mkdtemp()
     os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
@@ -313,8 +311,8 @@ def test_base64_passphrase_catalog(*_):
 
 
 @mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt1234567890]['})
+    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    'PEGLEG_SALT': 'MySecretSalt1234567890]['})
 def test_crypt_coding_flow():
     cs_util = CryptoString()
     orig_passphrase = cs_util.get_crypto_string()

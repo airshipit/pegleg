@@ -25,7 +25,6 @@ from pegleg.engine import bundle
 from pegleg.engine import catalog
 from pegleg.engine.secrets import wrap_secret
 from pegleg.engine.util import files
-from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 from pegleg.engine.util.shipyard_helper import ShipyardHelper
 
 LOG = logging.getLogger(__name__)
@@ -542,17 +541,7 @@ def wrap_secret_cli(*, site_name, author, filename, output_path, schema,
          'to genesis.sh script.')
 @SITE_REPOSITORY_ARGUMENT
 def genesis_bundle(*, build_dir, validators, site_name):
-    passphrase = os.environ.get("PEGLEG_PASSPHRASE")
-    salt = os.environ.get("PEGLEG_SALT")
     encryption_key = os.environ.get("PROMENADE_ENCRYPTION_KEY")
-    if passphrase:
-        passphrase = passphrase.encode()
-    if salt:
-        salt = salt.encode()
-    config.set_passphrase(passphrase)
-    config.set_salt(salt)
-
-    PeglegSecretManagement.check_environment()
     bundle.build_genesis(build_dir,
                          encryption_key,
                          validators,

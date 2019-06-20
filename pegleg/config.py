@@ -16,6 +16,8 @@
 # context passing but will require a somewhat heavy code refactor. See:
 # http://click.pocoo.org/5/commands/#nested-handling-and-contexts
 
+import os
+
 from pegleg.engine import exceptions
 
 try:
@@ -155,15 +157,16 @@ def set_rel_type_path(p):
     GLOBAL_CONTEXT['type_path'] = p
 
 
-def set_passphrase(passphrase):
+def set_passphrase():
     """Set the passphrase for encryption and decryption."""
 
+    passphrase = os.environ.get('PEGLEG_PASSPHRASE')
     if not passphrase:
         raise exceptions.PassphraseNotFoundException()
     elif len(passphrase) < GLOBAL_CONTEXT['passphrase_min_length']:
         raise exceptions.PassphraseInsufficientLengthException()
 
-    GLOBAL_CONTEXT['passphrase'] = passphrase
+    GLOBAL_CONTEXT['passphrase'] = passphrase.encode()
 
 
 def get_passphrase():
@@ -171,15 +174,16 @@ def get_passphrase():
     return GLOBAL_CONTEXT['passphrase']
 
 
-def set_salt(salt):
+def set_salt():
     """Set the salt for encryption and decryption."""
 
+    salt = os.environ.get('PEGLEG_SALT')
     if not salt:
         raise exceptions.SaltNotFoundException()
     elif len(salt) < GLOBAL_CONTEXT['salt_min_length']:
         raise exceptions.SaltInsufficientLengthException()
 
-    GLOBAL_CONTEXT['salt'] = salt
+    GLOBAL_CONTEXT['salt'] = salt.encode()
 
 
 def get_salt():

@@ -19,8 +19,6 @@ import pytest
 import yaml
 
 from pegleg.engine import util
-from pegleg.engine.util.pegleg_secret_management import ENV_PASSPHRASE
-from pegleg.engine.util.pegleg_secret_management import ENV_SALT
 from pegleg.engine.util.shipyard_helper import ShipyardHelper
 from pegleg.engine.util.shipyard_helper import ShipyardClient
 
@@ -138,8 +136,8 @@ def test_shipyard_helper_init_():
 @mock.patch.object(ShipyardHelper, 'formatted_response_handler',
                    autospec=True, return_value=None)
 @mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt1234567890]['
+    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    'PEGLEG_SALT': 'MySecretSalt1234567890]['
 })
 def test_upload_documents(*args):
     """ Tests upload document """
@@ -171,8 +169,8 @@ def test_upload_documents(*args):
 @mock.patch.object(ShipyardHelper, 'formatted_response_handler',
                    autospec=True, return_value=None)
 @mock.patch.dict(os.environ, {
-    ENV_PASSPHRASE: 'ytrr89erARAiPE34692iwUMvWqqBvC',
-    ENV_SALT: 'MySecretSalt1234567890]['
+    'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+    'PEGLEG_SALT': 'MySecretSalt1234567890]['
 })
 def test_upload_documents_fail(*args):
     """ Tests Document upload error """
