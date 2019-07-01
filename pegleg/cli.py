@@ -477,7 +477,14 @@ def wrap_secret_cli(*, site_name, author, filename, output_path, schema, name,
     """
 
     engine.repository.process_repositories(site_name, overwrite_existing=True)
-    wrap_secret(author, filename, output_path, schema, name, layer, encrypt)
+    wrap_secret(author,
+                filename,
+                output_path,
+                schema,
+                name,
+                layer,
+                encrypt,
+                site_name=site_name)
 
 
 @site.command('genesis_bundle',
@@ -624,7 +631,7 @@ def encrypt(*, save_location, author, site_name):
     engine.repository.process_repositories(site_name, overwrite_existing=True)
     if save_location is None:
         save_location = config.get_site_repo()
-    engine.secrets.encrypt(save_location, author, site_name)
+    engine.secrets.encrypt(save_location, author, site_name=site_name)
 
 
 @secrets.command('decrypt',
@@ -654,7 +661,7 @@ def encrypt(*, save_location, author, site_name):
 def decrypt(*, path, save_location, overwrite, site_name):
     engine.repository.process_repositories(site_name)
 
-    decrypted = engine.secrets.decrypt(path)
+    decrypted = engine.secrets.decrypt(path, site_name=site_name)
     if overwrite:
         for path, data in decrypted.items():
             files.write(path, data)

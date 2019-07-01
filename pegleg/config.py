@@ -19,6 +19,7 @@
 import os
 
 from pegleg.engine import exceptions
+from pegleg.engine import secrets
 
 try:
     if GLOBAL_CONTEXT:
@@ -33,6 +34,8 @@ except NameError:
         'type_path': 'type',
         'passphrase': None,
         'salt': None,
+        'global_passphrase': None,
+        'global_salt': None,
         'salt_min_length': 24,
         'passphrase_min_length': 24,
         'default_umask': 0o027
@@ -195,3 +198,19 @@ def set_salt():
 def get_salt():
     """Get the salt for encryption and decryption."""
     return GLOBAL_CONTEXT['salt']
+
+
+def set_global_enc_keys(site_name):
+    """Get the global salt and passphrase for encryption."""
+    GLOBAL_CONTEXT['global_passphrase'], GLOBAL_CONTEXT['global_salt'] = \
+        secrets.get_global_creds(site_name)
+
+
+def get_global_passphrase():
+    """Get the global passphrase for encryption and decryption."""
+    return GLOBAL_CONTEXT['global_passphrase']
+
+
+def get_global_salt():
+    """Get the global salt for encryption and decryption."""
+    return GLOBAL_CONTEXT['global_salt']

@@ -19,7 +19,9 @@ import os
 from prettytable import PrettyTable
 import yaml
 
+from pegleg import config
 from pegleg.engine.catalog.pki_utility import PKIUtility
+from pegleg.engine import exceptions
 from pegleg.engine.generators.passphrase_generator import PassphraseGenerator
 from pegleg.engine.util.cryptostring import CryptoString
 from pegleg.engine.util import definition
@@ -60,7 +62,8 @@ def encrypt(save_location, author, site_name):
     for repo_base, file_path in definition.site_files_by_repo(site_name):
         secrets_found = True
         PeglegSecretManagement(file_path=file_path,
-                               author=author).encrypt_secrets(
+                               author=author,
+                               site_name=site_name).encrypt_secrets(
                                    _get_dest_path(repo_base, file_path,
                                                   save_location))
     if secrets_found:
@@ -70,7 +73,7 @@ def encrypt(save_location, author, site_name):
             'No secret documents were found for site: {}'.format(site_name))
 
 
-def decrypt(path):
+def decrypt(path, site_name=None):
     """Decrypt one secrets file, and print the decrypted file to standard out.
 
     Search the specified file_path for a file.
@@ -93,7 +96,8 @@ def decrypt(path):
         return file_dict
 
     if os.path.isfile(path):
-        file_dict[path] = PeglegSecretManagement(path).decrypt_secrets()
+        file_dict[path] = PeglegSecretManagement(
+            path, site_name=site_name).decrypt_secrets()
     else:
         match = os.path.join(path, '**', '*.yaml')
         file_list = glob(match, recursive=True)
@@ -121,8 +125,8 @@ def _get_dest_path(repo_base, file_path, save_location):
     :rtype: string
     """
 
-    if (save_location and save_location != os.path.sep and
-            save_location.endswith(os.path.sep)):
+    if (save_location and save_location != os.path.sep
+            and save_location.endswith(os.path.sep)):
         save_location = save_location.rstrip(os.path.sep)
     if repo_base and repo_base.endswith(os.path.sep):
         repo_base = repo_base.rstrip(os.path.sep)
@@ -166,7 +170,14 @@ def generate_crypto_string(length):
     return CryptoString().get_crypto_string(length)
 
 
-def wrap_secret(author, filename, output_path, schema, name, layer, encrypt):
+def wrap_secret(author,
+                filename,
+                output_path,
+                schema,
+                name,
+                layer,
+                encrypt,
+                site_name=None):
     """Wrap a bare secrets file in a YAML and ManagedDocument.
 
     :param author: author for ManagedDocument
@@ -199,7 +210,9 @@ def wrap_secret(author, filename, output_path, schema, name, layer, encrypt):
     }
     managed_secret = PeglegManagedSecret(inner_doc, author=author)
     if encrypt:
-        psm = PeglegSecretManagement(docs=[inner_doc], author=author)
+        psm = PeglegSecretManagement(docs=[inner_doc],
+                                     author=author,
+                                     site_name=site_name)
         output_doc = psm.get_encrypted_secrets()[0][0]
     else:
         output_doc = managed_secret.pegleg_document
@@ -239,3 +252,54 @@ def check_cert_expiry(site_name, duration=60):
 
     # Return table of cert names and expiration dates that are expiring
     return cert_table.get_string()
+
+
+def get_global_creds(site_name):
+    """Determine which credentials to use for global secrets.
+
+    If a user desires to encrypt site secrets with one set of credentials but
+    global secrets with a different set of credentials (in the case of
+    multiple sites) Pegleg needs a way to handle a two-step encryption or
+    decryption chain. This is accomplished by storing global credentials at
+    the site level and encrypting them with site credentials. Pegleg will
+    attempt to find both the global_salt and global_passphrase, decrypt them
+    then use these credentials for any global encrypt/decrypt operations.
+    If both global_salt and global_passphrase are found return both.
+    If only one global credential is found, raise an error with the assumption
+    the user wishes to use global credentials but does not have both.
+    If neither are found, return the site credentials with the assumption
+    the user wishes to encrypt the global documents with the site credentials.
+
+    :param str site_name: The target site
+    :return: Either the global, or site level - passphrase and salt
+    """
+
+    log_msg = "Multiple documents containing {} detected.  Using latest."
+    global_passphrase = None
+    global_salt = None
+    docs = definition.site_files(site_name)
+    for doc in docs:
+        with open(doc, 'r') as f:
+            results = yaml.safe_load_all(f)  # Validate valid YAML.
+            results = PeglegSecretManagement(
+                docs=results).get_decrypted_secrets()
+            for result in results:
+                if result['schema'] == "deckhand/Passphrase/v1":
+                    if result['metadata']['name'] == 'global_passphrase':
+                        if global_passphrase:
+                            LOG.warn(log_msg.format('global_passphrase'))
+                        global_passphrase = result['data'].encode()
+                    if result['metadata']['name'] == 'global_salt':
+                        if global_salt:
+                            LOG.warn(log_msg.format('global_salt'))
+                        global_salt = result['data'].encode()
+
+        # Break out of search if both passphrase and salt are found
+        if global_passphrase and global_salt:
+            return (global_passphrase, global_salt)
+
+    # End of search, determine if we should use site keys or raise an error
+    if global_passphrase or global_salt:
+        raise exceptions.GlobalCredentialsNotFound()
+    else:
+        return (config.get_passphrase(), config.get_salt())
