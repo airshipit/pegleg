@@ -10,6 +10,6 @@ urllib3==1.24.3
 chardet==3.0.4
 
 # External dependencies
-git+https://opendev.org/airship/deckhand.git@aeefd9d1211410b3bf608080eb4a5d7ecbcc9b1d
+git+https://opendev.org/airship/deckhand.git@48c774c64855dca0fc9a149d8dd182805fa9f48d
 git+https://opendev.org/airship/shipyard.git@efb21f2958e8cfb5071321002e9132b0900f7be9#egg=shipyard_client&subdirectory=src/bin/shipyard_client
 git+https://opendev.org/airship/promenade.git@0e93670448904af57baf7f6cb76be19e36c55809
