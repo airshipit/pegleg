@@ -51,6 +51,59 @@ data: 512363f37eab654313991174aef9f867d
 ...
 """
 
+TEST_GLOBAL_DATA = """
+---
+schema: deckhand/Passphrase/v1
+metadata:
+  schema: metadata/Document/v1
+  name: osh_addons_keystone_ranger-agent_password
+  layeringDefinition:
+    abstract: false
+    layer: global
+  storagePolicy: encrypted
+data: 512363f37eab654313991174aef9f867d
+...
+"""
+
+GLOBAL_PASSPHRASE_SALT_DOC = """
+---
+schema: deckhand/Passphrase/v1
+metadata:
+  schema: metadata/Document/v1
+  name: global_passphrase
+  layeringDefinition:
+    abstract: false
+    layer: site
+  storagePolicy: encrypted
+data: TbKYNtM@3gXpL=AFLAwU?&Ey
+...
+---
+schema: deckhand/Passphrase/v1
+metadata:
+  schema: metadata/Document/v1
+  name: global_salt
+  layeringDefinition:
+    abstract: false
+    layer: site
+  storagePolicy: encrypted
+data: h3=DQ#GNYEuCvybgpfW7ZxAP
+...
+"""
+
+GLOBAL_SALT_DOC = """
+---
+schema: deckhand/Passphrase/v1
+metadata:
+  schema: metadata/Document/v1
+  name: global_salt
+  layeringDefinition:
+    abstract: false
+    layer: site
+  storagePolicy: encrypted
+data: h3=DQ#GNYEuCvybgpfW7ZxAP
+...
+"""
+
 
 def test_encrypt_and_decrypt():
     data = test_utils.rand_name("this is an example of un-encrypted "
@@ -314,3 +367,123 @@ def test_check_expiry(create_tmp_deployment_files):
                         assert cert_info['expired'] is False, \
                             "%s is expired/expiring on %s" % \
                             (generated_file.name, cert_info['expiry_date'])
+
+
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
+def test_get_global_creds_missing_creds(create_tmp_deployment_files, tmpdir):
+    # Create site files
+    site_dir = tmpdir.join("deployment_files", "site", "cicd")
+
+    save_location = tmpdir.mkdir("encrypted_site_files")
+    save_location_str = str(save_location)
+
+    # Capture global credentials, verify they are not present and we default
+    # to site credentials instead.
+    passphrase, salt = secrets.get_global_creds("cicd")
+    assert passphrase.decode() == 'ytrr89erARAiPE34692iwUMvWqqBvC'
+    assert salt.decode() == 'MySecretSalt1234567890]['
+
+
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
+def test_get_global_creds_missing_pass(create_tmp_deployment_files, tmpdir):
+    # Create site files
+    site_dir = tmpdir.join("deployment_files", "site", "cicd")
+
+    # Create global salt file
+    with open(
+            os.path.join(str(site_dir), 'secrets', 'passphrases',
+                         'cicd-global-passphrase-encrypted.yaml'),
+            "w") as outfile:
+        outfile.write(GLOBAL_SALT_DOC)
+
+    save_location = tmpdir.mkdir("encrypted_site_files")
+    save_location_str = str(save_location)
+
+    # Demonstrate that encryption fails when only the global salt or
+    # only the global passphrase are present among the site files.
+    with pytest.raises(exceptions.GlobalCredentialsNotFound):
+        secrets.encrypt(save_location_str, "pytest", "cicd")
+
+
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
+def test_get_global_creds(create_tmp_deployment_files, tmpdir):
+    # Create site files
+    site_dir = tmpdir.join("deployment_files", "site", "cicd")
+
+    # Create global passphrase and salt file
+    with open(os.path.join(str(site_dir), 'secrets',
+                           'passphrases',
+                           'cicd-global-passphrase-encrypted.yaml'), "w") \
+            as outfile:
+        outfile.write(GLOBAL_PASSPHRASE_SALT_DOC)
+
+    save_location = tmpdir.mkdir("encrypted_site_files")
+    save_location_str = str(save_location)
+
+    # Encrypt the global passphrase and salt file using site passphrase/salt
+    secrets.encrypt(save_location_str, "pytest", "cicd")
+    encrypted_files = listdir(save_location_str)
+    assert len(encrypted_files) > 0
+
+    # Capture global credentials, verify we have the right ones
+    passphrase, salt = secrets.get_global_creds("cicd")
+    assert passphrase.decode() == "TbKYNtM@3gXpL=AFLAwU?&Ey"
+    assert salt.decode() == "h3=DQ#GNYEuCvybgpfW7ZxAP"
+
+
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
+def test_global_encrypt_decrypt(create_tmp_deployment_files, tmpdir):
+    # Create site files
+    site_dir = tmpdir.join("deployment_files", "site", "cicd")
+
+    # Create and encrypt global passphrase and salt file using site keys
+    with open(os.path.join(str(site_dir), 'secrets',
+                           'passphrases',
+                           'cicd-global-passphrase-encrypted.yaml'), "w") \
+            as outfile:
+        outfile.write(GLOBAL_PASSPHRASE_SALT_DOC)
+
+    save_location = tmpdir.mkdir("encrypted_site_files")
+    save_location_str = str(save_location)
+
+    # Encrypt the global passphrase and salt file using site passphrase/salt
+    secrets.encrypt(save_location_str, "pytest", "cicd")
+
+    # Create and encrypt a global type document
+    global_doc_path = os.path.join(str(site_dir), 'secrets', 'passphrases',
+                                   'globally_encrypted_doc.yaml')
+    with open(global_doc_path, "w") as outfile:
+        outfile.write(TEST_GLOBAL_DATA)
+
+    # encrypt documents and validate that they were encrypted
+    doc_mgr = PeglegSecretManagement(file_path=global_doc_path,
+                                     author='pytest',
+                                     site_name='cicd')
+    doc_mgr.encrypt_secrets(global_doc_path)
+    doc = doc_mgr.documents[0]
+    assert doc.is_encrypted()
+    assert doc.data['encrypted']['by'] == 'pytest'
+
+    doc_mgr = PeglegSecretManagement(file_path=global_doc_path,
+                                     author='pytest',
+                                     site_name='cicd')
+    decrypted_data = doc_mgr.get_decrypted_secrets()
+    test_data = list(yaml.safe_load_all(TEST_GLOBAL_DATA))
+    assert test_data[0]['data'] == decrypted_data[0]['data']
+    assert test_data[0]['schema'] == decrypted_data[0]['schema']

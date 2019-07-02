@@ -35,7 +35,8 @@ class PeglegSecretManagement(object):
                  docs=None,
                  generated=False,
                  catalog=None,
-                 author=None):
+                 author=None,
+                 site_name=None):
         """
         Read the source file and the environment data needed to wrap and
         process the file documents as pegleg managed document.
@@ -43,11 +44,16 @@ class PeglegSecretManagement(object):
         provided.
         """
 
+        # Set passphrase and salt
         config.set_passphrase()
-        self.passphrase = config.get_passphrase()
-
         config.set_salt()
-        self.salt = config.get_salt()
+
+        # Check if we're working with a specific site, if so determine if the
+        # global encryption keys already exist. If they don't, set them.
+        if site_name:
+            if not (config.get_global_passphrase()
+                    and config.get_global_salt()):
+                config.set_global_enc_keys(site_name)
 
         if all([file_path, docs]) or not any([file_path, docs]):
             raise ValueError('Either `file_path` or `docs` must be '
@@ -134,10 +140,19 @@ class PeglegSecretManagement(object):
                 # policies
                 doc_list.append(doc.embedded_document)
                 continue
+
+            # Get appropriate encryption keys to use
+            if doc.get_layer() == 'site':
+                passphrase = config.get_passphrase()
+                salt = config.get_salt()
+            else:
+                passphrase = config.get_global_passphrase()
+                salt = config.get_global_salt()
+
             secret_doc = doc.get_secret()
             if type(secret_doc) != bytes:
                 secret_doc = secret_doc.encode()
-            doc.set_secret(encrypt(secret_doc, self.passphrase, self.salt))
+            doc.set_secret(encrypt(secret_doc, passphrase, salt))
             doc.set_encrypted(self._author)
             encrypted_docs = True
             doc_list.append(doc.pegleg_document)
@@ -170,9 +185,17 @@ class PeglegSecretManagement(object):
         for doc in self.documents:
             # do not decrypt already decrypted data
             if doc.is_encrypted():
+
+                # Get appropriate encryption keys to use
+                if doc.get_layer() == 'site':
+                    passphrase = config.get_passphrase()
+                    salt = config.get_salt()
+                else:
+                    passphrase = config.get_global_passphrase()
+                    salt = config.get_global_salt()
+
                 doc.set_secret(
-                    decrypt(doc.get_secret(), self.passphrase,
-                            self.salt).decode())
+                    decrypt(doc.get_secret(), passphrase, salt).decode())
                 doc.set_decrypted()
             doc_list.append(doc.embedded_document)
         return doc_list

@@ -558,6 +558,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         with open(file_path, "r") as ceph_fsid_fi:
             ceph_fsid = yaml.safe_load(ceph_fsid_fi)
             ceph_fsid["metadata"]["storagePolicy"] = "encrypted"
+            ceph_fsid["metadata"]["layeringDefinition"]["layer"] = "site"
 
         with open(file_path, "w") as ceph_fsid_fi:
             yaml.dump(ceph_fsid, ceph_fsid_fi)

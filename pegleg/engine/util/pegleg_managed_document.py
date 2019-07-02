@@ -32,7 +32,6 @@ class PeglegManagedSecretsDocument(object):
     """Object representing one Pegleg managed secret document."""
 
     def __init__(self, document, generated=False, catalog=None, author=None):
-
         """
         Parse and wrap an externally generated document in a
         pegleg managed document.
@@ -54,8 +53,8 @@ class PeglegManagedSecretsDocument(object):
         if self.is_pegleg_managed_secret(document):
             self._pegleg_document = document
         else:
-            self._pegleg_document = self.__wrap(
-                document, generated, catalog, author)
+            self._pegleg_document = self.__wrap(document, generated, catalog,
+                                                author)
         self._embedded_document = \
             self._pegleg_document['data']['managedDocument']
 
@@ -160,9 +159,7 @@ class PeglegManagedSecretsDocument(object):
 
     def set_encrypted(self, author=None):
         """Mark the pegleg managed document as encrypted."""
-        self.data[ENCRYPTED] = {
-            'at': datetime.utcnow().isoformat()
-        }
+        self.data[ENCRYPTED] = {'at': datetime.utcnow().isoformat()}
         if author:
             self.data[ENCRYPTED]['by'] = author
 
@@ -175,3 +172,6 @@ class PeglegManagedSecretsDocument(object):
 
     def get_secret(self):
         return self._embedded_document.get('data')
+
+    def get_layer(self):
+        return self._embedded_document[METADATA]['layeringDefinition']['layer']

@@ -139,9 +139,17 @@ class SaltInsufficientLengthException(PeglegBaseException):
     message = 'PEGLEG_SALT must be at least 24 characters long.'
 
 
+class GlobalCredentialsNotFound(PeglegBaseException):
+    """Exception raised when global_passphrase or global_salt are not found."""
+
+    message = ('global_salt and global_passphrase must either both be '
+               'defined, or neither can be defined in site documents.')
+
+
 #
 # Shipyard Helper Exceptions
 #
+
 
 class InvalidBufferModeException(PeglegBaseException):
     """Exception raised when invalid buffer mode specified"""
