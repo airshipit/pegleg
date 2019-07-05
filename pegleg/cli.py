@@ -339,6 +339,7 @@ def collection_default_callback(ctx, param, value):
 @click.option('--os-username', envvar='OS_USERNAME', required=False)
 @click.option('--os-password', envvar='OS_PASSWORD', required=False)
 @click.option('--os-auth-url', envvar='OS_AUTH_URL', required=False)
+@click.option('--os-auth-token', envvar='OS_AUTH_TOKEN', required=False)
 # Option passed to Shipyard client context
 @click.option(
     '--context-marker',
@@ -370,19 +371,23 @@ def collection_default_callback(ctx, param, value):
 @click.pass_context
 def upload(ctx, *, os_project_domain_name, os_user_domain_name,
            os_project_name, os_username, os_password, os_auth_url,
-           context_marker, site_name, buffer_mode, collection):
+           os_auth_token, context_marker, site_name, buffer_mode, collection):
     if not ctx.obj:
         ctx.obj = {}
 
     # Build API parameters required by Shipyard API Client.
-    auth_vars = {
-        'project_domain_name': os_project_domain_name,
-        'user_domain_name': os_user_domain_name,
-        'project_name': os_project_name,
-        'username': os_username,
-        'password': os_password,
-        'auth_url': os_auth_url
-    }
+    if os_auth_token:
+        os.environ['OS_AUTH_TOKEN'] = os_auth_token
+        auth_vars = {'os_auth_token': os_auth_token}
+    else:
+        auth_vars = {
+            'project_domain_name': os_project_domain_name,
+            'user_domain_name': os_user_domain_name,
+            'project_name': os_project_name,
+            'username': os_username,
+            'password': os_password,
+            'auth_url': os_auth_url
+        }
 
     ctx.obj['API_PARAMETERS'] = {'auth_vars': auth_vars}
     ctx.obj['context_marker'] = str(context_marker)
