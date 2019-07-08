@@ -87,7 +87,7 @@ data:
 ...
 """)
 
-TEST_BASE64_PASSPHRASES_CATALOG = yaml.safe_load(
+TEST_TYPES_CATALOG = yaml.safe_load(
     """
 ---
 schema: pegleg/PassphraseCatalog/v1
@@ -103,13 +103,18 @@ data:
     - description: 'description of base64 required passphrases'
       document_name: base64_encoded_passphrase_doc
       encrypted: true
-      encoding: base64
-    - description: 'description of not base64 encoded passphrases'
-      document_name: not_encoded
+      type: base64
+    - description: 'description of uuid secret'
+      document_name: uuid_passphrase_doc
       encrypted: true
       encoding: none
-    - description: 'description of not base64 encoded passphrases'
-      document_name: also_not_encoded
+      type: uuid
+    - description: 'description of random passphrase'
+      document_name: passphrase_doc
+      encrypted: true
+      type: passphrase
+    - description: 'description of default random passphrase'
+      document_name: default_passphrase_doc
       encrypted: true
 ...
 """)
@@ -150,9 +155,7 @@ TEST_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_PASSPHRASES_CATALOG]
 TEST_GLOBAL_SITE_DOCUMENTS = [
     TEST_SITE_DEFINITION, TEST_GLOBAL_PASSPHRASES_CATALOG
 ]
-TEST_BASE64_SITE_DOCUMENTS = [
-    TEST_SITE_DEFINITION, TEST_BASE64_PASSPHRASES_CATALOG
-]
+TEST_TYPE_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_TYPES_CATALOG]
 
 
 @mock.patch.object(
@@ -289,7 +292,7 @@ def test_global_passphrase_catalog(*_):
     util.definition,
     'documents_for_site',
     autospec=True,
-    return_value=TEST_BASE64_SITE_DOCUMENTS)
+    return_value=TEST_TYPE_SITE_DOCUMENTS)
 @mock.patch.object(
     pegleg.config,
     'get_site_repo',
@@ -307,12 +310,12 @@ def test_global_passphrase_catalog(*_):
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_base64_passphrase_catalog(*_):
+def test_uuid_passphrase_catalog(*_):
     _dir = tempfile.mkdtemp()
     os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
     PassphraseGenerator('cicd', _dir, 'test_author').generate()
 
-    for passphrase in TEST_BASE64_PASSPHRASES_CATALOG['data']['passphrases']:
+    for passphrase in TEST_TYPES_CATALOG['data']['passphrases']:
         passphrase_file_name = '{}.yaml'.format(passphrase['document_name'])
         passphrase_file_path = os.path.join(
             _dir, 'site', 'cicd', 'secrets', 'passphrases',
@@ -324,28 +327,5 @@ def test_base64_passphrase_catalog(*_):
                 doc['data']['managedDocument']['data'],
                 os.environ['PEGLEG_PASSPHRASE'].encode(),
                 os.environ['PEGLEG_SALT'].encode())
-            if passphrase_file_name == "base64_encoded_passphrase_doc.yaml":
-                assert decrypted_passphrase == base64.b64encode(
-                    base64.b64decode(decrypted_passphrase))
-
-
-@mock.patch.dict(
-    os.environ, {
-        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
-        'PEGLEG_SALT': 'MySecretSalt1234567890]['
-    })
-def test_crypt_coding_flow():
-    cs_util = CryptoString()
-    orig_passphrase = cs_util.get_crypto_string()
-    bytes_passphrase = orig_passphrase.encode()
-    b64_passphrase = base64.b64encode(bytes_passphrase)
-    encrypted = encryption.encrypt(
-        b64_passphrase, os.environ['PEGLEG_PASSPHRASE'].encode(),
-        os.environ['PEGLEG_SALT'].encode())
-    decrypted = encryption.decrypt(
-        encrypted, os.environ['PEGLEG_PASSPHRASE'].encode(),
-        os.environ['PEGLEG_SALT'].encode())
-    assert encrypted != decrypted
-    assert decrypted == b64_passphrase
-    assert base64.b64decode(decrypted) == bytes_passphrase
-    assert bytes_passphrase.decode() == orig_passphrase
+            if passphrase_file_name == "uuid_passphrase_doc.yaml":
+                assert uuid.UUID(decrypted_passphrase.decode()).version == 4

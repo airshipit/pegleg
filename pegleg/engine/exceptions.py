@@ -92,6 +92,27 @@ class PassphraseCatalogNotFoundException(PeglegBaseException):
         'the site Passphrases!')
 
 
+class InvalidPassphraseType(PeglegBaseException):
+    """Invalid Passphrase type"""
+    message = (
+        'Invalid Passphrase type %(ptype)s specified for %(pname)s. Valid '
+        'values are: %(validvalues)s.')
+
+
+class InvalidPassphrasePrompt(PeglegBaseException):
+    """Invalid Passphrase prompt field"""
+    message = (
+        'Invalid Passphrase prompt %(pprompt)s specified for %(pname)s. Valid '
+        'values are: %(validvalues)s.')
+
+
+class InvalidPassphraseRegeneration(PeglegBaseException):
+    """Invalid Regenerable value for entry in passphrase-catalog"""
+    message = (
+        'Invalid Regenerable value %(pregen)s specified for %(pname)s. Valid '
+        'values are: %(validvalues)s.')
+
+
 class GenesisBundleEncryptionException(PeglegBaseException):
     """Exception raised when encryption of the genesis bundle fails."""
 

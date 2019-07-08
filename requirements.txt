@@ -8,6 +8,7 @@ docker==3.7.2
 requests==2.20.0
 urllib3==1.24.3
 chardet==3.0.4
+oslo.utils==3.41.0
 
 # External dependencies
 git+https://opendev.org/airship/deckhand.git@134c55805b13b2d3f430a7c0fee840990c55c0aa

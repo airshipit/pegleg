@@ -15,7 +15,7 @@
 import logging
 
 from pegleg.engine.catalogs.base_catalog import BaseCatalog
-from pegleg.engine.exceptions import PassphraseCatalogNotFoundException
+from pegleg.engine import exceptions
 
 LOG = logging.getLogger(__name__)
 KIND = 'PassphraseCatalog'
@@ -24,10 +24,16 @@ P_LENGTH = 'length'
 P_DESCRIPTION = 'description'
 P_ENCRYPTED = 'encrypted'
 P_CLEARTEXT = 'cleartext'
-P_ENCODING = 'encoding'
+P_TYPE = 'type'
+P_REGENERABLE = 'regenerable'
+P_PROMPT = 'prompt'
 P_DEFAULT_LENGTH = 24
 P_DEFAULT_STORAGE_POLICY = 'encrypted'
-P_DEFAULT_ENCODING = 'none'
+P_DEFAULT_TYPE = 'passphrase'
+P_DEFAULT_REGENERABLE = True
+P_DEFAULT_PROMPT = False
+VALID_PASSPHRASE_TYPES = ['passphrase', 'base64', 'uuid']
+VALID_BOOLEAN_FIELDS = [True, False]
 
 __all__ = ['PassphraseCatalog']
 
@@ -51,7 +57,7 @@ class PassphraseCatalog(BaseCatalog):
         """
         super(PassphraseCatalog, self).__init__(KIND, sitename, documents)
         if not self._catalog_docs:
-            raise PassphraseCatalogNotFoundException()
+            raise exceptions.PassphraseCatalogNotFoundException()
 
     @property
     def get_passphrase_names(self):
@@ -88,17 +94,78 @@ class PassphraseCatalog(BaseCatalog):
                     else:
                         return P_DEFAULT_STORAGE_POLICY
 
-    def get_encoding_method(self, passphrase_name):
-        """Return the encoding method of the ``passphrase_name``.
+    def get_passphrase_type(self, passphrase_name):
+        """Return the type of the ``passphrase_name``.
 
-        If the catalog does not specify an encoding method for the
-        ``passphrase_name``, return the default encoding method, 'none'.
-        :param str passphrase_name: The name of the passphrase to evaluate.
-        :returns: The encoding method to be used for ``passphrase_name``.
-        :rtype: str
+        Determine what type of secret this passphrase name is. Valid options:
+        1. passphrase (a randomly generated passphrase)
+        2. base64 (a randomly generated passphrase, encoded with base64)
+        3. uuid (a randomly generated UUID)
+
+        If an invalid option is specified, raise an exception. If a valid
+        option is specified, return it. If no option is specified, default to
+        passphrase.
         """
 
         for c_doc in self._catalog_docs:
             for passphrase in c_doc['data']['passphrases']:
                 if passphrase[P_DOCUMENT_NAME] == passphrase_name:
-                    return passphrase.get(P_ENCODING, P_DEFAULT_ENCODING)
+                    passphrase_type = passphrase.get(P_TYPE,
+                                                     P_DEFAULT_TYPE).lower()
+                    if passphrase_type not in VALID_PASSPHRASE_TYPES:
+                        raise exceptions.InvalidPassphraseType(
+                            ptype=passphrase_type,
+                            pname=passphrase_name,
+                            validvalues=VALID_PASSPHRASE_TYPES)
+                    else:
+                        return passphrase_type
+
+    def is_passphrase_regenerable(self, passphrase_name):
+        """Return the regenerable field of the ``passphrase_name``.
+
+        Determines if this passphrase name is regenerable.
+        Valid options: True, False.
+        If no option is specified, default to True. If an invalid option is
+        specified, raise an exception
+
+        """
+        # UUIDs should not be regenerated
+        if self.get_passphrase_type(passphrase_name) == 'uuid':
+            return False
+
+        # All other types can be regenerated
+        for c_doc in self._catalog_docs:
+            for passphrase in c_doc['data']['passphrases']:
+                if passphrase[P_DOCUMENT_NAME] == passphrase_name:
+                    passphrase_regenerable = passphrase.get(
+                        P_REGENERABLE, P_DEFAULT_REGENERABLE)
+                    if passphrase_regenerable not in VALID_BOOLEAN_FIELDS:
+                        raise exceptions.InvalidPassphraseRegeneration(
+                            pregen=passphrase_regenerable,
+                            pname=passphrase_name,
+                            validvalues=VALID_BOOLEAN_FIELDS)
+                    else:
+                        return passphrase_regenerable
+
+    def is_passphrase_prompt(self, passphrase_name):
+        """Return the prompt field of the ``passphrase_name``.
+
+        Determines if this passphrase name should be generated interactively.
+        Valid options: True, False.
+        If no option is specified, default to False. If an invalid option is
+        specified, raise an exception
+
+        """
+
+        for c_doc in self._catalog_docs:
+            for passphrase in c_doc['data']['passphrases']:
+                if passphrase[P_DOCUMENT_NAME] == passphrase_name:
+                    passphrase_prompt = passphrase.get(
+                        P_PROMPT, P_DEFAULT_PROMPT)
+                    if passphrase_prompt not in VALID_BOOLEAN_FIELDS:
+                        raise exceptions.InvalidPassphrasePrompt(
+                            pprompt=passphrase_prompt,
+                            pname=passphrase_name,
+                            validvalues=VALID_BOOLEAN_FIELDS)
+                    else:
+                        return passphrase_prompt
