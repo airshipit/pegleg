@@ -490,6 +490,6 @@ def normalize_repo_path(repo_url_or_path):
             orig_repo_url_or_path)
         LOG.error(msg)
         raise exceptions.GitInvalidRepoException(
-            repo_path=orig_repo_url_or_path)
+            repo_url=orig_repo_url_or_path)
 
     return repo_url_or_path, sub_path
