@@ -118,7 +118,7 @@ FULL_STRUCTURE = {
 def _create_tree(root_path, *, tree=FULL_STRUCTURE):
     for name, data in tree.get('directories', {}).items():
         path = os.path.join(root_path, name)
-        os.makedirs(path, exist_ok=True)
+        os.makedirs(os.path.abspath(path), exist_ok=True)
         _create_tree(path, tree=data)
 
     for filename, yaml_data in tree.get('files', {}).items():
@@ -242,7 +242,7 @@ def dump(data, path, flag='w', **kwargs):
     if flag == 'w' and os.path.exists(path):
         raise click.ClickException('%s already exists, aborting' % path)
 
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, flag) as f:
 
         yaml.dump(data, f, **kwargs)
@@ -252,7 +252,7 @@ def safe_dump(data, path, flag='w', **kwargs):
     if flag == 'w' and os.path.exists(path):
         raise click.ClickException('%s already exists, aborting' % path)
 
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, flag) as f:
 
         yaml.safe_dump(data, f, **kwargs)
@@ -262,7 +262,7 @@ def dump_all(data, path, flag='w', **kwargs):
     if flag == 'w' and os.path.exists(path):
         raise click.ClickException('%s already exists, aborting' % path)
 
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, flag) as f:
 
         yaml.dump_all(data, f, **kwargs)
@@ -309,8 +309,8 @@ def read(path):
             '', lambda loader, suffix, node: None)
         try:
             return [
-                d for d in yaml.safe_load_all(stream) if d and
-                (is_deckhand_document(d) or is_pegleg_managed_document(d))
+                d for d in yaml.safe_load_all(stream) if d and (
+                    is_deckhand_document(d) or is_pegleg_managed_document(d))
             ]
         except yaml.YAMLError as e:
             raise click.ClickException('Failed to parse %s:\n%s' % (path, e))
@@ -329,7 +329,7 @@ def write(data, file_path):
     :type data: str, dict, or a list of dicts
     """
     try:
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        os.makedirs(os.path.dirname(os.path.abspath(file_path)), exist_ok=True)
         with open(file_path, 'w') as stream:
             if isinstance(data, str):
                 stream.write(data)
@@ -404,7 +404,7 @@ def check_file_save_location(save_location):
             LOG.debug(
                 "Save location %s does not exist. Creating "
                 "automatically.", save_location)
-            os.makedirs(save_location)
+            os.makedirs(os.path.abspath(save_location))
         # In case save_location already exists and isn't a directory.
         if not os.path.isdir(save_location):
             raise click.ClickException(

@@ -90,8 +90,9 @@ def git_handler(repo_url,
     # we do not need to clone, we may need to process the reference
     # by checking that out and returning the directory they passed in
     else:
-        LOG.debug('Treating repo_url=%s as an already-cloned repository. '
-                  'Attempting to checkout ref=%s', repo_url, ref)
+        LOG.debug(
+            'Treating repo_url=%s as an already-cloned repository. '
+            'Attempting to checkout ref=%s', repo_url, ref)
 
         # Normalize the repo path.
         repo_url, _ = normalize_repo_path(repo_url)
@@ -102,9 +103,10 @@ def git_handler(repo_url,
             # real local repository. Wrapper logic around this module will
             # only perform this functionality against a temporary replica of
             # local repositories, making the below operations safe.
-            LOG.info('Replica of local repo=%s is dirty. Committing all '
-                     'tracked/untracked changes to ref=%s',
-                     repo_name(repo_url), ref)
+            LOG.info(
+                'Replica of local repo=%s is dirty. Committing all '
+                'tracked/untracked changes to ref=%s', repo_name(repo_url),
+                ref)
             repo.git.add(all=True)
             repo.index.commit('Temporary Pegleg commit')
 
@@ -115,8 +117,9 @@ def git_handler(repo_url,
             _try_git_checkout(repo, repo_url, ref, fetch=False)
         except exceptions.GitException:
             # Otherwise, attempt to fetch and checkout the missing ref.
-            LOG.info('ref=%s not found locally for repo_url=%s, fetching from '
-                     'remote', ref, repo_url)
+            LOG.info(
+                'ref=%s not found locally for repo_url=%s, fetching from '
+                'remote', ref, repo_url)
             # Allow any errors to bubble up.
             _try_git_checkout(repo, repo_url, ref, fetch=True)
 
@@ -136,8 +139,9 @@ def _get_current_ref(repo_url):
     try:
         repo = Repo(repo_url, search_parent_directories=True)
         current_ref = repo.head.ref.name
-        LOG.debug('ref for repo_url=%s not specified, defaulting to currently '
-                  'checked out ref=%s', repo_url, current_ref)
+        LOG.debug(
+            'ref for repo_url=%s not specified, defaulting to currently '
+            'checked out ref=%s', repo_url, current_ref)
         return current_ref
     except Exception as e:
         return None
@@ -182,7 +186,7 @@ def _try_git_clone(repo_url,
     temp_dir = os.path.join(clone_path, repo_name)
 
     try:
-        os.makedirs(temp_dir)
+        os.makedirs(os.path.abspath(temp_dir))
     except FileExistsError:
         msg = "The repository already exists in the given path. Either " \
               "provide a new clone path or pass in the path of the local " \
@@ -198,21 +202,20 @@ def _try_git_clone(repo_url,
             LOG.debug('Cloning [%s] with proxy [%s]', repo_url, proxy_server)
             # TODO(felipemonteiro): proxy_server can be finicky. Need a config
             # option to retry up to N times.
-            repo = Repo.clone_from(
-                repo_url,
-                temp_dir,
-                config='http.proxy=%s' % proxy_server,
-                env=env_vars)
+            repo = Repo.clone_from(repo_url,
+                                   temp_dir,
+                                   config='http.proxy=%s' % proxy_server,
+                                   env=env_vars)
         else:
             LOG.debug('Cloning [%s]', repo_url)
             repo = Repo.clone_from(repo_url, temp_dir, env=env_vars)
     except git_exc.GitCommandError as e:
         LOG.exception('Failed to clone repo_url=%s using ref=%s.', repo_url,
                       ref)
-        if (ssh_cmd and ssh_cmd in e.stderr or
-                'permission denied' in e.stderr.lower()):
-            raise exceptions.GitAuthException(
-                repo_url=repo_url, ssh_key_path=auth_key)
+        if (ssh_cmd and ssh_cmd in e.stderr
+                or 'permission denied' in e.stderr.lower()):
+            raise exceptions.GitAuthException(repo_url=repo_url,
+                                              ssh_key_path=auth_key)
         elif 'could not resolve proxy' in e.stderr.lower():
             raise exceptions.GitProxyException(location=proxy_server)
         else:
@@ -247,8 +250,8 @@ def _get_remote_env_vars(auth_key=None):
             # required CLI input.
             ssh_cmd = (
                 'ssh -i {} -o ConnectionAttempts=20 -o ConnectTimeout=10 -o '
-                'StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
-                .format(os.path.expanduser(auth_key)))
+                'StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'.
+                format(os.path.expanduser(auth_key)))
             env_vars.update({'GIT_SSH_COMMAND': ssh_cmd})
         else:
             msg = "The auth_key path '%s' was not found" % auth_key
@@ -293,10 +296,16 @@ def _try_git_checkout(repo, repo_url, ref=None, fetch=True):
             # for each so that future checkouts can be performed using either
             # format. This way, no future processing is required to figure
             # out whether a refpath/hexsha exists within the repo.
-            _create_local_ref(
-                g, branches, ref=ref, newref=hexsha, reftype='hexsha')
-            _create_local_ref(
-                g, branches, ref=ref, newref=ref_path, reftype='refpath')
+            _create_local_ref(g,
+                              branches,
+                              ref=ref,
+                              newref=hexsha,
+                              reftype='hexsha')
+            _create_local_ref(g,
+                              branches,
+                              ref=ref,
+                              newref=ref_path,
+                              reftype='refpath')
             _create_or_checkout_local_ref(g, branches, ref=ref)
         else:
             LOG.debug('Checking out ref=%s from local repo_url=%s', ref,

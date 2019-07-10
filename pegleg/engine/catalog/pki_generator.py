@@ -216,7 +216,7 @@ class PKIGenerator(object):
 
             if not os.path.exists(dir_name):
                 LOG.debug('Creating secrets path: %s', dir_name)
-                os.makedirs(dir_name)
+                os.makedirs(os.path.abspath(dir_name))
 
             # Encrypt the document
             document['data']['managedDocument']['metadata']['storagePolicy']\
