@@ -239,9 +239,6 @@ def slurp(path):
 
 
 def dump(data, path, flag='w', **kwargs):
-    if flag == 'w' and os.path.exists(path):
-        raise click.ClickException('%s already exists, aborting' % path)
-
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, flag) as f:
 
@@ -249,9 +246,6 @@ def dump(data, path, flag='w', **kwargs):
 
 
 def safe_dump(data, path, flag='w', **kwargs):
-    if flag == 'w' and os.path.exists(path):
-        raise click.ClickException('%s already exists, aborting' % path)
-
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, flag) as f:
 
@@ -259,9 +253,6 @@ def safe_dump(data, path, flag='w', **kwargs):
 
 
 def dump_all(data, path, flag='w', **kwargs):
-    if flag == 'w' and os.path.exists(path):
-        raise click.ClickException('%s already exists, aborting' % path)
-
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, flag) as f:
 
