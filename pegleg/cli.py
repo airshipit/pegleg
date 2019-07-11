@@ -669,7 +669,7 @@ def decrypt(*, path, save_location, overwrite, site_name):
     decrypted = engine.secrets.decrypt(path, site_name=site_name)
     if overwrite:
         for path, data in decrypted.items():
-            files.write(path, data)
+            files.write(data, path)
     elif save_location is None:
         for data in decrypted.values():
             click.echo(data)
