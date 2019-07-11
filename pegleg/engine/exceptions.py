@@ -59,12 +59,12 @@ class GitSSHException(PeglegBaseException):
 
 class GitConfigException(PeglegBaseException):
     """Exception that occurs when reading Git repo config fails."""
-    message = 'Failed to read Git config file for repo path: %(repo_path)s'
+    message = 'Failed to read Git config file for repo path: %(repo_url)s'
 
 
 class GitInvalidRepoException(PeglegBaseException):
     """Exception raised when an invalid repository is detected."""
-    message = 'The repository path or URL is invalid: %(repo_path)s'
+    message = 'The repository path or URL is invalid: %(repo_url)s'
 
 
 class GitMissingUserException(PeglegBaseException):
