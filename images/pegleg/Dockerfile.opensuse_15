@@ -1,4 +1,4 @@
-ARG FROM=opensuse/leap:15.0
+ARG FROM=opensuse/leap:15.1
 FROM ${FROM}
 ARG CFSSLURL=https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 
