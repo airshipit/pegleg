@@ -17,42 +17,44 @@
 Pegleg  Exceptions
 ==================
 
+.. currentmodule:: pegleg.engine.exceptions
+
 Base Exceptions
 ---------------
 
-.. autoexception:: pegleg.engine.exceptions.PeglegBaseException
+.. autoexception:: PeglegBaseException
    :members:
    :undoc-members:
 
 Git Exceptions
 --------------
 
-.. autoexception:: pegleg.engine.exceptions.GitConfigException
+.. autoexception:: GitConfigException
    :members:
    :show-inheritance:
    :undoc-members:
 
-.. autoexception:: pegleg.engine.exceptions.GitException
+.. autoexception:: GitException
    :members:
    :show-inheritance:
    :undoc-members:
 
-.. autoexception:: pegleg.engine.exceptions.GitAuthException
+.. autoexception:: GitAuthException
    :members:
    :show-inheritance:
    :undoc-members:
 
-.. autoexception:: pegleg.engine.exceptions.GitProxyException
+.. autoexception:: GitProxyException
    :members:
    :show-inheritance:
    :undoc-members:
 
-.. autoexception:: pegleg.engine.exceptions.GitSSHException
+.. autoexception:: GitSSHException
    :members:
    :show-inheritance:
    :undoc-members:
 
-.. autoexception:: pegleg.engine.exceptions.GitInvalidRepoException
+.. autoexception:: GitInvalidRepoException
    :members:
    :show-inheritance:
    :undoc-members:
@@ -67,24 +69,24 @@ Authentication Exceptions
 PKI Exceptions
 --------------
 
-.. autoexception:: pegleg.engine.exceptions.IncompletePKIPairError
+.. autoexception:: IncompletePKIPairError
 
 Genesis Bundle Exceptions
 -------------------------
 
-.. autoexception:: pegleg.engine.exceptions.GenesisBundleEncryptionException
+.. autoexception:: GenesisBundleEncryptionException
    :members:
    :show-inheritance:
    :undoc-members:
 
-.. autoexception:: pegleg.engine.exceptions.GenesisBundleGenerateException
+.. autoexception:: GenesisBundleGenerateException
    :members:
    :show-inheritance:
 
 Passphrase Exceptions
 ---------------------
 
-.. autoexception:: pegleg.engine.exceptions.PassphraseCatalogNotFoundException
+.. autoexception:: PassphraseCatalogNotFoundException
    :members:
    :show-inheritance:
    :undoc-members:

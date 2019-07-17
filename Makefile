@@ -103,6 +103,7 @@ docs: clean
 .PHONY: clean
 clean:
 	rm -rf build
+	rm -rf doc/build
 
 .PHONY: py_lint
 py_lint:
