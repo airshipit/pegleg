@@ -127,11 +127,10 @@ def render(site_name, output_stream, validate):
                        explicit_start=True,
                        explicit_end=True)
     else:
-        yaml.dump_all(rendered_documents,
-                      output_stream,
-                      default_flow_style=False,
-                      explicit_start=True,
-                      explicit_end=True)
+        click.echo(yaml.dump_all(rendered_documents,
+                                 default_flow_style=False,
+                                 explicit_start=True,
+                                 explicit_end=True))
 
 
 def list_(output_stream):
