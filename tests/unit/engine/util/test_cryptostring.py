@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from pegleg.engine.util.cryptostring import CryptoString
-import string
 
 
 def test_cryptostring_default_len():
@@ -74,7 +73,7 @@ def test_cryptostring_has_symbol():
     s_util = CryptoString()
     crypto_string = 'Th1sP@sswordH4sSymbols!'
     assert s_util.has_symbol(crypto_string) is True
-    crypto_string = '!@#$%^&*()[]\}{|<>?,./~`'
+    crypto_string = r'!@#$%^&*()[]\}{|<>?,./~`'
     assert s_util.has_symbol(crypto_string) is True
     crypto_string = 'ThisPasswordH4sNoSymbols'
     assert s_util.has_symbol(crypto_string) is False

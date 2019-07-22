@@ -21,13 +21,6 @@ import random
 import requests
 import uuid
 
-_PROXY_SERVERS = {
-    'http': os.getenv(
-        'HTTP_PROXY', os.getenv('http_proxy', 'http://proxy.example.com')),
-    'https': os.getenv(
-        'HTTPS_PROXY', os.getenv('https_proxy', 'https://proxy.example.com'))
-}
-
 
 def rand_name(name='', prefix='pegleg'):
     """Generate a random name that includes a random number
@@ -46,6 +39,28 @@ def rand_name(name='', prefix='pegleg'):
     if prefix:
         rand_name = prefix + '-' + rand_name
     return rand_name
+
+
+def get_proxies():
+    use_proxy = False
+    http_proxy = None
+    https_proxy = None
+
+    if 'http_proxy' in os.environ:
+        http_proxy = os.environ['http_proxy']
+        use_proxy = True
+    elif 'HTTP_PROXY' in os.environ:
+        http_proxy = os.environ['HTTP_PROXY']
+        use_proxy = True
+
+    if 'https_proxy' in os.environ:
+        https_proxy = os.environ['https_proxy']
+        use_proxy = True
+    elif 'HTTPS_PROXY' in os.environ:
+        https_proxy = os.environ['HTTPS_PROXY']
+        use_proxy = True
+
+    return use_proxy, {'http': http_proxy, 'https_proxy': https_proxy}
 
 
 def is_connected():
@@ -71,7 +86,7 @@ def is_connected_behind_proxy():
     for _ in range(3):
         try:
             r = requests.get(
-                "http://www.github.com/", proxies=_PROXY_SERVERS, timeout=3)
+                "http://www.github.com/", proxies=get_proxies()[1], timeout=3)
             r.raise_for_status()
             return True
         except requests.exceptions.RequestException:

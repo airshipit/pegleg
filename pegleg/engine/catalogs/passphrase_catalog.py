@@ -39,7 +39,6 @@ class PassphraseCatalog(BaseCatalog):
     passphrase catalog documents.
 
     """
-
     def __init__(self, sitename, documents=None):
         """
         Parse the site passphrase catalog documents and capture the

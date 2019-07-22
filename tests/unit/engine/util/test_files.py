@@ -19,22 +19,20 @@ import yaml
 
 from pegleg import config
 from pegleg.engine.util import files
-from tests.unit.fixtures import create_tmp_deployment_files
-from tests.unit.fixtures import temp_path
 
 EXPECTED_FILE_PERM = '0o640'
 EXPECTED_DIR_PERM = '0o750'
 
 
 class TestFileHelpers(object):
-    def test_read_compatible_file(self, create_tmp_deployment_files):
+    def test_read_compatible_file(self, temp_deployment_files):
         path = os.path.join(
             config.get_site_repo(), 'site', 'cicd', 'secrets', 'passphrases',
             'cicd-passphrase.yaml')
         documents = files.read(path)
         assert 1 == len(documents)
 
-    def test_read_incompatible_file(self, create_tmp_deployment_files):
+    def test_read_incompatible_file(self, temp_deployment_files):
         # NOTE(felipemonteiro): The Pegleg site-definition.yaml is a
         # Deckhand-formatted document currently but probably shouldn't be,
         # because it has no business being in Deckhand. As such, validate that
@@ -46,7 +44,7 @@ class TestFileHelpers(object):
             "Documents returned should be empty for "
             "site-definition.yaml")
 
-    def test_write(self, create_tmp_deployment_files):
+    def test_write(self, temp_deployment_files):
         path = os.path.join(
             config.get_site_repo(), 'site', 'cicd', 'test_out.yaml')
         files.write("test text", path)
@@ -64,13 +62,13 @@ class TestFileHelpers(object):
         with pytest.raises(ValueError) as _:
             files.write(object(), path)
 
-    def test_file_permissions(self, create_tmp_deployment_files):
+    def test_file_permissions(self, temp_deployment_files):
         path = os.path.join(
             config.get_site_repo(), 'site', 'cicd', 'test_out.yaml')
         files.write("test text", path)
         assert oct(os.stat(path).st_mode & 0o777) == EXPECTED_FILE_PERM
 
-    def test_dir_permissions(self, create_tmp_deployment_files):
+    def test_dir_permissions(self, temp_deployment_files):
         path = os.path.join(config.get_site_repo(), 'site', 'cicd', 'test_dir')
         os.makedirs(path)
         assert oct(os.stat(path).st_mode & 0o777) == EXPECTED_DIR_PERM
@@ -84,16 +82,16 @@ def test_file_in_subdir():
     assert not files.file_in_subdir("aaa/bbb/../ccc.txt", "bbb")
 
 
-def test_read(temp_path):
+def test_read(tmpdir):
     # This will throw an error if yaml attempts to read the tag.
-    with open(os.path.join(temp_path, "invalid.yaml"), "w") as invalid_yaml:
+    with open(os.path.join(tmpdir, "invalid.yaml"), "w") as invalid_yaml:
         invalid_yaml.write("!!python/name:fake_class''\n")
-        files.read(os.path.join(temp_path, "invalid.yaml"))
+        files.read(os.path.join(tmpdir, "invalid.yaml"))
 
     # Under PyYAML's default behavior, the tag !!python/name:builtins.int
     # will be parsed into the method int. files.read should ignore this tag.
-    with open(os.path.join(temp_path, "valid.yaml"), "w") as valid_yaml:
+    with open(os.path.join(tmpdir, "valid.yaml"), "w") as valid_yaml:
         valid_yaml.write("!!python/name:builtins.int ''\n")
-    read_files = files.read(os.path.join(temp_path, "valid.yaml"))
+    read_files = files.read(os.path.join(tmpdir, "valid.yaml"))
     # Assert that the tag was not parsed into the method int
     assert int not in read_files

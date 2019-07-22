@@ -15,8 +15,6 @@
 from __future__ import absolute_import
 import copy
 import os
-import shutil
-import tempfile
 
 import pytest
 import yaml
@@ -39,6 +37,18 @@ data: %(name)s-password
 """
 
 
+@pytest.fixture(autouse=True)
+def restore_config():
+    """Used for ensuring the original global context is reset in memory
+    following each test execution.
+    """
+    original_global_context = copy.deepcopy(config.GLOBAL_CONTEXT)
+    try:
+        yield
+    finally:
+        config.GLOBAL_CONTEXT = original_global_context
+
+
 def _gen_document(**kwargs):
     if "storagePolicy" not in kwargs:
         kwargs["storagePolicy"] = "cleartext"
@@ -46,8 +56,8 @@ def _gen_document(**kwargs):
     return yaml.safe_load(test_document)
 
 
-@pytest.fixture()
-def create_tmp_deployment_files(tmpdir):
+@pytest.fixture
+def temp_deployment_files(tmpdir):
     """Fixture that creates a temporary directory structure."""
     sitenames = ['cicd', 'lab']
 
@@ -154,14 +164,4 @@ schema: pegleg/SiteDefinition/v1
         cicd_path = os.path.join(str(p), files._site_path(site))
         files._create_tree(cicd_path, tree=test_structure)
 
-    yield tmpdir
-
-
-@pytest.fixture()
-def temp_path():
-    temp_folder = tempfile.mkdtemp()
-    try:
-        yield temp_folder
-    finally:
-        if os.path.exists(temp_folder):
-            shutil.rmtree(temp_folder, ignore_errors=True)
+    return tmpdir

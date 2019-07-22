@@ -13,18 +13,16 @@
 # limitations under the License.
 
 import os
+from unittest import mock
 
 import click
-import mock
 import pytest
 
-from deckhand.engine import layering
 from deckhand import errors as dh_errors
 
 from pegleg import config
 from pegleg.engine import errorcodes
 from pegleg.engine import lint
-from tests.unit.fixtures import create_tmp_deployment_files
 
 _SKIP_P003_REASON = """Currently broken with revisioned repositories
 directory layout changes. The old pseudo-revision folders like 'v4.0' are
@@ -224,12 +222,11 @@ class TestSelectableLinting(object):
 
 
 class TestSelectableLintingHelperFunctions(object):
-    """The fixture ``create_tmp_deployment_files`` produces many linting errors
+    """The fixture ``temp_deployment_files`` produces many linting errors
     by default.
 
     """
-
-    def test_verify_file_contents(self, create_tmp_deployment_files):
+    def test_verify_file_contents(self, temp_deployment_files):
         """Validate that linting by a specific site ("cicd") produces a subset
         of all the linting errors produced for all sites.
 

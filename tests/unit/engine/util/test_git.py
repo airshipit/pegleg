@@ -14,14 +14,13 @@
 
 import os
 import shutil
+from unittest import mock
 
 from git import Repo
-import mock
 import pytest
 
 from pegleg.engine import exceptions
 from pegleg.engine.util import git
-from tests.unit.fixtures import temp_path
 from tests.unit import test_utils
 
 
@@ -99,14 +98,15 @@ def test_git_clone_with_patch_ref():
 
 
 @pytest.mark.skipif(
-    not test_utils.is_connected_behind_proxy(),
+    not test_utils.get_proxies()[0]
+    or not test_utils.is_connected_behind_proxy(),
     reason='git clone requires proxy connectivity.')
 @mock.patch.object(git, 'LOG', autospec=True)
 def test_git_clone_behind_proxy(mock_log):
     url = 'https://review.opendev.org/airship/armada'
     commit = 'cba78d1d03e4910f6ab1691bae633c5bddce893d'
 
-    for proxy_server in test_utils._PROXY_SERVERS.values():
+    for proxy_server in test_utils.get_proxies()[1].values():
         git_dir = git.git_handler(url, commit, proxy_server=proxy_server)
         _validate_git_clone(git_dir, commit)
 
@@ -508,8 +508,8 @@ def test_is_repository():
         subpath='deployment_files/site')
 
 
-def test_is_repository_negative(temp_path):
-    assert not git.is_repository(temp_path)
+def test_is_repository_negative(tmpdir):
+    assert not git.is_repository(tmpdir)
 
 
 @pytest.mark.skipif(

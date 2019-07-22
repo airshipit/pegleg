@@ -35,7 +35,6 @@ class PassphraseGenerator(BaseGenerator):
     Generates passphrases for a given environment, specified in a
     passphrase catalog.
     """
-
     def __init__(self, sitename, save_location, author):
         """Constructor for ``PassphraseGenerator``.
 

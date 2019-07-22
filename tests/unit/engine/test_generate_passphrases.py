@@ -15,10 +15,10 @@
 import base64
 import os
 import tempfile
+from unittest import mock
 import uuid
 
 from cryptography import fernet
-import mock
 import pytest
 from testfixtures import log_capture
 import yaml

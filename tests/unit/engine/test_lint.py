@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import mock
+from unittest import mock
 
 from pegleg.engine import lint
 from pegleg.engine.errorcodes import DECKHAND_DUPLICATE_SCHEMA
@@ -21,11 +21,10 @@ from pegleg.engine.util import deckhand
 from pegleg.engine.util import files
 from pegleg.engine.util.pegleg_managed_document \
         import PeglegManagedSecretsDocument
-from tests.unit.fixtures import create_tmp_deployment_files
 
 
 def test_verify_deckhand_render_site_documents_separately(
-        create_tmp_deployment_files):
+        temp_deployment_files):
     expected_documents = {
         'cicd': [
             'global-common', 'global-v1.0', 'cicd-type-common',

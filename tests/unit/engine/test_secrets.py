@@ -14,11 +14,9 @@
 
 import os
 from os import listdir
+from unittest import mock
 
-import click
-import mock
 import pytest
-import tempfile
 import yaml
 
 from pegleg import config
@@ -26,16 +24,13 @@ from pegleg.engine.catalog.pki_generator import PKIGenerator
 from pegleg.engine.catalog import pki_utility
 from pegleg.engine import exceptions
 from pegleg.engine import secrets
-from pegleg.engine.util import encryption as crypt, catalog, git
+from pegleg.engine.util import encryption as crypt, git
 from pegleg.engine.util import files
 from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 from tests.unit import test_utils
-from tests.unit.fixtures import temp_path, create_tmp_deployment_files, \
-    _gen_document
-from tests.unit.test_cli import TestSiteSecretsActions, BaseCLIActionTest, \
-    TEST_PARAMS
+from tests.unit.test_cli import TEST_PARAMS
 
 TEST_DATA = """
 ---
@@ -150,7 +145,7 @@ def test_short_salt():
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_secret_encrypt_and_decrypt(create_tmp_deployment_files, tmpdir):
+def test_secret_encrypt_and_decrypt(temp_deployment_files, tmpdir):
     site_dir = tmpdir.join("deployment_files", "site", "cicd")
     passphrase_doc = """---
 schema: deckhand/Passphrase/v1
@@ -250,12 +245,12 @@ def test_pegleg_secret_management_double_encrypt():
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_encrypt_decrypt_using_file_path(temp_path):
+def test_encrypt_decrypt_using_file_path(tmpdir):
     # write the test data to temp file
     test_data = list(yaml.safe_load_all(TEST_DATA))
-    file_path = os.path.join(temp_path, 'secrets_file.yaml')
+    file_path = os.path.join(tmpdir, 'secrets_file.yaml')
     files.write(test_data, file_path)
-    save_path = os.path.join(temp_path, 'encrypted_secrets_file.yaml')
+    save_path = os.path.join(tmpdir, 'encrypted_secrets_file.yaml')
 
     # encrypt documents and validate that they were encrypted
     doc_mgr = PeglegSecretManagement(file_path=file_path, author='test_author')
@@ -279,10 +274,10 @@ def test_encrypt_decrypt_using_file_path(temp_path):
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_encrypt_decrypt_using_docs(temp_path):
+def test_encrypt_decrypt_using_docs(tmpdir):
     # write the test data to temp file
     test_data = list(yaml.safe_load_all(TEST_DATA))
-    save_path = os.path.join(temp_path, 'encrypted_secrets_file.yaml')
+    save_path = os.path.join(tmpdir, 'encrypted_secrets_file.yaml')
 
     # encrypt documents and validate that they were encrypted
     doc_mgr = PeglegSecretManagement(docs=test_data, author='test_author')
@@ -314,7 +309,7 @@ def test_encrypt_decrypt_using_docs(temp_path):
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_generate_pki_using_local_repo_path(create_tmp_deployment_files):
+def test_generate_pki_using_local_repo_path(temp_deployment_files):
     """Validates ``generate-pki`` action using local repo path."""
     # Scenario:
     #
@@ -342,7 +337,7 @@ def test_generate_pki_using_local_repo_path(create_tmp_deployment_files):
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_check_expiry(create_tmp_deployment_files):
+def test_check_expiry(temp_deployment_files):
     """ Validates check_expiry """
     repo_path = str(
         git.git_handler(TEST_PARAMS["repo_url"], ref=TEST_PARAMS["repo_rev"]))
@@ -376,7 +371,7 @@ def test_check_expiry(create_tmp_deployment_files):
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_get_global_creds_missing_creds(create_tmp_deployment_files, tmpdir):
+def test_get_global_creds_missing_creds(temp_deployment_files, tmpdir):
     # Create site files
     site_dir = tmpdir.join("deployment_files", "site", "cicd")
 
@@ -395,7 +390,7 @@ def test_get_global_creds_missing_creds(create_tmp_deployment_files, tmpdir):
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_get_global_creds_missing_pass(create_tmp_deployment_files, tmpdir):
+def test_get_global_creds_missing_pass(temp_deployment_files, tmpdir):
     # Create site files
     site_dir = tmpdir.join("deployment_files", "site", "cicd")
 
@@ -419,7 +414,7 @@ def test_get_global_creds_missing_pass(create_tmp_deployment_files, tmpdir):
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_get_global_creds(create_tmp_deployment_files, tmpdir):
+def test_get_global_creds(temp_deployment_files, tmpdir):
     # Create site files
     site_dir = tmpdir.join("deployment_files", "site", "cicd")
 
@@ -449,7 +444,7 @@ def test_get_global_creds(create_tmp_deployment_files, tmpdir):
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_global_encrypt_decrypt(create_tmp_deployment_files, tmpdir):
+def test_global_encrypt_decrypt(temp_deployment_files, tmpdir):
     # Create site files
     site_dir = tmpdir.join("deployment_files", "site", "cicd")
 

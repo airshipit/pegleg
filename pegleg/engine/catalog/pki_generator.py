@@ -41,7 +41,6 @@ class PKIGenerator(object):
     ``<site>/secrets/<subpath>``.
 
     """
-
     def __init__(
             self, sitename, block_strings=True, author=None, duration=365):
         """Constructor for ``PKIGenerator``.

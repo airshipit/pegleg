@@ -16,9 +16,8 @@ import copy
 import os
 import shutil
 import textwrap
+from unittest import mock
 
-import click
-import mock
 import pytest
 import yaml
 
@@ -173,7 +172,6 @@ def create_tmp_pki_structure(tmpdir):
         structure with pki/ subfolder.
 
     """
-
     def _create_tmp_folder_system(sitename, pki_catalog):
         """Creates a temporary site folder system.
 

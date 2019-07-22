@@ -14,9 +14,8 @@
 
 import json
 import time
+from unittest import mock
 
-import click
-import mock
 import pytest
 
 from pegleg import config

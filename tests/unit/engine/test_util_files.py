@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import mock
+from unittest import mock
 
 from pegleg import config
 from pegleg.engine.util import files
-from tests.unit.fixtures import create_tmp_deployment_files
 
 TEST_DATA = [('/tmp/test_repo', 'test_file.yaml')]
 TEST_DATA_2 = [{'schema': 'pegleg/SiteDefinition/v1', 'data': 'test'}]
@@ -36,7 +35,7 @@ def test_no_non_yamls(tmpdir):
         assert i.endswith('.yaml')
 
 
-def test_list_all_files(create_tmp_deployment_files):
+def test_list_all_files(temp_deployment_files):
     expected_files = sorted(
         [
             'deployment_files/global/common/global-common.yaml',

@@ -28,7 +28,6 @@ __all__ = ['BaseCatalog']
 
 class BaseCatalog(ABC):
     """Abstract Base Class for all site catalogs."""
-
     def __init__(self, kind, sitename, documents=None):
         """
         Search for site catalog of the specified ``kind`` among the site

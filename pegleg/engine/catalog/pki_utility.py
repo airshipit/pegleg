@@ -47,7 +47,6 @@ class PKIUtility(object):
     of ``pegleg/PeglegManagedDocument/v1``.
 
     """
-
     @staticmethod
     def cfssl_exists():
         """Checks whether cfssl command exists. Useful for testing."""

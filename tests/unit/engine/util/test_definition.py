@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from pytest import mark
 
 from pegleg.engine.util import definition
-from tests.unit.fixtures import create_tmp_deployment_files
 
 
 class TestSiteDefinitionHelpers(object):
@@ -43,11 +43,11 @@ class TestSiteDefinitionHelpers(object):
 
         return global_documents + site_documents
 
-    def test_documents_for_site(self, create_tmp_deployment_files):
+    def test_documents_for_site(self, temp_deployment_files):
         self._test_documents_for_site("cicd")
         self._test_documents_for_site("lab")
 
-    def test_documents_for_each_site(self, create_tmp_deployment_files):
+    def test_documents_for_each_site(self, temp_deployment_files):
         documents_by_site = definition.documents_for_each_site()
         sort_func = lambda x: x['metadata']['name']
 

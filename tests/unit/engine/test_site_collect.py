@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import mock
 import os
 import shutil
 import yaml
+from unittest import mock
 
 import click
 
 from pegleg.engine import site
 from pegleg.engine.util import deckhand
-from tests.unit.fixtures import create_tmp_deployment_files
 
 
 def _site_definition(site_name):
@@ -85,7 +84,7 @@ def _test_site_collect_to_file(tmpdir, site_name, collection_path):
             shutil.rmtree(collection_str_path, ignore_errors=True)
 
 
-def test_site_collect_to_file(tmpdir, create_tmp_deployment_files):
+def test_site_collect_to_file(tmpdir, temp_deployment_files):
     _test_site_collect_to_file(tmpdir, "cicd", "cicd_path")
     _test_site_collect_to_file(tmpdir, "lab", "lab_path")
 
@@ -104,7 +103,7 @@ def _test_site_collect_to_stdout(site_name):
         assert 'name: {}'.format(expected) in all_lines
 
 
-def test_site_collect_to_stdout(create_tmp_deployment_files):
+def test_site_collect_to_stdout(temp_deployment_files):
     _test_site_collect_to_stdout("cicd")
     _test_site_collect_to_stdout("lab")
 

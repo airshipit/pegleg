@@ -15,12 +15,12 @@ import logging
 import pytest
 from testfixtures import log_capture
 
-from pegleg.engine import exceptions as exc
+from pegleg.engine import exceptions
 
 
 @log_capture()
 def test_exception_with_missing_kwargs(capture):
     message = 'Testing missing kwargs exception with {text}'
-    with pytest.raises(exc.PeglegBaseException):
-        raise exc.PeglegBaseException(message=message, key="value")
+    with pytest.raises(exceptions.PeglegBaseException):
+        raise exceptions.PeglegBaseException(message=message, key="value")
     capture.check(('pegleg.engine.exceptions', 'WARNING', 'Missing kwargs'))

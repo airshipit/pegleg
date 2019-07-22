@@ -30,7 +30,6 @@ __all__ = ['PeglegManagedSecretsDocument']
 
 class PeglegManagedSecretsDocument(object):
     """Object representing one Pegleg managed secret document."""
-
     def __init__(self, document, generated=False, catalog=None, author=None):
         """
         Parse and wrap an externally generated document in a

@@ -28,7 +28,6 @@ class BaseGenerator(ABC):
     Abstract Base Class, providing the common data and methods for all
     generator classes
     """
-
     def __init__(self, sitename, save_location, author=None):
         """Constructor for ``BaseGenerator``.
 

@@ -30,14 +30,12 @@ LOG = logging.getLogger(__name__)
 
 class AuthValuesError(exceptions.PeglegBaseException):
     """Shipyard authentication failed. """
-
     def __init__(self, *, diagnostic):
         self.diagnostic = diagnostic
 
 
 class DocumentUploadError(exceptions.PeglegBaseException):
     """Exception occurs while uploading documents"""
-
     def __init__(self, message):
         self.message = message
 
@@ -50,7 +48,6 @@ class ShipyardHelper(object):
     3. Commits the document
     4. Formats response from Shipyard api_client
     """
-
     def __init__(self, context, buffer_mode='replace'):
         """
         Initializes params to be used by Shipyard

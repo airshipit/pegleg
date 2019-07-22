@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import mock
 import os
+from unittest import mock
 
 import click
 import pytest
@@ -120,7 +120,6 @@ def _test_process_repositories(
     All params above are mutually exclusive. Can only test one at a time.
 
     """
-
     @mock.patch.object(
         util.definition,
         'load_as_params',

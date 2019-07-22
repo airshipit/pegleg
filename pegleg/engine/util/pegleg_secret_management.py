@@ -29,7 +29,6 @@ LOG = logging.getLogger(__name__)
 
 class PeglegSecretManagement(object):
     """An object to handle operations on of a pegleg managed file."""
-
     def __init__(
             self,
             file_path=None,

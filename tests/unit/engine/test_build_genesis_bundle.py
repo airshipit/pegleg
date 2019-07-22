@@ -14,8 +14,8 @@
 
 import logging
 import os
+from unittest import mock
 
-import mock
 import pytest
 import yaml
 
@@ -24,8 +24,6 @@ from pegleg.engine import bundle
 from pegleg.engine.exceptions import GenesisBundleEncryptionException
 from pegleg.engine.exceptions import GenesisBundleGenerateException
 from pegleg.engine.util import files
-
-from tests.unit.fixtures import temp_path
 
 SITE_DEFINITION = """
 ---
@@ -92,15 +90,15 @@ data: ABAgagajajkb839215387
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_no_encryption_key(temp_path):
+def test_no_encryption_key(tmpdir):
     # Write the test data to temp file
     config_data = list(yaml.safe_load_all(SITE_CONFIG_DATA))
-    base_config_dir = os.path.join(temp_path, 'config_dir')
+    base_config_dir = os.path.join(tmpdir, 'config_dir')
     config.set_site_repo(base_config_dir)
     config_dir = os.path.join(base_config_dir, 'site', 'test_site')
 
     config_path = os.path.join(config_dir, 'config_file.yaml')
-    build_dir = os.path.join(temp_path, 'build_dir')
+    build_dir = os.path.join(tmpdir, 'build_dir')
     os.makedirs(config_dir)
 
     files.write(config_data, config_path)
@@ -123,15 +121,15 @@ def test_no_encryption_key(temp_path):
         'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
         'PEGLEG_SALT': 'MySecretSalt1234567890]['
     })
-def test_failed_deckhand_validation(temp_path):
+def test_failed_deckhand_validation(tmpdir):
     # Write the test data to temp file
     config_data = list(yaml.safe_load_all(SITE_CONFIG_DATA))
-    base_config_dir = os.path.join(temp_path, 'config_dir')
+    base_config_dir = os.path.join(tmpdir, 'config_dir')
     config.set_site_repo(base_config_dir)
     config_dir = os.path.join(base_config_dir, 'site', 'test_site')
 
     config_path = os.path.join(config_dir, 'config_file.yaml')
-    build_dir = os.path.join(temp_path, 'build_dir')
+    build_dir = os.path.join(tmpdir, 'build_dir')
     os.makedirs(config_dir)
     files.write(config_data, config_path)
     files.write(
