@@ -23,14 +23,14 @@
     check:
       jobs:
         - openstack-tox-pep8
-        - dependency-vulnerability-check
+        - pegleg-dependency-vulnerability-check
         - airship-pegleg-docker-build-gate-ubuntu_xenial
         - airship-pegleg-docker-build-gate-ubuntu_bionic
         - airship-pegleg-docker-build-gate-opensuse
     gate:
       jobs:
         - openstack-tox-pep8
-        - dependency-vulnerability-check
+        - pegleg-dependency-vulnerability-check
         - airship-pegleg-docker-build-gate-ubuntu_xenial
         - airship-pegleg-docker-build-gate-ubuntu_bionic
         - airship-pegleg-docker-build-gate-opensuse
@@ -48,7 +48,7 @@
         label: ubuntu-xenial
 
 - job:
-    name: dependency-vulnerability-check
+    name: pegleg-dependency-vulnerability-check
     parent: openstack-tox
     voting: false
     timeout: 600
