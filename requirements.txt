@@ -11,6 +11,6 @@ chardet==3.0.4
 oslo.utils==3.41.0
 
 # External dependencies
-git+https://opendev.org/airship/deckhand.git@134c55805b13b2d3f430a7c0fee840990c55c0aa
-git+https://opendev.org/airship/shipyard.git@aeb0c198b196dbc69190299fe98df4137faf0333#egg=shipyard_client&subdirectory=src/bin/shipyard_client
-git+https://opendev.org/airship/promenade.git@32a6c15ffd6c283375bfd1cc9ae82f9232a9b501
+git+https://opendev.org/airship/deckhand.git@a4850f8c4fc02dd1971282c6d9e4beb9cd5be320
+git+https://opendev.org/airship/shipyard.git@1472a22dce698ea77f15b007906b263eef470f52#egg=shipyard_client&subdirectory=src/bin/shipyard_client
+git+https://opendev.org/airship/promenade.git@89f9842b2ec428709a05fd0a8d4cd1796043375d
