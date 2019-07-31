@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+from collections import OrderedDict
 from unittest import mock
 
 import pytest
@@ -43,42 +44,53 @@ DATA = {
     ]
 }
 
-MULTI_REPO_DATA = {
-    'repo1': [
-        {
-            'schema': 'pegleg/SiteDefinition/v1',
-            'metadata': {
-                'schema': 'metadata/Document/v1',
-                'layeringDefinition': {
-                    'abstract': False,
-                    'layer': 'site'
-                },
-                'name': 'site-name',
-                'storagePolicy': 'cleartext'
-            },
-            'data': {
-                'site_type': 'foundry'
-            }
-        }
-    ],
-    'repo2': [
-        {
-            'schema': 'pegleg/SiteDefinition/v1',
-            'metadata': {
-                'schema': 'metadata/Document/v1',
-                'layeringDefinition': {
-                    'abstract': False,
-                    'layer': 'site'
-                },
-                'name': 'site-name',
-                'storagePolicy': 'cleartext'
-            },
-            'data': {
-                'site_type': 'foundry'
-            }
-        }
-    ]
-}
+MULTI_REPO_DATA = OrderedDict(
+    [
+        (
+            'repo1', [
+                OrderedDict(
+                    [
+                        ('schema', 'pegleg/SiteDefinition/v1'),
+                        (
+                            'metadata',
+                            OrderedDict(
+                                [
+                                    ('schema', 'metadata/Document/v1'),
+                                    (
+                                        'layeringDefinition',
+                                        OrderedDict(
+                                            [
+                                                ('abstract', False),
+                                                ('layer', 'site')
+                                            ])), ('name', 'site-name'),
+                                    ('storagePolicy', 'cleartext')
+                                ])),
+                        ('data', OrderedDict([('site_type', 'foundry')]))
+                    ])
+            ]),
+        (
+            'repo2', [
+                OrderedDict(
+                    [
+                        ('schema', 'pegleg/SiteDefinition/v1'),
+                        (
+                            'metadata',
+                            OrderedDict(
+                                [
+                                    ('schema', 'metadata/Document/v1'),
+                                    (
+                                        'layeringDefinition',
+                                        OrderedDict(
+                                            [
+                                                ('abstract', False),
+                                                ('layer', 'site')
+                                            ])), ('name', 'site-name'),
+                                    ('storagePolicy', 'cleartext')
+                                ])),
+                        ('data', OrderedDict([('site_type', 'foundry')]))
+                    ])
+            ])
+    ])
 
 
 @pytest.fixture(autouse=True)

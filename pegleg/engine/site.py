@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import OrderedDict
 import logging
 import os
 
@@ -24,6 +25,7 @@ from yaml.constructor import SafeConstructor
 from pegleg import config
 from pegleg.engine import util
 from pegleg.engine.util import files
+from pegleg.engine.util.files import add_representer_ordered_dict
 
 __all__ = ('collect', 'list_', 'show', 'render')
 
@@ -50,6 +52,7 @@ def _collect_to_stdout(site_name):
             for line in _read_and_format_yaml(filename):
                 # This code is a pattern to convert \r\n to \n.
                 click.echo("\n".join(line.splitlines()))
+        add_representer_ordered_dict()
         res = yaml.safe_dump(
             _get_deployment_data_doc(),
             explicit_start=True,
@@ -81,6 +84,7 @@ def _collect_to_file(site_name, save_location):
                 save_files[repo_name] = open(save_file, 'w')
             LOG.debug("Collecting file %s to file %s", filename, save_file)
             save_files[repo_name].writelines(_read_and_format_yaml(filename))
+        add_representer_ordered_dict()
         save_files[curr_site_repo].writelines(
             yaml.safe_dump(
                 _get_deployment_data_doc(),
@@ -129,6 +133,7 @@ def render(site_name, output_stream, validate):
             explicit_start=True,
             explicit_end=True)
     else:
+        add_representer_ordered_dict()
         click.echo(
             yaml.dump_all(
                 rendered_documents,
@@ -185,21 +190,22 @@ def _get_deployment_data_doc():
         files.path_leaf(repo): _get_repo_deployment_data_stanza(repo)
         for repo in config.all_repos()
     }
-    return {
-        "schema": "pegleg/DeploymentData/v1",
-        "metadata": {
-            "schema": "metadata/Document/v1",
-            "name": "deployment-version",
-            "layeringDefinition": {
-                "abstract": False,
-                "layer": "global"
-            },
-            "storagePolicy": "cleartext",
-        },
-        "data": {
-            "documents": stanzas
-        }
-    }
+    return OrderedDict(
+        [
+            ("schema", "pegleg/DeploymentData/v1"),
+            (
+                "metadata",
+                OrderedDict(
+                    [
+                        ("schema", "metadata/Document/v1"),
+                        ("name", "deployment-version"),
+                        (
+                            "layeringDefinition",
+                            OrderedDict(
+                                [("abstract", False), ("layer", "global")])),
+                        ("storagePolicy", "cleartext"),
+                    ])), ("data", OrderedDict([("documents", stanzas)]))
+        ])
 
 
 def _get_repo_deployment_data_stanza(repo_path):

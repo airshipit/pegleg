@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from abc import ABC
+from collections import OrderedDict
 import logging
 import os
 
@@ -54,19 +55,20 @@ class BaseGenerator(ABC):
         :param str storage_policy: Storage policy for the secret data
         :param str secret_data: The data to be stored in this document.
         """
-        return {
-            'schema': 'deckhand/{}/v1'.format(kind),
-            'metadata': {
-                'schema': 'metadata/Document/v1',
-                'name': name,
-                'layeringDefinition': {
-                    'abstract': False,
-                    'layer': 'site',
-                },
-                'storagePolicy': storage_policy,
-            },
-            'data': secret_data,
-        }
+        layering_definition = OrderedDict(
+            [('abstract', False), ('layer', 'site')])
+        metadata = OrderedDict(
+            [
+                ('schema', 'metadata/Document/v1'), ('name', name),
+                ('layeringDefinition', layering_definition),
+                ('storagePolicy', storage_policy)
+            ])
+        data = OrderedDict(
+            [
+                ('schema', 'deckhand/{}/v1'.format(kind)),
+                ('metadata', metadata), ('data', secret_data)
+            ])
+        return data
 
     def get_save_path(self, passphrase_name):
         """Calculate and return the save path of the ``passphrase_name``."""

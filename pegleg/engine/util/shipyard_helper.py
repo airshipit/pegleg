@@ -23,6 +23,7 @@ import yaml
 
 from pegleg.engine import exceptions
 from pegleg.engine.util import files
+from pegleg.engine.util.files import add_representer_ordered_dict
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 
 LOG = logging.getLogger(__name__)
@@ -83,6 +84,7 @@ class ShipyardHelper(object):
                 docs=collected_documents[document])
             decrypted_documents = pegleg_secret_mgmt.get_decrypted_secrets()
             collection_data.extend(decrypted_documents)
+        add_representer_ordered_dict()
         collection_as_yaml = yaml.dump_all(
             collection_data, Dumper=yaml.SafeDumper)
 

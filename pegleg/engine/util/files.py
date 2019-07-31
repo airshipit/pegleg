@@ -240,6 +240,7 @@ def slurp(path):
 
 
 def dump(data, path, flag='w', **kwargs):
+    add_representer_ordered_dict()
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, flag) as f:
 
@@ -247,6 +248,7 @@ def dump(data, path, flag='w', **kwargs):
 
 
 def safe_dump(data, path, flag='w', **kwargs):
+    add_representer_ordered_dict()
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, flag) as f:
 
@@ -254,6 +256,7 @@ def safe_dump(data, path, flag='w', **kwargs):
 
 
 def dump_all(data, path, flag='w', **kwargs):
+    add_representer_ordered_dict()
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, flag) as f:
 
@@ -308,7 +311,7 @@ def read(path):
             raise click.ClickException('Failed to parse %s:\n%s' % (path, e))
 
 
-def write(data, file_path):
+def write(data, file_path, sort_keys=False):
     """
     Write the data to destination file_path.
 
@@ -319,7 +322,10 @@ def write(data, file_path):
     :type file_path: str
     :param data: data to be written to the destination file
     :type data: str, dict, or a list of dicts
+    :param sort_keys: sort keys alphabetically in output yaml
+    :type sort_keys: bool
     """
+    add_representer_ordered_dict()
     try:
         os.makedirs(os.path.dirname(os.path.abspath(file_path)), exist_ok=True)
         with open(file_path, 'w') as stream:
@@ -331,6 +337,7 @@ def write(data, file_path):
                 yaml.safe_dump_all(
                     data,
                     stream,
+                    sort_keys=sort_keys,
                     explicit_start=True,
                     explicit_end=True,
                     default_flow_style=False)
@@ -341,6 +348,17 @@ def write(data, file_path):
     except EnvironmentError as e:
         raise click.ClickError(
             "Couldn't write data to {}: {}".format(file_path, e))
+
+
+def add_representer_ordered_dict():
+    yaml.add_representer(
+        collections.OrderedDict,
+        lambda dumper, dict_data: dumper.represent_mapping(
+            'tag:yaml.org,2002:map', dict_data.items()))
+    yaml.add_representer(
+        collections.OrderedDict,
+        lambda dumper, dict_data: dumper.represent_mapping(
+            'tag:yaml.org,2002:map', dict_data.items()), yaml.SafeDumper)
 
 
 def _recurse_subdirs(search_path, depth):

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from collections import OrderedDict
 from datetime import datetime
 import logging
 
@@ -71,28 +71,36 @@ class PeglegManagedSecretsDocument(object):
         document.
         :rtype: dict
         """
-
-        doc = {
-            'schema': PEGLEG_MANAGED_SCHEMA,
-            'metadata': {
-                'name': secrets_document['metadata']['name'],
-                'schema': 'metadata/Document/v1',
-                'labels': secrets_document['metadata'].get('labels', {}),
-                'layeringDefinition': {
-                    'abstract': False,
-                    # The current requirement only requires site layer.
-                    'layer': 'site',
-                },
-                'storagePolicy': 'cleartext'
-            },
-            'data': {
-                'managedDocument': {
-                    'schema': secrets_document['schema'],
-                    'metadata': secrets_document['metadata'],
-                    'data': secrets_document['data']
-                }
-            }
-        }
+        layering_definition = OrderedDict(
+            [
+                ('abstract', False),
+                # The current requirement only requires site layer.
+                ('layer', 'site')
+            ])
+        metadata = OrderedDict(
+            [
+                ('name', secrets_document['metadata']['name']),
+                ('schema', 'metadata/Document/v1'),
+                ('labels', secrets_document['metadata'].get('labels', {})),
+                ('layeringDefinition', layering_definition),
+                ('storagePolicy', 'cleartext')
+            ])
+        data = OrderedDict(
+            [
+                (
+                    'managedDocument',
+                    OrderedDict(
+                        [
+                            ('schema', secrets_document['schema']),
+                            ('metadata', secrets_document['metadata']),
+                            ('data', secrets_document['data'])
+                        ]))
+            ])
+        doc = OrderedDict(
+            [
+                ('schema', PEGLEG_MANAGED_SCHEMA), ('metadata', metadata),
+                ('data', data)
+            ])
 
         if generated:
             doc['data'][GENERATED] = {

@@ -21,6 +21,7 @@ from pegleg import config
 from pegleg.engine.util.encryption import decrypt
 from pegleg.engine.util.encryption import encrypt
 from pegleg.engine.util import files
+from pegleg.engine.util.files import add_representer_ordered_dict
 from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument as PeglegManagedSecret
 
@@ -167,11 +168,12 @@ class PeglegSecretManagement(object):
         """Decrypt and unwrap pegleg managed encrypted secrets documents
         included in a site secrets file, and print the result to the standard
         out."""
-
+        add_representer_ordered_dict()
         secrets = self.get_decrypted_secrets()
 
         return yaml.safe_dump_all(
             secrets,
+            sort_keys=False,
             explicit_start=True,
             explicit_end=True,
             default_flow_style=False)

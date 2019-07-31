@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from collections import OrderedDict
 from glob import glob
 import logging
 import os
@@ -193,19 +193,23 @@ def wrap_secret(
     with open(filename, 'r') as in_fi:
         data = in_fi.read()
 
-    inner_doc = {
-        "schema": schema,
-        "data": data,
-        "metadata": {
-            "layeringDefinition": {
-                "abstract": False,
-                "layer": layer
-            },
-            "name": name,
-            "schema": "metadata/Document/v1",
-            "storagePolicy": "encrypted" if encrypt else "cleartext"
-        }
-    }
+    inner_doc = OrderedDict(
+        [
+            ("schema", schema), ("data", data),
+            (
+                "metadata",
+                OrderedDict(
+                    [
+                        (
+                            "layeringDefinition",
+                            OrderedDict(
+                                [("abstract", False), ("layer", layer)])),
+                        ("name", name), ("schema", "metadata/Document/v1"),
+                        (
+                            "storagePolicy",
+                            "encrypted" if encrypt else "cleartext")
+                    ]))
+        ])
     managed_secret = PeglegManagedSecret(inner_doc, author=author)
     if encrypt:
         psm = PeglegSecretManagement(
@@ -213,7 +217,7 @@ def wrap_secret(
         output_doc = psm.get_encrypted_secrets()[0][0]
     else:
         output_doc = managed_secret.pegleg_document
-    files.safe_dump(output_doc, output_path)
+    files.safe_dump(output_doc, output_path, sort_keys=False)
 
 
 def check_cert_expiry(site_name, duration=60):

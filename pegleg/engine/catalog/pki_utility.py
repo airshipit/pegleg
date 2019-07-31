@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import OrderedDict
 import datetime
 import json
 import logging
@@ -315,23 +316,24 @@ class PKIUtility(object):
         """
 
         wrapped_schema = 'deckhand/%s/v1' % kind
-        wrapped_metadata = {
-            'schema': 'metadata/Document/v1',
-            'name': name,
-            'layeringDefinition': {
-                'abstract': False,
-                'layer': 'site',
-            },
-            'storagePolicy': 'cleartext'
-        }
+        wrapped_metadata = OrderedDict(
+            [
+                ('schema', 'metadata/Document/v1'), ('name', name),
+                (
+                    'layeringDefinition',
+                    OrderedDict([
+                        ('abstract', False),
+                        ('layer', 'site'),
+                    ])), ('storagePolicy', 'cleartext')
+            ])
         wrapped_data = PKIUtility._block_literal(
             data, block_strings=block_strings)
 
-        document = {
-            "schema": wrapped_schema,
-            "metadata": wrapped_metadata,
-            "data": wrapped_data
-        }
+        document = OrderedDict(
+            [
+                ("schema", wrapped_schema), ("metadata", wrapped_metadata),
+                ("data", wrapped_data)
+            ])
 
         return PeglegManagedSecretsDocument(document).pegleg_document
 
