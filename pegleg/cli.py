@@ -332,6 +332,7 @@ def collection_default_callback(ctx, param, value):
 
 @site.command('upload', help='Upload documents to Shipyard')
 # Keystone authentication parameters
+@click.option('--os-domain-name', envvar='OS_DOMAIN_NAME', required=False)
 @click.option(
     '--os-project-domain-name',
     envvar='OS_PROJECT_DOMAIN_NAME',
@@ -378,25 +379,32 @@ def collection_default_callback(ctx, param, value):
 @SITE_REPOSITORY_ARGUMENT
 @click.pass_context
 def upload(
-        ctx, *, os_project_domain_name, os_user_domain_name, os_project_name,
-        os_username, os_password, os_auth_url, os_auth_token, context_marker,
-        site_name, buffer_mode, collection):
+        ctx, *, os_domain_name, os_project_domain_name, os_user_domain_name,
+        os_project_name, os_username, os_password, os_auth_url, os_auth_token,
+        context_marker, site_name, buffer_mode, collection):
     if not ctx.obj:
         ctx.obj = {}
 
     # Build API parameters required by Shipyard API Client.
     if os_auth_token:
         os.environ['OS_AUTH_TOKEN'] = os_auth_token
-        auth_vars = {'os_auth_token': os_auth_token}
+        auth_vars = {'token': os_auth_token, 'auth_url': os_auth_url}
     else:
         auth_vars = {
-            'project_domain_name': os_project_domain_name,
             'user_domain_name': os_user_domain_name,
             'project_name': os_project_name,
             'username': os_username,
             'password': os_password,
             'auth_url': os_auth_url
         }
+
+    # Domain-scoped params
+    if os_domain_name:
+        auth_vars['domain_name'] = os_domain_name
+        auth_vars['project_domain_name'] = None
+    # Project-scoped params
+    else:
+        auth_vars['project_domain_name'] = os_project_domain_name
 
     ctx.obj['API_PARAMETERS'] = {'auth_vars': auth_vars}
     ctx.obj['context_marker'] = str(context_marker)
