@@ -473,8 +473,13 @@ Generate PKI
 ^^^^^^^^^^^^
 
 Generate certificates and keys according to all PKICatalog documents in the
-site using the PKI module. Regenerating certificates can be
-accomplished by re-running this command.
+site using the PKI module. The default behavior is to generate all
+certificates that are not yet present. For example, the first time generate PKI
+is run or when new entries are added to the PKICatalogue, only those new
+entries will be generated on subsequent runs.
+
+Pegleg also supports a full regeneration of all certificates at any time, by
+using the --regenerate-all flag.
 
 Pegleg places generated document files in ``<site>/secrets/passphrases``,
 ``<site>/secrets/certificates``, or ``<site>/secrets/keypairs`` as
@@ -511,6 +516,10 @@ Minimum=0, no maximum.  Values less than 0 will raise an exception.
 NOTE: A generated certificate where days = 0 should only be used for testing.
 A certificate generated in such a way will be valid for 0 seconds.
 
+**--regenerate-all** (Optional, Default=False).
+
+Force Pegleg to regenerate all PKI items.
+
 Examples
 """"""""
 
@@ -520,7 +529,8 @@ Examples
     secrets generate-pki \
     <site_name> \
     -a <author> \
-    -d <days>
+    -d <days> \
+    --regenerate-all
 
 .. _command-line-repository-overrides:
 

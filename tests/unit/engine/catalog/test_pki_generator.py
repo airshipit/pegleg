@@ -63,6 +63,18 @@ _SITE_DEFINITION = textwrap.dedent(
     ...
     """)
 
+_LAYERING_DEFINITION = textwrap.dedent(
+    """
+    ---
+    schema: deckhand/LayeringPolicy/v1
+    metadata:
+      schema: metadata/Control/v1
+      name: layering-policy
+    data:
+      layerOrder:
+        - site
+    """)
+
 _CA_KEY_NAME = "kubernetes"
 _CERT_KEY_NAME = "kubelet-n3"
 _KEYPAIR_KEY_NAME = "service-account"
@@ -192,6 +204,8 @@ def create_tmp_pki_structure(tmpdir):
         test_structure = copy.deepcopy(_SITE_TEST_STRUCTURE)
         test_structure['files']['site-definition.yaml'] = yaml.safe_load(
             site_definition)
+        test_structure['files']['layering-definition.yaml'] = yaml.safe_load(
+            _LAYERING_DEFINITION)
         test_structure['directories']['pki']['files'][
             'pki-catalog.yaml'] = yaml.safe_load(pki_catalog)
 

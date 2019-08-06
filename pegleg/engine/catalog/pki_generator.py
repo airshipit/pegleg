@@ -21,6 +21,7 @@ from pegleg import config
 from pegleg.engine.catalog import pki_utility
 from pegleg.engine.common import managed_document as md
 from pegleg.engine import exceptions
+from pegleg.engine import site
 from pegleg.engine import util
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 
@@ -42,7 +43,12 @@ class PKIGenerator(object):
 
     """
     def __init__(
-            self, sitename, block_strings=True, author=None, duration=365):
+            self,
+            sitename,
+            block_strings=True,
+            author=None,
+            duration=365,
+            regenerate_all=False):
         """Constructor for ``PKIGenerator``.
 
         :param int duration: Duration in days that generated certificates
@@ -53,11 +59,12 @@ class PKIGenerator(object):
             block-style YAML string. Defaults to true.
         :param str author: Identifying name of the author generating new
             certificates.
-
+        :param bool regenerate_all: If Pegleg should regenerate all certs.
         """
 
+        self._regenerate_all = regenerate_all
         self._sitename = sitename
-        self._documents = util.definition.documents_for_site(sitename)
+        self._documents = site.get_rendered_docs(sitename)
         self._author = author
 
         self.keys = pki_utility.PKIUtility(
@@ -126,11 +133,10 @@ class PKIGenerator(object):
 
     def _get_or_gen(self, generator, kinds, document_name, *args, **kwargs):
         docs = self._find_docs(kinds, document_name)
-        if not docs:
+        if not docs or self._regenerate_all:
             docs = generator(document_name, *args, **kwargs)
         else:
             docs = PeglegSecretManagement(docs=docs)
-
         # Adding these to output should be idempotent, so we use a dict.
 
         for wrapper_doc in docs:

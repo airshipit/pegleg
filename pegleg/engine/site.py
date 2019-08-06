@@ -106,24 +106,7 @@ def collect(site_name, save_location):
 
 
 def render(site_name, output_stream, validate):
-    documents = []
-    # Ignore YAML tags, only construct dicts
-    SafeConstructor.add_multi_constructor(
-        '', lambda loader, suffix, node: None)
-    for filename in util.definition.site_files(site_name):
-        with open(filename, 'r') as f:
-            documents.extend(list(yaml.safe_load_all(f)))
-
-    rendered_documents, errors = util.deckhand.deckhand_render(
-        documents=documents, validate=validate)
-    err_msg = ''
-    if errors:
-        for err in errors:
-            if isinstance(err, tuple) and len(err) > 1:
-                err_msg += ': '.join(err) + '\n'
-            else:
-                err_msg += str(err) + '\n'
-        raise click.ClickException(err_msg)
+    rendered_documents = get_rendered_docs(site_name, validate=validate)
 
     if output_stream:
         files.dump_all(
@@ -140,6 +123,30 @@ def render(site_name, output_stream, validate):
                 default_flow_style=False,
                 explicit_start=True,
                 explicit_end=True))
+
+
+def get_rendered_docs(site_name, validate=True):
+    documents = []
+    # Ignore YAML tags, only construct dicts
+    SafeConstructor.add_multi_constructor(
+        '', lambda loader, suffix, node: None)
+    for filename in util.definition.site_files(site_name):
+        with open(filename, 'r') as f:
+            documents.extend(list(yaml.safe_load_all(f)))
+
+    rendered_documents, errors = util.deckhand.deckhand_render(
+        documents=documents, validate=validate)
+
+    if errors:
+        err_msg = ''
+        for err in errors:
+            if isinstance(err, tuple) and len(err) > 1:
+                err_msg += ': '.join(err) + '\n'
+            else:
+                err_msg += str(err) + '\n'
+        raise click.ClickException(err_msg)
+
+    return rendered_documents
 
 
 def list_(output_stream):
