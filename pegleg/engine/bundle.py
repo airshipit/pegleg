@@ -73,10 +73,15 @@ def build_genesis(build_path, encryption_key, validators, debug, site_name):
             substitute=True,
             allow_missing_substitutions=False,
             leave_kubectl=False)
+        # Both a policy and key are present, generate bundle with encryption
         if c.get_path('EncryptionPolicy:scripts.genesis') and encryption_key:
             Builder(c, validators=validators).build_all(output_dir=build_path)
-        else:
+        # A policy or key are present but not both, raise an error
+        elif c.get_path('EncryptionPolicy:scripts.genesis') or encryption_key:
             raise GenesisBundleEncryptionException()
+        # Neither policy or key are present, generate bundle without encryption
+        else:
+            Builder(c, validators=validators).build_all(output_dir=build_path)
 
     except exceptions.PromenadeException as e:
         LOG.error(
