@@ -49,12 +49,13 @@
 
 - job:
     name: pegleg-dependency-vulnerability-check
-    parent: openstack-tox
+    parent: tox-py36
     voting: false
     timeout: 600
-    nodeset: spyglass-single-node
+    nodeset: ubuntu-bionic
     vars:
       tox_envlist: safety
+      bindep_profile: test py36
 
 - job:
     name: airship-pegleg-docker-build-gate-ubuntu_xenial
