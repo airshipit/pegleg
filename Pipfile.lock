@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "82b92d92ddbd2d6ae72bfa461fc7f504505d90f64f2ddbc138153ed217e5b16b"
+            "sha256": "6d63b640e52a88bf1a5424ed1c2248246e720a9aeec666ed659c74046948bd5a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -282,7 +282,7 @@
         },
         "shipyard-client": {
             "git": "https://opendev.org/airship/shipyard.git",
-            "ref": "1472a22dce698ea77f15b007906b263eef470f52",
+            "ref": "9c5f68cf97585a86c9edfc3b24545b36bdd90e14",
             "subdirectory": "src/bin/shipyard_client"
         },
         "six": {

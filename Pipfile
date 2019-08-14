@@ -26,7 +26,7 @@ GitPython = "~=2.1.11"
 docker = ">=3.7.2"
 PyYAML = "~=5.1"
 deckhand = {git = "https://opendev.org/airship/deckhand.git",ref = "a4850f8c4fc02dd1971282c6d9e4beb9cd5be320"}
-shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "1472a22dce698ea77f15b007906b263eef470f52",subdirectory = "src/bin/shipyard_client"}
+shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "9c5f68cf97585a86c9edfc3b24545b36bdd90e14",subdirectory = "src/bin/shipyard_client"}
 promenade = {git = "https://opendev.org/airship/promenade.git",ref = "89f9842b2ec428709a05fd0a8d4cd1796043375d"}
 oslo-utils = "~=3.41.0"
 
