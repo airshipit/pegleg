@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include vcs-requirements.env
+
 PEGLEG_BUILD_CTX  ?= pegleg
 IMAGE_NAME        ?= pegleg
 IMAGE_PREFIX      ?= airshipit
@@ -75,7 +77,7 @@ ifeq ($(USE_PROXY), true)
 		--label "org.opencontainers.image.revision=$(COMMIT)" \
 		--label "org.opencontainers.image.created=$(shell date --rfc-3339=seconds --utc)" \
 		--label "org.opencontainers.image.title=$(IMAGE_NAME)" \
-		-f images/pegleg/Dockerfile.$(DISTRO) \
+		-f images/pegleg/Dockerfile.${DISTRO} \
 		$(_BASE_IMAGE_ARG) \
 		--build-arg http_proxy=$(PROXY) \
 		--build-arg https_proxy=$(PROXY) \
@@ -83,15 +85,21 @@ ifeq ($(USE_PROXY), true)
 		--build-arg HTTPS_PROXY=$(PROXY) \
 		--build-arg no_proxy=$(NO_PROXY) \
 		--build-arg NO_PROXY=$(NO_PROXY) \
-		--build-arg ctx_base=$(PEGLEG_BUILD_CTX) .
+		--build-arg ctx_base=$(PEGLEG_BUILD_CTX) . \
+		--build-arg DECKHAND_VERSION=${DECKHAND_VERSION} \
+		--build-arg PROMENADE_VERSION=${PROMENADE_VERSION} \
+		--build-arg SHIPYARD_VERSION=${SHIPYARD_VERSION}
 else
 	docker build -t $(IMAGE) --network=host --label $(LABEL) \
 		--label "org.opencontainers.image.revision=$(COMMIT)" \
 		--label "org.opencontainers.image.created=$(shell date --rfc-3339=seconds --utc)" \
 		--label "org.opencontainers.image.title=$(IMAGE_NAME)" \
-		-f images/pegleg/Dockerfile.$(DISTRO) \
+		-f images/pegleg/Dockerfile.${DISTRO} \
 		$(_BASE_IMAGE_ARG) \
-		--build-arg ctx_base=$(PEGLEG_BUILD_CTX) .
+		--build-arg ctx_base=$(PEGLEG_BUILD_CTX) . \
+		--build-arg DECKHAND_VERSION=${DECKHAND_VERSION} \
+		--build-arg PROMENADE_VERSION=${PROMENADE_VERSION} \
+		--build-arg SHIPYARD_VERSION=${SHIPYARD_VERSION}
 endif
 ifeq ($(PUSH_IMAGE), true)
 	docker push $(IMAGE)
