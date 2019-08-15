@@ -72,7 +72,7 @@ class GitInvalidRepoException(PeglegBaseException):
 
 class GitMissingUserException(PeglegBaseException):
     """Exception raised when a username is required, but not provided."""
-    message = 'Repo URL %(url)s reuqires a username, but none was provided.'
+    message = 'Repo URL %(url)s requires a username, but none was provided.'
 
 
 #
