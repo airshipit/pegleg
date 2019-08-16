@@ -11,6 +11,9 @@ LABEL org.opencontainers.image.licenses='Apache-2.0'
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
+ARG DECKHAND_VERSION=branch/master
+ARG SHIPYARD_VERSION=branch/master
+ARG PROMENADE_VERSION=branch/master
 
 RUN set -x \
     && zypper up -y \
@@ -38,7 +41,10 @@ VOLUME /var/pegleg
 WORKDIR /var/pegleg
 
 COPY requirements.txt /opt/pegleg/requirements.txt
-RUN pip3 install --no-cache-dir -r /opt/pegleg/requirements.txt
+RUN pip3 install -r https://opendev.org/airship/deckhand/raw/${DECKHAND_VERSION}/requirements.txt \
+    && pip3 install -r https://opendev.org/airship/promenade/raw/${PROMENADE_VERSION}/requirements.txt \
+    && pip3 install -r https://opendev.org/airship/shipyard/raw/${SHIPYARD_VERSION}/src/bin/shipyard_client/requirements.txt \
+    && pip3 install --no-cache-dir -r /opt/pegleg/requirements.txt
 
 COPY tools/install-cfssl.sh /opt/pegleg/tools/install-cfssl.sh
 RUN /opt/pegleg/tools/install-cfssl.sh ${CFSSLURL}
