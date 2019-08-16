@@ -8,7 +8,7 @@ click==7.0
 cryptography==2.3.1
 debtcollector==1.21.0
 docker==4.0.2
-git+https://opendev.org/airship/deckhand.git@a4850f8c4fc02dd1971282c6d9e4beb9cd5be320#egg=deckhand
+git+https://opendev.org/airship/deckhand.git@ecc7b834edf0278c935379e1ef54b9a2fe6a40ff#egg=deckhand
 git+https://opendev.org/airship/promenade.git@89f9842b2ec428709a05fd0a8d4cd1796043375d#egg=promenade
 git+https://opendev.org/airship/shipyard.git@9c5f68cf97585a86c9edfc3b24545b36bdd90e14#egg=shipyard-client&subdirectory=src/bin/shipyard_client
 gitdb2==2.0.5

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6d63b640e52a88bf1a5424ed1c2248246e720a9aeec666ed659c74046948bd5a"
+            "sha256": "b66461ab43a0a4969486776092dd6103e5bc4f7698f65a4bcb172858be9d7689"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -119,7 +119,7 @@
         },
         "deckhand": {
             "git": "https://opendev.org/airship/deckhand.git",
-            "ref": "a4850f8c4fc02dd1971282c6d9e4beb9cd5be320"
+            "ref": "ecc7b834edf0278c935379e1ef54b9a2fe6a40ff"
         },
         "docker": {
             "hashes": [
@@ -401,13 +401,6 @@
             ],
             "version": "==4.5.4"
         },
-        "ddt": {
-            "hashes": [
-                "sha256:474546b4020ce8a2f9550ba8899c28aa2c284c7bbf175bddede98be949d1ca7c",
-                "sha256:d13e6af8f36238e89d00f4ebccf2bda4f6d1878be560a6600689e42077e164e3"
-            ],
-            "version": "==1.2.1"
-        },
         "execnet": {
             "hashes": [
                 "sha256:0dd40ad3b960aae93bdad7fe1c3f049bbcc8fba47094655a4301f5b33e906816",
@@ -466,6 +459,7 @@
                 "sha256:23d3d873e008a513952355379d93cbcab874c58f4f034ff657c7a87422fa64e8",
                 "sha256:80d2de76188eabfbfcf27e6a37342c2827801e59c4cc14b0371c56fed43820e3"
             ],
+            "markers": "python_version < '3.8'",
             "version": "==0.19"
         },
         "mccabe": {
@@ -533,11 +527,11 @@
         },
         "pytest": {
             "hashes": [
-                "sha256:6ef6d06de77ce2961156013e9dff62f1b2688aa04d0dc244299fe7d67e09370d",
-                "sha256:a736fed91c12681a7b34617c8fcefe39ea04599ca72c608751c31d89579a3f77"
+                "sha256:95b1f6db806e5b1b5b443efeb58984c24945508f93a866c1719e1a507a957d7c",
+                "sha256:c3d5020755f70c82eceda3feaf556af9a341334414a8eca521a18f463bcead88"
             ],
             "index": "pypi",
-            "version": "==5.0.1"
+            "version": "==5.1.1"
         },
         "pytest-cov": {
             "hashes": [
