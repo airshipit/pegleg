@@ -363,7 +363,8 @@ def test_check_expiry(temp_deployment_files):
                         cert_info = pki_util.check_expiry(cert)
                         assert cert_info['expired'] is False, \
                             "%s is expired/expiring on %s" % \
-                            (generated_file.name, cert_info['expiry_date'])
+                            (result['metadata']['name'],
+                             cert_info['expiry_date'])
 
 
 @mock.patch.dict(

@@ -26,9 +26,9 @@ from pegleg.engine.util import git
 from tests.unit import test_utils
 
 TEST_PARAMS = {
-    "site_name": "airship-seaworthy",
+    "site_name": "seaworthy",
     "site_type": "foundry",
-    "repo_rev": '6b183e148b9bb7ba6f75c98dd13451088255c60b',
+    "repo_rev": '33bdd46754b7acabb2cbc2f4b335d34ecb80d4ce',
     "repo_name": "treasuremap",
     "repo_url": "https://opendev.org/airship/treasuremap.git",
 }
@@ -67,7 +67,7 @@ class BaseCLIActionTest(object):
     def setup_class(cls):
         cls.runner = CliRunner()
 
-        # Pin so we know that airship-seaworthy is a valid site.
+        # Pin so we know that seaworthy is a valid site.
         cls.site_name = TEST_PARAMS["site_name"]
         cls.site_type = TEST_PARAMS["site_type"]
 
@@ -551,7 +551,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
 
         repo_path = self.treasuremap_path
         file_path = os.path.join(
-            repo_path, "site", "airship-seaworthy", "secrets", "passphrases",
+            repo_path, "site", "seaworthy", "secrets", "passphrases",
             "ceph_fsid.yaml")
         with open(file_path, "r") as ceph_fsid_fi:
             ceph_fsid = yaml.safe_load(ceph_fsid_fi)
@@ -566,7 +566,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
 
         assert result.exit_code == 0
 
-        with open(os.path.join(repo_path, "site", "airship-seaworthy",
+        with open(os.path.join(repo_path, "site", "seaworthy",
                                "secrets", "passphrases", "ceph_fsid.yaml"),
                   "r") \
                 as ceph_fsid_fi:
@@ -602,7 +602,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
 
         repo_path = self.treasuremap_path
         file_dir = os.path.join(
-            repo_path, "site", "airship-seaworthy", "secrets", "certificates")
+            repo_path, "site", "seaworthy", "secrets", "certificates")
         file_path = os.path.join(file_dir, "test.crt")
         output_path = os.path.join(file_dir, "test.yaml")
 
