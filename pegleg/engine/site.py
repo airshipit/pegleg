@@ -54,7 +54,7 @@ def _collect_to_stdout(site_name):
                 click.echo("\n".join(line.splitlines()))
         add_representer_ordered_dict()
         res = yaml.safe_dump(
-            _get_deployment_data_doc(),
+            get_deployment_data_doc(),
             explicit_start=True,
             explicit_end=True,
             default_flow_style=False)
@@ -87,7 +87,7 @@ def _collect_to_file(site_name, save_location):
         add_representer_ordered_dict()
         save_files[curr_site_repo].writelines(
             yaml.safe_dump(
-                _get_deployment_data_doc(),
+                get_deployment_data_doc(),
                 default_flow_style=False,
                 explicit_start=True,
                 explicit_end=True))
@@ -107,7 +107,7 @@ def collect(site_name, save_location):
 
 def render(site_name, output_stream, validate):
     rendered_documents = get_rendered_docs(site_name, validate=validate)
-
+    rendered_documents.append(get_deployment_data_doc())
     if output_stream:
         files.dump_all(
             rendered_documents,
@@ -192,7 +192,7 @@ def show(site_name, output_stream):
         click.echo(msg)
 
 
-def _get_deployment_data_doc():
+def get_deployment_data_doc():
     stanzas = {
         files.path_leaf(repo): _get_repo_deployment_data_stanza(repo)
         for repo in config.all_repos()
