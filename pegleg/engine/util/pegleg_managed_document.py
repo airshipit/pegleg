@@ -173,6 +173,7 @@ class PeglegManagedSecretsDocument(object):
     def set_decrypted(self):
         """Mark the pegleg managed document as un-encrypted."""
         self.data.pop(ENCRYPTED)
+        self._embedded_document[METADATA][STORAGE_POLICY] = 'cleartext'
 
     def set_secret(self, secret):
         self._embedded_document['data'] = secret

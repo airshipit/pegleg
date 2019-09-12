@@ -177,8 +177,8 @@ data: {0}-password
             "site/cicd/secrets/passphrases/"
             "cicd-passphrase-encrypted.yaml"))
     decrypted = secrets.decrypt(encrypted_path)
-    assert yaml.safe_load(
-        decrypted[encrypted_path]) == yaml.safe_load(passphrase_doc)
+    assert yaml.safe_load(decrypted[encrypted_path])['data'] == yaml.safe_load(
+        passphrase_doc)['data']
 
 
 @mock.patch.dict(
@@ -297,8 +297,6 @@ def test_encrypt_decrypt_using_docs(tmpdir):
     assert test_data[0]['schema'] == decrypted_data[0]['schema']
     assert test_data[0]['metadata']['name'] == decrypted_data[0]['metadata'][
         'name']
-    assert test_data[0]['metadata']['storagePolicy'] == decrypted_data[0][
-        'metadata']['storagePolicy']
 
 
 @pytest.mark.skipif(
