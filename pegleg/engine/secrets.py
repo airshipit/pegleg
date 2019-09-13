@@ -148,7 +148,7 @@ def generate_passphrases(
     :param str site_name: The site to read from
     :param str save_location: Location to write files to
     :param str author: Author who's generating the files
-    :param bool interactive: Whether to generate the results interactively
+    :param bool interactive: Whether to allow user input for passphrases
     :param bool force_cleartext: Whether to generate results in clear text
     """
 

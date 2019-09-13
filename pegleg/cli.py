@@ -632,7 +632,7 @@ def generate():
     'interactive',
     is_flag=True,
     default=False,
-    help='Generate passphrases interactively, not automatically')
+    help='Enables input prompts for "prompt: true" passphrases')
 @click.option(
     '--force-cleartext',
     'force_cleartext',

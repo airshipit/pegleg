@@ -888,7 +888,9 @@ are placed in the following folder structure under ``save_location``:
 
 **-i / --interactive** (Optional). False by default.
 
-Generate passphrases interactively, not automatically.
+Enables input prompts for "prompt: true" passphrases. Input prompts are
+otherwise disabled by default and prompted passphrases will be
+skipped.
 
 **--force-cleartext** (Optional). False by default.
 
