@@ -54,7 +54,6 @@ class PassphraseGenerator(BaseGenerator):
               self).__init__(sitename, save_location, author)
         self._catalog = PassphraseCatalog(
             self._sitename, documents=self._documents)
-        self._pass_util = CryptoString()
 
     def generate(self, interactive=False, force_cleartext=False):
         """
@@ -80,6 +79,7 @@ class PassphraseGenerator(BaseGenerator):
             passphrase = None
             passphrase_type = self._catalog.get_passphrase_type(p_name)
             prompt = self._catalog.is_passphrase_prompt(p_name)
+            profile = self._catalog.get_passphrase_profile(p_name)
             if interactive and prompt:
                 auto_allowed = regenerable
 
@@ -111,7 +111,7 @@ class PassphraseGenerator(BaseGenerator):
                 if passphrase_type == 'uuid':  # nosec
                     passphrase = uuidutils.generate_uuid()
                 else:
-                    passphrase = self._pass_util.get_crypto_string(
+                    passphrase = CryptoString(profile).get_crypto_string(
                         self._catalog.get_length(p_name))
                     if passphrase_type == 'base64':  # nosec
                         # Take the randomly generated string and convert to a

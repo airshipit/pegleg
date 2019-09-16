@@ -113,6 +113,13 @@ class InvalidPassphraseRegeneration(PeglegBaseException):
         'values are: %(validvalues)s.')
 
 
+class InvalidPassphraseProfile(PeglegBaseException):
+    """Invalid Passphrase profile field"""
+    message = (
+        'Invalid Passphrase profile %(pprofile)s specified. '
+        'Valid values are: %(validvalues)s.')
+
+
 class GenesisBundleEncryptionException(PeglegBaseException):
     """Exception raised when encryption of the genesis bundle fails."""
 

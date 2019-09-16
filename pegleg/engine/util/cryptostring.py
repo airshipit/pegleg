@@ -15,14 +15,30 @@
 import random
 import string
 
+from pegleg.engine.catalogs import passphrase_profiles
+from pegleg.engine import exceptions
+
 __all__ = ['CryptoString']
 
 
 class CryptoString(object):
-    def __init__(self):
-        punctuation = '@#&-+=?'
-        self._pool = string.ascii_letters + string.digits + punctuation
+    def __init__(self, profile=None):
+        if profile and profile.lower() in passphrase_profiles.VALID_PROFILES:
+            self._pool = passphrase_profiles.PROFILES[profile.lower()]
+        elif profile:
+            raise exceptions.InvalidPassphraseProfile(
+                pprofile=profile.lower(),
+                validvalues=passphrase_profiles.VALID_PROFILES)
+        else:
+            self._pool = passphrase_profiles.PROFILES['default']
         self._random = random.SystemRandom()
+        self.determine_char_sets()
+
+    def determine_char_sets(self):
+        self.test_upper = self.has_upper(self._pool)
+        self.test_lower = self.has_lower(self._pool)
+        self.test_number = self.has_number(self._pool)
+        self.test_symbol = self.has_symbol(self._pool)
 
     def has_upper(self, crypto_str):
         """Check if string contains an uppercase letter
@@ -69,13 +85,20 @@ class CryptoString(object):
 
         :param str crypto_str: The string to test.
         :returns: True if string contains at least one each: uppercase letter,
-            lowercase letter, number and symbol
+            lowercase letter, number and symbol if that character set is
+            present in the original passphrase pool.
         :rtype: boolean
         """
 
-        for test in [self.has_upper, self.has_lower, self.has_number,
-                     self.has_symbol]:
-            if not test(crypto_str):
+        test_cases = [
+            self.test_upper, self.test_lower, self.test_number,
+            self.test_symbol
+        ]
+        tests = [
+            self.has_upper, self.has_lower, self.has_number, self.has_symbol
+        ]
+        for (test_case, test) in zip(test_cases, tests):
+            if test_case and not test(crypto_str):
                 return False
 
         return True

@@ -15,6 +15,7 @@
 import logging
 
 from pegleg.engine.catalogs.base_catalog import BaseCatalog
+from pegleg.engine.catalogs import passphrase_profiles
 from pegleg.engine import exceptions
 
 LOG = logging.getLogger(__name__)
@@ -34,6 +35,8 @@ P_DEFAULT_REGENERABLE = True
 P_DEFAULT_PROMPT = False
 VALID_PASSPHRASE_TYPES = ['passphrase', 'base64', 'uuid']
 VALID_BOOLEAN_FIELDS = [True, False]
+P_PROFILE = 'profile'
+P_DEFAULT_PROFILE = 'default'
 
 __all__ = ['PassphraseCatalog']
 
@@ -169,3 +172,25 @@ class PassphraseCatalog(BaseCatalog):
                             validvalues=VALID_BOOLEAN_FIELDS)
                     else:
                         return passphrase_prompt
+
+    def get_passphrase_profile(self, passphrase_name):
+        """Return the profile field of the ``passphrase_name``.
+
+        Determine which profile this passphrase should use when selecting
+        the pool to generate passphrase from.
+        If no option is specified, use default profile.  See
+        pegleg.engine.catalogs.passphrase_profiles for default and valid
+        options.
+        """
+
+        for c_doc in self._catalog_docs:
+            for passphrase in c_doc['data']['passphrases']:
+                if passphrase[P_DOCUMENT_NAME] == passphrase_name:
+                    profile = passphrase.get(P_PROFILE,
+                                             P_DEFAULT_PROFILE).lower()
+                    if profile not in passphrase_profiles.VALID_PROFILES:
+                        raise exceptions.InvalidPassphraseProfile(
+                            pprofile=profile,
+                            validvalues=passphrase_profiles.VALID_PROFILES)
+                    else:
+                        return profile

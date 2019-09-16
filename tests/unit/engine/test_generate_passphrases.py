@@ -119,6 +119,50 @@ data:
 ...
 """)
 
+TEST_PROFILES_CATALOG = yaml.safe_load(
+    """
+---
+schema: pegleg/PassphraseCatalog/v1
+metadata:
+  schema: metadata/Document/v1
+  name: cluster-passphrases
+  layeringDefinition:
+    abstract: false
+    layer: global
+  storagePolicy: cleartext
+data:
+  passphrases:
+    - description: 'default profile'
+      document_name: default_passphrase
+      encrypted: true
+      profile: default
+    - description: 'alphanumeric profile'
+      document_name: alphanumeric_passphrase
+      encrypted: true
+      profile: alphanumeric
+    - description: 'alphanumeric_lower profile'
+      document_name: alphanumeric_lower_passphrase
+      encrypted: true
+      profile: alphanumeric_lower
+    - description: 'alphanumeric_upper profile'
+      document_name: alphanumeric_upper_passphrase
+      encrypted: true
+      profile: alphanumeric_upper
+    - description: 'all profile'
+      document_name: all_passphrase
+      encrypted: true
+      profile: all
+    - description: 'hex_lower profile'
+      document_name: hex_lower_passphrase
+      encrypted: true
+      profile: hex_lower
+    - description: 'hex_upper profile'
+      document_name: hex_upper_passphrase
+      encrypted: true
+      profile: hex_upper
+...
+""")
+
 TEST_REPOSITORIES = {
     'repositories': {
         'global': {
@@ -156,6 +200,7 @@ TEST_GLOBAL_SITE_DOCUMENTS = [
     TEST_SITE_DEFINITION, TEST_GLOBAL_PASSPHRASES_CATALOG
 ]
 TEST_TYPE_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_TYPES_CATALOG]
+TEST_PROFILES_SITE_DOCUMENTS = [TEST_SITE_DEFINITION, TEST_PROFILES_CATALOG]
 
 
 @mock.patch.object(
@@ -329,3 +374,93 @@ def test_uuid_passphrase_catalog(*_):
                 os.environ['PEGLEG_SALT'].encode())
             if passphrase_file_name == "uuid_passphrase_doc.yaml":
                 assert uuid.UUID(decrypted_passphrase.decode()).version == 4
+
+
+@mock.patch.object(
+    util.definition,
+    'documents_for_site',
+    autospec=True,
+    return_value=TEST_PROFILES_SITE_DOCUMENTS)
+@mock.patch.object(
+    pegleg.config,
+    'get_site_repo',
+    autospec=True,
+    return_value='cicd_site_repo')
+@mock.patch.object(
+    util.definition,
+    'site_files',
+    autospec=True,
+    return_value=[
+        'cicd_global_repo/site/cicd/passphrases/passphrase-catalog.yaml',
+    ])
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
+def test_profiles_catalog(*_):
+    _dir = tempfile.mkdtemp()
+    os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
+    PassphraseGenerator('cicd', _dir, 'test_author').generate()
+    s_util = CryptoString()
+
+    for passphrase in TEST_PROFILES_CATALOG['data']['passphrases']:
+        passphrase_file_name = '{}.yaml'.format(passphrase['document_name'])
+        passphrase_file_path = os.path.join(
+            _dir, 'site', 'cicd', 'secrets', 'passphrases',
+            passphrase_file_name)
+        assert os.path.isfile(passphrase_file_path)
+        with open(passphrase_file_path) as stream:
+            doc = yaml.safe_load(stream)
+            decrypted_passphrase = encryption.decrypt(
+                doc['data']['managedDocument']['data'],
+                os.environ['PEGLEG_PASSPHRASE'].encode(),
+                os.environ['PEGLEG_SALT'].encode()).decode()
+            assert len(decrypted_passphrase) == 24
+            if passphrase_file_name == "default_passphrase.yaml":
+                assert s_util.has_lower(decrypted_passphrase) is True
+                assert s_util.has_upper(decrypted_passphrase) is True
+                assert s_util.has_number(decrypted_passphrase) is True
+                assert s_util.has_symbol(decrypted_passphrase) is True
+                bad_symbols = any(
+                    char in '!"$%()*,./:;<>[]^_`{|}~\''
+                    for char in decrypted_passphrase)
+                assert not bad_symbols
+            elif passphrase_file_name == "alphanumeric_passphrase.yaml":
+                assert s_util.has_lower(decrypted_passphrase) is True
+                assert s_util.has_upper(decrypted_passphrase) is True
+                assert s_util.has_number(decrypted_passphrase) is True
+                assert s_util.has_symbol(decrypted_passphrase) is False
+            elif passphrase_file_name == "alphanumeric_lower_passphrase.yaml":
+                assert s_util.has_lower(decrypted_passphrase) is True
+                assert s_util.has_upper(decrypted_passphrase) is False
+                assert s_util.has_number(decrypted_passphrase) is True
+                assert s_util.has_symbol(decrypted_passphrase) is False
+            elif passphrase_file_name == "alphanumeric_upper_passphrase.yaml":
+                assert s_util.has_lower(decrypted_passphrase) is False
+                assert s_util.has_upper(decrypted_passphrase) is True
+                assert s_util.has_number(decrypted_passphrase) is True
+                assert s_util.has_symbol(decrypted_passphrase) is False
+            elif passphrase_file_name == "all_passphrase.yaml":
+                assert s_util.has_lower(decrypted_passphrase) is True
+                assert s_util.has_upper(decrypted_passphrase) is True
+                assert s_util.has_number(decrypted_passphrase) is True
+                assert s_util.has_symbol(decrypted_passphrase) is True
+            elif passphrase_file_name == "hex_lower_passphrase.yaml":
+                assert s_util.has_lower(decrypted_passphrase) is True
+                assert s_util.has_upper(decrypted_passphrase) is False
+                assert s_util.has_number(decrypted_passphrase) is True
+                assert s_util.has_symbol(decrypted_passphrase) is False
+                bad_letters = any(
+                    char in 'ghijklmnopqrstuvwxyz'
+                    for char in decrypted_passphrase)
+                assert not bad_letters
+            elif passphrase_file_name == "hex_upper_passphrase.yaml":
+                assert s_util.has_lower(decrypted_passphrase) is False
+                assert s_util.has_upper(decrypted_passphrase) is True
+                assert s_util.has_number(decrypted_passphrase) is True
+                assert s_util.has_symbol(decrypted_passphrase) is False
+                bad_letters = any(
+                    char in 'GHIJKLMNOPQRSTUVWXYZ'
+                    for char in decrypted_passphrase)
+                assert not bad_letters

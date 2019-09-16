@@ -93,3 +93,73 @@ def test_cryptostring_has_all():
     assert s_util.validate_crypto_str(crypto_string) is False
     crypto_string = 'ThisPasswordH4sNoSymbols'
     assert s_util.validate_crypto_str(crypto_string) is False
+
+
+def test_cryptostring_default_profile():
+    s_util = CryptoString(profile='default')
+    crypto_string = s_util.get_crypto_string()
+    assert s_util.has_lower(crypto_string) is True
+    assert s_util.has_upper(crypto_string) is True
+    assert s_util.has_number(crypto_string) is True
+    assert s_util.has_symbol(crypto_string) is True
+    bad_symbols = any(
+        char in '!"$%()*,./:;<>[]^_`{|}~\'' for char in crypto_string)
+    assert not bad_symbols
+
+
+def test_cryptostring_alphanumeric_profile():
+    s_util = CryptoString(profile='alphanumeric')
+    crypto_string = s_util.get_crypto_string()
+    assert s_util.has_lower(crypto_string) is True
+    assert s_util.has_upper(crypto_string) is True
+    assert s_util.has_number(crypto_string) is True
+    assert s_util.has_symbol(crypto_string) is False
+
+
+def test_cryptostring_alphanumeric_lower_profile():
+    s_util = CryptoString(profile='alphanumeric_lower')
+    crypto_string = s_util.get_crypto_string()
+    assert s_util.has_lower(crypto_string) is True
+    assert s_util.has_upper(crypto_string) is False
+    assert s_util.has_number(crypto_string) is True
+    assert s_util.has_symbol(crypto_string) is False
+
+
+def test_cryptostring_alphanumeric_upper_profile():
+    s_util = CryptoString(profile='alphanumeric_upper')
+    crypto_string = s_util.get_crypto_string()
+    assert s_util.has_lower(crypto_string) is False
+    assert s_util.has_upper(crypto_string) is True
+    assert s_util.has_number(crypto_string) is True
+    assert s_util.has_symbol(crypto_string) is False
+
+
+def test_cryptostring_all_profile():
+    s_util = CryptoString(profile='all')
+    crypto_string = s_util.get_crypto_string()
+    assert s_util.has_lower(crypto_string) is True
+    assert s_util.has_upper(crypto_string) is True
+    assert s_util.has_number(crypto_string) is True
+    assert s_util.has_symbol(crypto_string) is True
+
+
+def test_cryptostring_hex_lower_profile():
+    s_util = CryptoString(profile='hex_lower')
+    crypto_string = s_util.get_crypto_string()
+    assert s_util.has_lower(crypto_string) is True
+    assert s_util.has_upper(crypto_string) is False
+    assert s_util.has_number(crypto_string) is True
+    assert s_util.has_symbol(crypto_string) is False
+    bad_letters = any(char in 'ghijklmnopqrstuvwxyz' for char in crypto_string)
+    assert not bad_letters
+
+
+def test_cryptostring_hex_upper_profile():
+    s_util = CryptoString(profile='hex_upper')
+    crypto_string = s_util.get_crypto_string()
+    assert s_util.has_lower(crypto_string) is False
+    assert s_util.has_upper(crypto_string) is True
+    assert s_util.has_number(crypto_string) is True
+    assert s_util.has_symbol(crypto_string) is False
+    bad_letters = any(char in 'GHIJKLMNOPQRSTUVWXYZ' for char in crypto_string)
+    assert not bad_letters
