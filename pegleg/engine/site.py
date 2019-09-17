@@ -26,6 +26,7 @@ from pegleg import config
 from pegleg.engine import util
 from pegleg.engine.util import files
 from pegleg.engine.util.files import add_representer_ordered_dict
+from pegleg.engine.util.git import TEMP_PEGLEG_COMMIT_MSG
 
 __all__ = ('collect', 'list_', 'show', 'render')
 
@@ -219,6 +220,20 @@ def _get_repo_deployment_data_stanza(repo_path):
     try:
         repo = git.Repo(repo_path)
         commit = repo.commit()
+        contains_pegleg_commit = TEMP_PEGLEG_COMMIT_MSG in commit.message
+
+        # The repo may not appear dirty if Pegleg has made a temporary commit
+        # on top of changed/untracked files, but we know if that temporary
+        # commit happened the repo is indeed dirty
+        dirty = (repo.is_dirty() or contains_pegleg_commit)
+
+        if contains_pegleg_commit:
+            # The commit grabbed above isn't really what we want this data to
+            # reflect, because it was a commit made by Pegleg itself.
+            # Grab the commit before Pegleg made its temporary commit(s)
+            while (TEMP_PEGLEG_COMMIT_MSG in commit.message
+                   and len(commit.parents) > 0):
+                commit = commit.parents[0]
 
         # If we're at a particular tag, reference it
         tag = [tag.name for tag in repo.tags if tag.commit == commit]
@@ -233,6 +248,6 @@ def _get_repo_deployment_data_stanza(repo_path):
                     tag = "Detached HEAD"
                 else:
                     raise e
-        return {"commit": commit.hexsha, "tag": tag, "dirty": repo.is_dirty()}
+        return {"commit": commit.hexsha, "tag": tag, "dirty": dirty}
     except git.InvalidGitRepositoryError:
         return {"commit": "None", "tag": "None", "dirty": "None"}

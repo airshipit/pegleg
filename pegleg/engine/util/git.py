@@ -30,6 +30,8 @@ __all__ = (
     'git_handler', 'is_repository', 'is_equal', 'repo_url', 'repo_name',
     'normalize_repo_path')
 
+TEMP_PEGLEG_COMMIT_MSG = 'Temporary Pegleg commit'
+
 
 def git_handler(
         repo_url, ref=None, proxy_server=None, auth_key=None, clone_path=None):
@@ -107,7 +109,7 @@ def git_handler(
                 'tracked/untracked changes to ref=%s', repo_name(repo_url),
                 ref)
             repo.git.add(all=True)
-            repo.index.commit('Temporary Pegleg commit')
+            repo.index.commit(TEMP_PEGLEG_COMMIT_MSG)
 
         try:
             # Check whether the ref exists locally.
