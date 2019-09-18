@@ -22,6 +22,7 @@ from shipyard_client.api_client.shipyardclient_context import \
 import yaml
 
 from pegleg.engine import exceptions
+from pegleg.engine import site
 from pegleg.engine.util import files
 from pegleg.engine.util.files import add_representer_ordered_dict
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
@@ -76,7 +77,7 @@ class ShipyardHelper(object):
 
         collected_documents = files.collect_files_by_repo(self.site_name)
 
-        collection_data = []
+        collection_data = [site.get_deployment_data_doc()]
         LOG.info("Processing %d collection(s)", len(collected_documents))
         for idx, document in enumerate(collected_documents):
             # Decrypt the documents if encrypted

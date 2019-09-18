@@ -114,3 +114,6 @@ AUTHORS
 
 # Ansible
 *.retry
+
+# Linux
+~

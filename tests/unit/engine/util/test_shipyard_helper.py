@@ -20,6 +20,7 @@ import pytest
 import yaml
 
 from pegleg.engine import util
+from pegleg.engine.site import get_deployment_data_doc
 from pegleg.engine.util.shipyard_helper import ShipyardHelper
 from pegleg.engine.util.shipyard_helper import ShipyardClient
 
@@ -151,6 +152,10 @@ def _get_data_as_collection(data):
     return yaml.dump_all(collection, Dumper=yaml.SafeDumper)
 
 
+def _get_deployment_data_as_yaml():
+    return yaml.safe_dump(get_deployment_data_doc())
+
+
 def test_shipyard_helper_init_():
     """ Tests ShipyardHelper init method """
     # Scenario:
@@ -197,7 +202,11 @@ def test_upload_documents(*args):
 
         # Validate Shipyard call to post configdocs was invoked with correct
         # collection name and buffer mode.
-        expected_data = _get_data_as_collection(MULTI_REPO_DATA)
+        expected_data = '---\n'.join(
+            [
+                _get_deployment_data_as_yaml(),
+                _get_data_as_collection(MULTI_REPO_DATA)
+            ])
         mock_api_client.post_configdocs.assert_called_with(
             collection_id='test-site',
             buffer_mode='replace',
