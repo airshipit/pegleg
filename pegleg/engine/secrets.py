@@ -25,6 +25,7 @@ from pegleg.engine import exceptions
 from pegleg.engine.generators.passphrase_generator import PassphraseGenerator
 from pegleg.engine.util.cryptostring import CryptoString
 from pegleg.engine.util import definition
+from pegleg.engine.util import encryption
 from pegleg.engine.util import files
 from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument as PeglegManagedSecret
@@ -275,26 +276,38 @@ def get_global_creds(site_name):
     :return: Either the global, or site level - passphrase and salt
     """
 
-    log_msg = "Multiple documents containing {} detected.  Using latest."
+    config.set_passphrase()
+    config.set_salt()
     global_passphrase = None
     global_salt = None
-    docs = definition.site_files(site_name)
-    for doc in docs:
-        with open(doc, 'r') as f:
-            results = yaml.safe_load_all(f)  # Validate valid YAML.
-            results = PeglegSecretManagement(
-                docs=results).get_decrypted_secrets()
-            for result in results:
-                if result['schema'] == "deckhand/Passphrase/v1":
-                    if result['metadata']['name'] == 'global_passphrase':
-                        if global_passphrase:
-                            LOG.warn(log_msg.format('global_passphrase'))
-                        global_passphrase = result['data'].encode()
-                    if result['metadata']['name'] == 'global_salt':
-                        if global_salt:
-                            LOG.warn(log_msg.format('global_salt'))
-                        global_salt = result['data'].encode()
+    docs = definition.documents_for_site(site_name)
 
+    for doc in docs:
+        if doc['schema'] == 'pegleg/PeglegManagedDocument/v1':
+            try:
+                name = doc['data']['managedDocument']['metadata']['name']
+                schema = doc['data']['managedDocument']['schema']
+                data = doc['data']['managedDocument']['data']
+                if schema == 'deckhand/Passphrase/v1':
+                    if name == 'global_passphrase':
+                        global_passphrase = encryption.decrypt(
+                            data, config.get_passphrase(), config.get_salt())
+                    elif name == 'global_salt':
+                        global_salt = encryption.decrypt(
+                            data, config.get_passphrase(), config.get_salt())
+            except KeyError:
+                continue
+        else:
+            try:
+                name = doc['metadata']['name']
+                schema = doc['schema']
+                data = doc['data']
+                if name == 'global_passphrase':
+                    global_passphrase = data.encode()
+                elif name == 'global_salt':
+                    global_salt = data.encode()
+            except KeyError:
+                continue
         # Break out of search if both passphrase and salt are found
         if global_passphrase and global_salt:
             return (global_passphrase, global_salt)

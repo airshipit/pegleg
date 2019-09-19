@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from collections import OrderedDict
 from datetime import datetime
 import logging
@@ -23,6 +24,7 @@ ENCRYPTED = 'encrypted'
 GENERATED = 'generated'
 STORAGE_POLICY = 'storagePolicy'
 METADATA = 'metadata'
+DEFAULT_LAYER = 'site'
 LOG = logging.getLogger(__name__)
 
 __all__ = ['PeglegManagedSecretsDocument']
@@ -71,12 +73,11 @@ class PeglegManagedSecretsDocument(object):
         document.
         :rtype: dict
         """
+        layer = secrets_document.get('metadata',
+                                     {}).get('layeringDefinition',
+                                             {}).get('layer', DEFAULT_LAYER)
         layering_definition = OrderedDict(
-            [
-                ('abstract', False),
-                # The current requirement only requires site layer.
-                ('layer', 'site')
-            ])
+            [('abstract', False), ('layer', layer)])
         metadata = OrderedDict(
             [
                 ('name', secrets_document['metadata']['name']),

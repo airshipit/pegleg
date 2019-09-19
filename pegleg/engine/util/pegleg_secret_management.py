@@ -49,13 +49,6 @@ class PeglegSecretManagement(object):
         config.set_passphrase()
         config.set_salt()
 
-        # Check if we're working with a specific site, if so determine if the
-        # global encryption keys already exist. If they don't, set them.
-        if site_name:
-            if not (config.get_global_passphrase()
-                    and config.get_global_salt()):
-                config.set_global_enc_keys(site_name)
-
         if all([file_path, docs]) or not any([file_path, docs]):
             raise ValueError(
                 'Either `file_path` or `docs` must be '
