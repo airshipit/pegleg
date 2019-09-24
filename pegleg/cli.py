@@ -132,19 +132,30 @@ SITE_REPOSITORY_ARGUMENT = click.argument(
     is_flag=True,
     default=False,
     help='Enable debug logging')
-def main(*, verbose):
+@click.option(
+    '-l',
+    '--logging-level',
+    'logging_level',
+    default='40',
+    show_default=True,
+    type=click.Choice(['10', '20', '30', '40', '50']),
+    help='Sets logging level where:\n'
+    '10=DEBUG\n'
+    '20=INFO\n'
+    '30=WARNING\n'
+    '40=ERROR\n'
+    '50=CRITICAL')
+def main(*, verbose, logging_level):
     """Main CLI meta-group, which includes the following groups:
 
     * site: site-level actions
     * repo: repository-level actions
 
     """
-
+    lvl = logging_level
     if verbose:
-        log_level = logging.DEBUG
-    else:
-        log_level = logging.ERROR
-    logging.basicConfig(format=LOG_FORMAT, level=log_level)
+        lvl = logging.DEBUG
+    logging.basicConfig(format=LOG_FORMAT, level=int(lvl))
 
 
 @main.group(help='Commands related to repositories')
