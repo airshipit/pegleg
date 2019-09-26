@@ -81,6 +81,19 @@ CLI Options
 
 Enable debug logging.
 
+**-l / --logging-level** (Optional, Default=40).
+
+Specifies the logging level, as a number, with which to run pegleg. The
+available levels are as follows:
+
+* 10 (DEBUG)
+* 20 (INFO)
+* 30 (WARNING)
+* 40 (ERROR)
+* 50 (CRITICAL)
+
+The `-v` option will override any logging level specified in favor of DEBUG.
+
 .. _repo-group:
 
 Repo Group
