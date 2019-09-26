@@ -1,4 +1,4 @@
-# Copyright 2018 AT&T Intellectual Property.  All other rights reserved.
+# Copyright 2019 AT&T Intellectual Property.  All other rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,118 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import functools
 import logging
-import os
 import warnings
 
 import click
 
-from pegleg import config
-from pegleg import engine
-from pegleg.engine import bundle
-from pegleg.engine import catalog
-from pegleg.engine.secrets import wrap_secret
-from pegleg.engine.util import files
-from pegleg.engine.util.shipyard_helper import ShipyardHelper
+from pegleg.cli import utils
+from pegleg import pegleg_main
 
 LOG = logging.getLogger(__name__)
-
-LOG_FORMAT = '%(asctime)s %(levelname)-8s %(name)s:%(funcName)s [%(lineno)3d] %(message)s'  # noqa
 
 CONTEXT_SETTINGS = {
     'help_option_names': ['-h', '--help'],
 }
-
-
-def _process_repositories_callback(ctx, param, value):
-    """Convenient callback for ``@click.argument(site_name)``.
-
-    Automatically processes repository information for the specified site. This
-    entails cloning all requires repositories and checking out specified
-    references for each repository.
-    """
-    engine.repository.process_repositories(value)
-    return value
-
-
-MAIN_REPOSITORY_OPTION = click.option(
-    '-r',
-    '--site-repository',
-    'site_repository',
-    required=True,
-    help='Path or URL to the primary repository (containing '
-    'site_definition.yaml) repo.')
-
-EXTRA_REPOSITORY_OPTION = click.option(
-    '-e',
-    '--extra-repository',
-    'extra_repositories',
-    multiple=True,
-    help='Path or URL of additional repositories. These should be named per '
-    'the site-definition file, e.g. -e global=/opt/global -e '
-    'secrets=/opt/secrets. By default, the revision specified in the '
-    'site-definition for the site will be leveraged but can be '
-    'overridden using -e global=/opt/global@revision.')
-
-REPOSITORY_KEY_OPTION = click.option(
-    '-k',
-    '--repo-key',
-    'repo_key',
-    help='The SSH public key to use when cloning remote authenticated '
-    'repositories.')
-
-REPOSITORY_USERNAME_OPTION = click.option(
-    '-u',
-    '--repo-username',
-    'repo_username',
-    help='The SSH username to use when cloning remote authenticated '
-    'repositories specified in the site-definition file. Any '
-    'occurrences of REPO_USERNAME will be replaced with this '
-    'value.\n'
-    'Use only if REPO_USERNAME appears in a repo URL.')
-
-REPOSITORY_CLONE_PATH_OPTION = click.option(
-    '-p',
-    '--clone-path',
-    'clone_path',
-    help='The path where the repo will be cloned. By default the repo will be '
-    'cloned to the /tmp path. If this option is '
-    'included and the repo already '
-    'exists, then the repo will not be cloned again and the '
-    'user must specify a new clone path or pass in the local copy '
-    'of the repository as the site repository. Suppose the repo '
-    'name is airship/treasuremap and the clone path is '
-    '/tmp/mypath then the following directory is '
-    'created /tmp/mypath/airship/treasuremap '
-    'which will contain the contents of the repo')
-
-ALLOW_MISSING_SUBSTITUTIONS_OPTION = click.option(
-    '-f',
-    '--fail-on-missing-sub-src',
-    required=False,
-    type=click.BOOL,
-    default=True,
-    show_default=True,
-    help='Raise Deckhand exception on missing substition sources.')
-
-EXCLUDE_LINT_OPTION = click.option(
-    '-x',
-    '--exclude',
-    'exclude_lint',
-    multiple=True,
-    help='Excludes specified linting checks. Warnings will still be issued. '
-    '-w takes priority over -x.')
-
-WARN_LINT_OPTION = click.option(
-    '-w',
-    '--warn',
-    'warn_lint',
-    multiple=True,
-    help='Warn if linting check fails. -w takes priority over -x.')
-
-SITE_REPOSITORY_ARGUMENT = click.argument(
-    'site_name', callback=_process_repositories_callback)
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -153,70 +54,50 @@ def main(*, verbose, logging_level):
     * repo: repository-level actions
 
     """
-    lvl = logging_level
-    if verbose:
-        lvl = logging.DEBUG
-    logging.basicConfig(format=LOG_FORMAT, level=int(lvl))
+    pegleg_main.set_logging_level(verbose, logging_level)
 
 
 @main.group(help='Commands related to repositories')
-@MAIN_REPOSITORY_OPTION
-@REPOSITORY_CLONE_PATH_OPTION
+@utils.MAIN_REPOSITORY_OPTION
+@utils.REPOSITORY_CLONE_PATH_OPTION
 # TODO(felipemonteiro): Support EXTRA_REPOSITORY_OPTION as well to be
 # able to lint multiple repos together.
-@REPOSITORY_USERNAME_OPTION
-@REPOSITORY_KEY_OPTION
+@utils.REPOSITORY_USERNAME_OPTION
+@utils.REPOSITORY_KEY_OPTION
 def repo(*, site_repository, clone_path, repo_key, repo_username):
     """Group for repo-level actions, which include:
 
     * lint: lint all sites across the repository
-
     """
+    pegleg_main.run_config(
+        site_repository,
+        clone_path,
+        repo_key,
+        repo_username, [],
+        run_umask=True)
 
-    config.set_site_repo(site_repository)
-    config.set_clone_path(clone_path)
-    config.set_repo_key(repo_key)
-    config.set_repo_username(repo_username)
-    config.set_umask()
 
-
-def _lint_helper(
-        *, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name=None):
-    """Helper for executing lint on specific site or all sites in repo."""
-    if site_name:
-        func = functools.partial(engine.lint.site, site_name=site_name)
-    else:
-        func = engine.lint.full
-    warns = func(
-        fail_on_missing_sub_src=fail_on_missing_sub_src,
-        exclude_lint=exclude_lint,
-        warn_lint=warn_lint)
+@repo.command('lint', help='Lint all sites in a repository')
+@utils.ALLOW_MISSING_SUBSTITUTIONS_OPTION
+@utils.EXCLUDE_LINT_OPTION
+@utils.WARN_LINT_OPTION
+def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
+    """Lint all sites using checks defined in :mod:`pegleg.engine.errorcodes`.
+    """
+    warns = pegleg_main.run_lint(
+        exclude_lint, fail_on_missing_sub_src, warn_lint)
     if warns:
         click.echo("Linting passed, but produced some warnings.")
         for w in warns:
             click.echo(w)
 
 
-@repo.command('lint', help='Lint all sites in a repository')
-@ALLOW_MISSING_SUBSTITUTIONS_OPTION
-@EXCLUDE_LINT_OPTION
-@WARN_LINT_OPTION
-def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
-    """Lint all sites using checks defined in :mod:`pegleg.engine.errorcodes`.
-    """
-    engine.repository.process_site_repository(update_config=True)
-    _lint_helper(
-        fail_on_missing_sub_src=fail_on_missing_sub_src,
-        exclude_lint=exclude_lint,
-        warn_lint=warn_lint)
-
-
 @main.group(help='Commands related to sites')
-@MAIN_REPOSITORY_OPTION
-@REPOSITORY_CLONE_PATH_OPTION
-@EXTRA_REPOSITORY_OPTION
-@REPOSITORY_USERNAME_OPTION
-@REPOSITORY_KEY_OPTION
+@utils.MAIN_REPOSITORY_OPTION
+@utils.REPOSITORY_CLONE_PATH_OPTION
+@utils.EXTRA_REPOSITORY_OPTION
+@utils.REPOSITORY_USERNAME_OPTION
+@utils.REPOSITORY_KEY_OPTION
 def site(
         *, site_repository, clone_path, extra_repositories, repo_key,
         repo_username):
@@ -228,13 +109,13 @@ def site(
     * show: show a site's files
 
     """
-
-    config.set_site_repo(site_repository)
-    config.set_clone_path(clone_path)
-    config.set_extra_repo_overrides(extra_repositories or [])
-    config.set_repo_key(repo_key)
-    config.set_repo_username(repo_username)
-    config.set_umask()
+    pegleg_main.run_config(
+        site_repository,
+        clone_path,
+        repo_key,
+        repo_username,
+        extra_repositories or [],
+        run_umask=True)
 
 
 @site.command(help='Output complete config for one site')
@@ -253,20 +134,9 @@ def site(
     # compatibility concerns.
     default=False,
     help='Perform validations on documents prior to collection.')
-@click.option(
-    '-x',
-    '--exclude',
-    'exclude_lint',
-    multiple=True,
-    help='Excludes specified linting checks. Warnings will still be issued. '
-    '-w takes priority over -x.')
-@click.option(
-    '-w',
-    '--warn',
-    'warn_lint',
-    multiple=True,
-    help='Warn if linting check fails. -w takes priority over -x.')
-@SITE_REPOSITORY_ARGUMENT
+@utils.EXCLUDE_LINT_OPTION
+@utils.WARN_LINT_OPTION
+@utils.SITE_REPOSITORY_ARGUMENT
 def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     """Collects documents into a single site-definition.yaml file, which
     defines the entire site definition and contains all documents required
@@ -278,32 +148,25 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
     Collect can lint documents prior to collection if the ``--validate``
     flag is optionally included.
     """
-    if validate:
-        # Lint the primary repo prior to document collection.
-        _lint_helper(
-            site_name=site_name,
-            fail_on_missing_sub_src=True,
-            exclude_lint=exclude_lint,
-            warn_lint=warn_lint)
-    engine.site.collect(site_name, save_location)
+    pegleg_main.run_collect(
+        exclude_lint, save_location, site_name, validate, warn_lint)
 
 
 @site.command('list', help='List known sites')
-@click.option('-o', '--output', 'output_stream', help='Where to output.')
+@utils.OUTPUT_STREAM_OPTION
 def list_sites(*, output_stream):
-    engine.repository.process_site_repository(update_config=True)
-    engine.site.list_(output_stream)
+    pegleg_main.run_list_sites(output_stream)
 
 
 @site.command(help='Show details for one site')
-@click.option('-o', '--output', 'output_stream', help='Where to output.')
-@SITE_REPOSITORY_ARGUMENT
+@utils.OUTPUT_STREAM_OPTION
+@utils.SITE_REPOSITORY_ARGUMENT
 def show(*, output_stream, site_name):
-    engine.site.show(site_name, output_stream)
+    pegleg_main.run_show(output_stream, site_name)
 
 
 @site.command('render', help='Render a site through the deckhand engine')
-@click.option('-o', '--output', 'output_stream', help='Where to output.')
+@utils.OUTPUT_STREAM_OPTION
 @click.option(
     '-v',
     '--validate',
@@ -314,32 +177,26 @@ def show(*, output_stream, site_name):
     help='Whether to pre-validate documents using built-in schema validation. '
     'Skips over externally registered DataSchema documents to avoid '
     'false positives.')
-@SITE_REPOSITORY_ARGUMENT
+@utils.SITE_REPOSITORY_ARGUMENT
 def render(*, output_stream, site_name, validate):
-    engine.site.render(site_name, output_stream, validate)
+    pegleg_main.run_render(output_stream, site_name, validate)
 
 
 @site.command('lint', help='Lint a given site in a repository')
-@ALLOW_MISSING_SUBSTITUTIONS_OPTION
-@EXCLUDE_LINT_OPTION
-@WARN_LINT_OPTION
-@SITE_REPOSITORY_ARGUMENT
+@utils.ALLOW_MISSING_SUBSTITUTIONS_OPTION
+@utils.EXCLUDE_LINT_OPTION
+@utils.WARN_LINT_OPTION
+@utils.SITE_REPOSITORY_ARGUMENT
 def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
     """Lint a given site using checks defined in
     :mod:`pegleg.engine.errorcodes`.
     """
-    _lint_helper(
-        site_name=site_name,
-        fail_on_missing_sub_src=fail_on_missing_sub_src,
-        exclude_lint=exclude_lint,
-        warn_lint=warn_lint)
-
-
-def collection_default_callback(ctx, param, value):
-    LOG.debug('Evaluating %s: %s', param.name, value)
-    if not value:
-        return ctx.params['site_name']
-    return value
+    warns = pegleg_main.run_lint_site(
+        exclude_lint, fail_on_missing_sub_src, site_name, warn_lint)
+    if warns:
+        click.echo("Linting passed, but produced some warnings.")
+        for w in warns:
+            click.echo(w)
 
 
 @site.command('upload', help='Upload documents to Shipyard')
@@ -387,43 +244,18 @@ def collection_default_callback(ctx, param, value):
     'collection',
     help='Specifies the name to use for the uploaded collection. '
     'Defaults to the specified `site_name`.',
-    callback=collection_default_callback)
-@SITE_REPOSITORY_ARGUMENT
+    callback=utils.collection_default_callback)
+@utils.SITE_REPOSITORY_ARGUMENT
 @click.pass_context
 def upload(
         ctx, *, os_domain_name, os_project_domain_name, os_user_domain_name,
         os_project_name, os_username, os_password, os_auth_url, os_auth_token,
         context_marker, site_name, buffer_mode, collection):
-    if not ctx.obj:
-        ctx.obj = {}
-
-    # Build API parameters required by Shipyard API Client.
-    if os_auth_token:
-        os.environ['OS_AUTH_TOKEN'] = os_auth_token
-        auth_vars = {'token': os_auth_token, 'auth_url': os_auth_url}
-    else:
-        auth_vars = {
-            'user_domain_name': os_user_domain_name,
-            'project_name': os_project_name,
-            'username': os_username,
-            'password': os_password,
-            'auth_url': os_auth_url
-        }
-
-    # Domain-scoped params
-    if os_domain_name:
-        auth_vars['domain_name'] = os_domain_name
-        auth_vars['project_domain_name'] = None
-    # Project-scoped params
-    else:
-        auth_vars['project_domain_name'] = os_project_domain_name
-
-    ctx.obj['API_PARAMETERS'] = {'auth_vars': auth_vars}
-    ctx.obj['context_marker'] = str(context_marker)
-    ctx.obj['site_name'] = site_name
-    ctx.obj['collection'] = collection
-    config.set_global_enc_keys(site_name)
-    click.echo(ShipyardHelper(ctx, buffer_mode).upload_documents())
+    resp = pegleg_main.run_upload(
+        buffer_mode, collection, context_marker, ctx, os_auth_token,
+        os_auth_url, os_domain_name, os_password, os_project_domain_name,
+        os_project_name, os_user_domain_name, os_username, site_name)
+    click.echo(resp)
 
 
 @site.group(name='secrets', help='Commands to manage site secrets documents')
@@ -433,7 +265,7 @@ def secrets():
 
 @secrets.command(
     'generate-pki',
-    short_help='[DEPRECATED - Use secrets generate certificates] \n'
+    short_help='[DEPRECATED - Use secrets generate certificates]\n'
     'Generate certs and keys according to the site PKICatalog',
     help='[DEPRECATED - Use secrets generate certificates]\n'
     'Generate certificates and keys according to all PKICatalog '
@@ -446,7 +278,7 @@ def secrets():
     '-a',
     '--author',
     'author',
-    help='Identifying name of the author generating new certificates. Used'
+    help='Identifying name of the author generating new certificates. Used '
     'for tracking provenance information in the PeglegManagedDocuments. '
     'An attempt is made to automatically determine this value, '
     'but should be provided.')
@@ -472,11 +304,8 @@ def generate_pki_deprecated(site_name, author, days, regenerate_all):
     """
     warnings.warn(
         "DEPRECATED - Use secrets generate certificates", DeprecationWarning)
-    engine.repository.process_repositories(site_name, overwrite_existing=True)
-    config.set_global_enc_keys(site_name)
-    pkigenerator = catalog.pki_generator.PKIGenerator(
-        site_name, author=author, duration=days, regenerate_all=regenerate_all)
-    output_paths = pkigenerator.generate()
+    output_paths = pegleg_main.run_generate_pki(
+        author, days, regenerate_all, site_name)
 
     click.echo("Generated PKI files written to:\n%s" % '\n'.join(output_paths))
 
@@ -525,21 +354,9 @@ def generate_pki_deprecated(site_name, author, days, regenerate_all):
 def wrap_secret_cli(
         *, site_name, author, filename, output_path, schema, name, layer,
         encrypt):
-    """Wrap a bare secrets file in a YAML and ManagedDocument.
-
-    """
-
-    engine.repository.process_repositories(site_name, overwrite_existing=True)
-    config.set_global_enc_keys(site_name)
-    wrap_secret(
-        author,
-        filename,
-        output_path,
-        schema,
-        name,
-        layer,
-        encrypt,
-        site_name=site_name)
+    """Wrap a bare secrets file in a YAML and ManagedDocument"""
+    pegleg_main.run_wrap_secret(
+        author, encrypt, filename, layer, name, output_path, schema, site_name)
 
 
 @site.command(
@@ -558,14 +375,9 @@ def wrap_secret_cli(
     default=False,
     help='A flag to request generate genesis validation scripts in addition '
     'to genesis.sh script.')
-@SITE_REPOSITORY_ARGUMENT
+@utils.SITE_REPOSITORY_ARGUMENT
 def genesis_bundle(*, build_dir, validators, site_name):
-    encryption_key = os.environ.get("PROMENADE_ENCRYPTION_KEY")
-    config.set_global_enc_keys(site_name)
-
-    bundle.build_genesis(
-        build_dir, encryption_key, validators,
-        logging.DEBUG == LOG.getEffectiveLevel(), site_name)
+    pegleg_main.run_genesis_bundle(build_dir, site_name, validators)
 
 
 @secrets.command(
@@ -581,14 +393,10 @@ def genesis_bundle(*, build_dir, validators, site_name):
 @click.argument('site_name')
 def check_pki_certs(site_name, days):
     """Check PKI certificates of a site for expiration."""
+    expiring_certs_exist, cert_results = pegleg_main.run_check_pki_certs(
+        days, site_name)
 
-    engine.repository.process_repositories(site_name, overwrite_existing=True)
-    config.set_global_enc_keys(site_name)
-
-    expired_certs_exist, cert_results = engine.secrets.check_cert_expiry(
-        site_name, duration=days)
-
-    if expired_certs_exist:
+    if expiring_certs_exist:
         click.echo(
             "The following certs will expire within the next {} days: \n{}".
             format(days, cert_results))
@@ -601,11 +409,11 @@ def check_pki_certs(site_name, days):
 
 
 @main.group(help='Commands related to types')
-@MAIN_REPOSITORY_OPTION
-@REPOSITORY_CLONE_PATH_OPTION
-@EXTRA_REPOSITORY_OPTION
-@REPOSITORY_USERNAME_OPTION
-@REPOSITORY_KEY_OPTION
+@utils.MAIN_REPOSITORY_OPTION
+@utils.REPOSITORY_CLONE_PATH_OPTION
+@utils.EXTRA_REPOSITORY_OPTION
+@utils.REPOSITORY_USERNAME_OPTION
+@utils.REPOSITORY_KEY_OPTION
 def type(
         *, site_repository, clone_path, extra_repositories, repo_key,
         repo_username):
@@ -614,19 +422,20 @@ def type(
     * list: list all types across the repository
 
     """
-    config.set_site_repo(site_repository)
-    config.set_clone_path(clone_path)
-    config.set_extra_repo_overrides(extra_repositories or [])
-    config.set_repo_key(repo_key)
-    config.set_repo_username(repo_username)
+    pegleg_main.run_config(
+        site_repository,
+        clone_path,
+        repo_key,
+        repo_username,
+        extra_repositories or [],
+        run_umask=False)
 
 
 @type.command('list', help='List known types')
-@click.option('-o', '--output', 'output_stream', help='Where to output.')
+@utils.OUTPUT_STREAM_OPTION
 def list_types(*, output_stream):
     """List type names for a given repository."""
-    engine.repository.process_site_repository(update_config=True)
-    engine.type.list_types(output_stream)
+    pegleg_main.run_list_types(output_stream)
 
 
 @secrets.group(
@@ -682,17 +491,8 @@ def generate_pki(site_name, author, days, regenerate_all, save_location):
     site.
 
     """
-
-    engine.repository.process_repositories(site_name, overwrite_existing=True)
-    config.set_global_enc_keys(site_name)
-    pkigenerator = catalog.pki_generator.PKIGenerator(
-        site_name,
-        author=author,
-        duration=days,
-        regenerate_all=regenerate_all,
-        save_location=save_location)
-    output_paths = pkigenerator.generate()
-
+    output_paths = pegleg_main.run_generate_pki(
+        author, days, regenerate_all, site_name, save_location)
     click.echo("Generated PKI files written to:\n%s" % '\n'.join(output_paths))
 
 
@@ -741,11 +541,9 @@ def generate_pki(site_name, author, days, regenerate_all, save_location):
 def generate_passphrases(
         *, site_name, save_location, author, passphrase_catalog, interactive,
         force_cleartext):
-    engine.repository.process_repositories(site_name)
-    config.set_global_enc_keys(site_name)
-    engine.secrets.generate_passphrases(
-        site_name, save_location, author, passphrase_catalog, interactive,
-        force_cleartext)
+    pegleg_main.run_generate_passphrases(
+        author, force_cleartext, interactive, save_location, site_name,
+        passphrase_catalog)
 
 
 @secrets.command(
@@ -771,11 +569,7 @@ def generate_passphrases(
     'documents')
 @click.argument('site_name')
 def encrypt(*, save_location, author, site_name):
-    engine.repository.process_repositories(site_name, overwrite_existing=True)
-    config.set_global_enc_keys(site_name)
-    if save_location is None:
-        save_location = config.get_site_repo()
-    engine.secrets.encrypt(save_location, author, site_name=site_name)
+    pegleg_main.run_encrypt(author, save_location, site_name)
 
 
 @secrets.command(
@@ -805,21 +599,10 @@ def encrypt(*, save_location, author, site_name):
     'Overrides --save-location option.')
 @click.argument('site_name')
 def decrypt(*, path, save_location, overwrite, site_name):
-    engine.repository.process_repositories(site_name)
-    config.set_global_enc_keys(site_name)
-
-    decrypted = engine.secrets.decrypt(path, site_name=site_name)
-    if overwrite:
-        for path, data in decrypted.items():
-            files.write(data, path)
-    elif save_location is None:
-        for data in decrypted.values():
-            click.echo(data)
-    else:
-        for path, data in decrypted.items():
-            file_name = os.path.split(path)[1]
-            file_save_location = os.path.join(save_location, file_name)
-            files.write(data, file_save_location)
+    data = pegleg_main.run_decrypt(overwrite, path, save_location, site_name)
+    if data:
+        for d in data:
+            click.echo(d)
 
 
 @main.group(help='Miscellaneous generate commands')
@@ -841,7 +624,7 @@ def generate():
 def generate_passphrase(length):
     click.echo(
         'Generated Passhprase: {}'.format(
-            engine.secrets.generate_crypto_string(length)))
+            pegleg_main.run_generate_passphrase(length)))
 
 
 @generate.command(
@@ -852,9 +635,8 @@ def generate_passphrase(length):
     'length',
     default=24,
     show_default=True,
-    help='Generate a passphrase of the given length. '
+    help='Generate a salt of the given length. '
     'Length is >= 24, no maximum length.')
 def generate_salt(length):
     click.echo(
-        "Generated Salt: {}".format(
-            engine.secrets.generate_crypto_string(length)))
+        "Generated Salt: {}".format(pegleg_main.run_generate_salt(length)))

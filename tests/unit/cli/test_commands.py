@@ -19,7 +19,7 @@ from click.testing import CliRunner
 import pytest
 import yaml
 
-from pegleg import cli
+from pegleg.cli import commands
 from pegleg.engine import errorcodes
 from pegleg.engine.catalog import pki_utility
 from pegleg.engine.util import git
@@ -97,7 +97,7 @@ class TestSiteCLIOptions(BaseCLIActionTest):
 
         # Note that the -p option is used to specify the clone_folder
         site_list = self.runner.invoke(
-            cli.site, ['-p', tmpdir, '-r', repo_url, 'list'])
+            commands.site, ['-p', tmpdir, '-r', repo_url, 'list'])
 
         assert site_list.exit_code == 0
         # Verify that the repo was cloned into the clone_path
@@ -118,7 +118,7 @@ class TestSiteCLIOptions(BaseCLIActionTest):
 
         # Note that the -p option is used to specify the clone_folder
         site_list = self.runner.invoke(
-            cli.site, ['-p', tmpdir, '-r', repo_path, 'list'])
+            commands.site, ['-p', tmpdir, '-r', repo_path, 'list'])
 
         assert site_list.exit_code == 0
         # Verify that passing in clone_path when using local repo has no effect
@@ -146,14 +146,14 @@ class TestSiteCLIOptionsNegative(BaseCLIActionTest):
 
         # Note that the -p option is used to specify the clone_folder
         site_list = self.runner.invoke(
-            cli.site, ['-p', tmpdir, '-r', repo_url, 'list'])
+            commands.site, ['-p', tmpdir, '-r', repo_url, 'list'])
 
         assert git.is_repository(os.path.join(tmpdir, self.repo_name))
 
         # Run site list for a second time to validate that the repo can't be
         # cloned twice in the same clone_path
         site_list = self.runner.invoke(
-            cli.site, ['-p', tmpdir, '-r', repo_url, 'list'])
+            commands.site, ['-p', tmpdir, '-r', repo_url, 'list'])
 
         assert site_list.exit_code == 1
         assert 'File exists' in site_list.output
@@ -166,7 +166,7 @@ class TestSiteCliActions(BaseCLIActionTest):
 
     def _validate_collect_site_action(self, repo_path_or_url, save_location):
         result = self.runner.invoke(
-            cli.site, [
+            commands.site, [
                 '-r', repo_path_or_url, 'collect', self.site_name, '-s',
                 save_location
             ])
@@ -228,7 +228,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
             mock_deckhand.deckhand_render.return_value = ([], [])
             result = self.runner.invoke(
-                cli.site, lint_command + exclude_lint_command)
+                commands.site, lint_command + exclude_lint_command)
 
         assert result.exit_code == 0, result.output
 
@@ -275,7 +275,7 @@ class TestSiteCliActions(BaseCLIActionTest):
     def _validate_list_site_action(self, repo_path_or_url, tmpdir):
         mock_output = os.path.join(tmpdir, 'output')
         result = self.runner.invoke(
-            cli.site, ['-r', repo_path_or_url, 'list', '-o', mock_output])
+            commands.site, ['-r', repo_path_or_url, 'list', '-o', mock_output])
 
         assert result.exit_code == 0, result.output
         with open(mock_output, 'r') as f:
@@ -308,7 +308,7 @@ class TestSiteCliActions(BaseCLIActionTest):
     def _validate_site_show_action(self, repo_path_or_url, tmpdir):
         mock_output = os.path.join(tmpdir, 'output')
         result = self.runner.invoke(
-            cli.site, [
+            commands.site, [
                 '-r', repo_path_or_url, 'show', self.site_name, '-o',
                 mock_output
             ])
@@ -346,7 +346,7 @@ class TestSiteCliActions(BaseCLIActionTest):
             with mock.patch(
                     'pegleg.engine.site.util.deckhand') as mock_deckhand:
                 mock_deckhand.deckhand_render.return_value = ([], [])
-                result = self.runner.invoke(cli.site, render_command)
+                result = self.runner.invoke(commands.site, render_command)
 
         assert result.exit_code == 0
         mock_yaml.dump_all.assert_called_once()
@@ -387,9 +387,9 @@ class TestSiteCliActions(BaseCLIActionTest):
 
         repo_path = self.treasuremap_path
 
-        with mock.patch('pegleg.cli.ShipyardHelper') as mock_obj:
+        with mock.patch('pegleg.pegleg_main.ShipyardHelper') as mock_obj:
             result = self.runner.invoke(
-                cli.site, [
+                commands.site, [
                     '-r', repo_path, 'upload', self.site_name, '--collection',
                     'collection'
                 ])
@@ -411,21 +411,21 @@ class TestSiteCliActions(BaseCLIActionTest):
         #    site_name
         repo_path = self.treasuremap_path
 
-        with mock.patch('pegleg.cli.ShipyardHelper') as mock_obj:
+        with mock.patch('pegleg.pegleg_main.ShipyardHelper') as mock_obj:
             result = self.runner.invoke(
-                cli.site, ['-r', repo_path, 'upload', self.site_name])
+                commands.site, ['-r', repo_path, 'upload', self.site_name])
         assert result.exit_code == 0
         mock_obj.assert_called_once()
 
 
 class TestGenerateActions(BaseCLIActionTest):
     def test_generate_passphrase(self):
-        result = self.runner.invoke(cli.generate, ['passphrase'])
+        result = self.runner.invoke(commands.generate, ['passphrase'])
 
         assert result.exit_code == 0, result.output
 
     def test_generate_salt(self):
-        result = self.runner.invoke(cli.generate, ['salt'])
+        result = self.runner.invoke(commands.generate, ['salt'])
 
         assert result.exit_code == 0, result.output
 
@@ -454,7 +454,7 @@ class TestRepoCliActions(BaseCLIActionTest):
         with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
             mock_deckhand.deckhand_render.return_value = ([], [])
             result = self.runner.invoke(
-                cli.repo, lint_command + exclude_lint_command)
+                commands.repo, lint_command + exclude_lint_command)
 
         assert result.exit_code == 0, result.output
         # A successful result (while setting lint checks to exclude) should
@@ -478,7 +478,7 @@ class TestRepoCliActions(BaseCLIActionTest):
         with mock.patch('pegleg.engine.site.util.deckhand') as mock_deckhand:
             mock_deckhand.deckhand_render.return_value = ([], [])
             result = self.runner.invoke(
-                cli.repo, lint_command + exclude_lint_command)
+                commands.repo, lint_command + exclude_lint_command)
 
         assert result.exit_code == 0, result.output
         # A successful result (while setting lint checks to exclude) should
@@ -526,7 +526,8 @@ class TestSiteSecretsActions(BaseCLIActionTest):
 
         secrets_opts = ['secrets', 'generate', 'certificates', self.site_name]
 
-        result = self.runner.invoke(cli.site, ['-r', repo_url] + secrets_opts)
+        result = self.runner.invoke(
+            commands.site, ['-r', repo_url] + secrets_opts)
         self._validate_generate_pki_action(result)
 
     @pytest.mark.skipif(
@@ -541,7 +542,8 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         repo_path = self.treasuremap_path
         secrets_opts = ['secrets', 'generate', 'certificates', self.site_name]
 
-        result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
+        result = self.runner.invoke(
+            commands.site, ['-r', repo_path] + secrets_opts)
         self._validate_generate_pki_action(result)
 
     @pytest.mark.skipif(
@@ -571,7 +573,8 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             yaml.dump(ceph_fsid, ceph_fsid_fi)
 
         secrets_opts = ['secrets', 'encrypt', '-a', 'test', self.site_name]
-        result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
+        result = self.runner.invoke(
+            commands.site, ['-r', repo_path] + secrets_opts)
 
         assert result.exit_code == 0
 
@@ -586,7 +589,8 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         secrets_opts = [
             'secrets', 'decrypt', '--path', file_path, self.site_name
         ]
-        result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
+        result = self.runner.invoke(
+            commands.site, ['-r', repo_path] + secrets_opts)
         assert result.exit_code == 0, result.output
 
     @pytest.mark.skipif(
@@ -595,7 +599,8 @@ class TestSiteSecretsActions(BaseCLIActionTest):
     def test_check_pki_certs_expired(self):
         repo_path = self.treasuremap_path
         secrets_opts = ['secrets', 'check-pki-certs', self.site_name]
-        result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
+        result = self.runner.invoke(
+            commands.site, ['-r', repo_path] + secrets_opts)
         assert result.exit_code == 1, result.output
 
     @pytest.mark.skipif(
@@ -604,7 +609,8 @@ class TestSiteSecretsActions(BaseCLIActionTest):
     def test_check_pki_certs(self):
         repo_path = self.treasuremap_path
         secrets_opts = ['secrets', 'check-pki-certs', 'airsloop']
-        result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
+        result = self.runner.invoke(
+            commands.site, ['-r', repo_path] + secrets_opts)
         assert result.exit_code == 0, result.output
 
     @mock.patch.dict(
@@ -631,7 +637,8 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             "deckhand/Certificate/v1", "-n", "test-certificate", "-l", "site",
             "--no-encrypt", self.site_name
         ]
-        result = self.runner.invoke(cli.site, ["-r", repo_path] + secrets_opts)
+        result = self.runner.invoke(
+            commands.site, ["-r", repo_path] + secrets_opts)
         assert result.exit_code == 0
 
         with open(output_path, "r") as output_fi:
@@ -652,7 +659,8 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             output_path, "-s", "deckhand/Certificate/v1", "-n",
             "test-certificate", "-l", "site", self.site_name
         ]
-        result = self.runner.invoke(cli.site, ["-r", repo_path] + secrets_opts)
+        result = self.runner.invoke(
+            commands.site, ["-r", repo_path] + secrets_opts)
         assert result.exit_code == 0
 
         with open(output_path, "r") as output_fi:
@@ -673,7 +681,7 @@ class TestTypeCliActions(BaseCLIActionTest):
     def _validate_type_list_action(self, repo_path_or_url, tmpdir):
         mock_output = os.path.join(tmpdir, 'output')
         result = self.runner.invoke(
-            cli.type, ['-r', repo_path_or_url, 'list', '-o', mock_output])
+            commands.type, ['-r', repo_path_or_url, 'list', '-o', mock_output])
         with open(mock_output, 'r') as f:
             table_output = f.read()
 
@@ -712,7 +720,7 @@ class TestSiteCliActionsWithSubdirectory(BaseCLIActionTest):
     def _validate_list_site_action(self, repo_path_or_url, tmpdir):
         mock_output = os.path.join(tmpdir, 'output')
         result = self.runner.invoke(
-            cli.site, ['-r', repo_path_or_url, 'list', '-o', mock_output])
+            commands.site, ['-r', repo_path_or_url, 'list', '-o', mock_output])
 
         with open(mock_output, 'r') as f:
             table_output = f.read()
