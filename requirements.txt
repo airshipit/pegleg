@@ -9,9 +9,9 @@ cryptography==2.3.1
 debtcollector==1.22.0
 docker==4.0.2
 git+https://opendev.org/airship/deckhand.git@7d2092b100bddcab77fca0acadd9fc99ba59797b#egg=deckhand
-git+https://opendev.org/airship/promenade.git@adc5146ffb4c1bee267b8c38f21716b48dd54208#egg=promenade
-git+https://opendev.org/airship/shipyard.git@9c5f68cf97585a86c9edfc3b24545b36bdd90e14#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-gitdb2==2.0.5
+git+https://opendev.org/airship/promenade.git@1f502d84ad9058a0856bad59a5c6827ada8b23eb#egg=promenade
+git+https://opendev.org/airship/shipyard.git@f42e85d7cedb0a22c2f90f53ad4902cc4a62d9a9#egg=shipyard-client&subdirectory=src/bin/shipyard_client
+gitdb2==2.0.6
 gitpython==2.1.14
 idna==2.8
 iso8601==0.1.12
@@ -29,6 +29,6 @@ pyyaml==5.1.2
 requests==2.22.0
 six==1.12.0
 smmap2==2.0.5
-urllib3==1.25.5
+urllib3==1.25.6
 websocket-client==0.56.0
 wrapt==1.11.2
