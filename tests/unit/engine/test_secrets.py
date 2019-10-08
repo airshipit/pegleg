@@ -379,6 +379,7 @@ def test_get_global_creds_missing_creds(temp_deployment_files, tmpdir):
 
     # Capture global credentials, verify they are not present and we default
     # to site credentials instead.
+    config.set_global_enc_keys("cicd")
     passphrase, salt = secrets.get_global_creds("cicd")
     assert passphrase.decode() == 'ytrr89erARAiPE34692iwUMvWqqBvC'
     assert salt.decode() == 'MySecretSalt1234567890]['
@@ -395,8 +396,7 @@ def test_get_global_creds_missing_pass(temp_deployment_files, tmpdir):
 
     # Create global salt file
     with open(os.path.join(str(site_dir), 'secrets', 'passphrases',
-                           'cicd-global-passphrase-encrypted.yaml'),
-              "w") as outfile:
+                           'cicd-global-salt-encrypted.yaml'), "w") as outfile:
         outfile.write(GLOBAL_SALT_DOC)
 
     save_location = tmpdir.mkdir("encrypted_site_files")
@@ -405,7 +405,7 @@ def test_get_global_creds_missing_pass(temp_deployment_files, tmpdir):
     # Demonstrate that encryption fails when only the global salt or
     # only the global passphrase are present among the site files.
     with pytest.raises(exceptions.GlobalCredentialsNotFound):
-        secrets.encrypt(save_location_str, "pytest", "cicd")
+        config.set_global_enc_keys("cicd")
 
 
 @mock.patch.dict(
@@ -428,6 +428,7 @@ def test_get_global_creds(temp_deployment_files, tmpdir):
     save_location_str = str(save_location)
 
     # Encrypt the global passphrase and salt file using site passphrase/salt
+    config.set_global_enc_keys("cicd")
     secrets.encrypt(save_location_str, "pytest", "cicd")
     encrypted_files = listdir(save_location_str)
     assert len(encrypted_files) > 0
@@ -458,6 +459,7 @@ def test_global_encrypt_decrypt(temp_deployment_files, tmpdir):
     save_location_str = str(save_location)
 
     # Encrypt the global passphrase and salt file using site passphrase/salt
+    config.set_global_enc_keys("cicd")
     secrets.encrypt(save_location_str, "pytest", "cicd")
 
     # Create and encrypt a global type document

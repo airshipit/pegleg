@@ -373,7 +373,11 @@ class TestSiteCliActions(BaseCLIActionTest):
         self._validate_render_site_action(repo_path)
 
     ### Upload tests ###
-
+    @mock.patch.dict(
+        os.environ, {
+            "PEGLEG_PASSPHRASE": "123456789012345678901234567890",
+            "PEGLEG_SALT": "MySecretSalt1234567890]["
+        })
     def test_upload_documents_shipyard_using_local_repo_path(self):
         """Validates ShipyardHelper is called with correct arguments."""
         # Scenario:
@@ -393,6 +397,11 @@ class TestSiteCliActions(BaseCLIActionTest):
         assert result.exit_code == 0
         mock_obj.assert_called_once()
 
+    @mock.patch.dict(
+        os.environ, {
+            "PEGLEG_PASSPHRASE": "123456789012345678901234567890",
+            "PEGLEG_SALT": "MySecretSalt1234567890]["
+        })
     def test_upload_collection_callback_default_to_site_name(self):
         """Validates that collection will default to the given site_name"""
         # Scenario:

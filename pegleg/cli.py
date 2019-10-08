@@ -421,7 +421,7 @@ def upload(
     ctx.obj['context_marker'] = str(context_marker)
     ctx.obj['site_name'] = site_name
     ctx.obj['collection'] = collection
-
+    config.set_global_enc_keys(site_name)
     click.echo(ShipyardHelper(ctx, buffer_mode).upload_documents())
 
 
@@ -469,6 +469,7 @@ def generate_pki(site_name, author, days, regenerate_all):
     """
 
     engine.repository.process_repositories(site_name, overwrite_existing=True)
+    config.set_global_enc_keys(site_name)
     pkigenerator = catalog.pki_generator.PKIGenerator(
         site_name, author=author, duration=days, regenerate_all=regenerate_all)
     output_paths = pkigenerator.generate()
@@ -525,6 +526,7 @@ def wrap_secret_cli(
     """
 
     engine.repository.process_repositories(site_name, overwrite_existing=True)
+    config.set_global_enc_keys(site_name)
     wrap_secret(
         author,
         filename,
@@ -555,6 +557,8 @@ def wrap_secret_cli(
 @SITE_REPOSITORY_ARGUMENT
 def genesis_bundle(*, build_dir, validators, site_name):
     encryption_key = os.environ.get("PROMENADE_ENCRYPTION_KEY")
+    config.set_global_enc_keys(site_name)
+
     bundle.build_genesis(
         build_dir, encryption_key, validators,
         logging.DEBUG == LOG.getEffectiveLevel(), site_name)
@@ -575,6 +579,7 @@ def check_pki_certs(site_name, days):
     """Check PKI certificates of a site for expiration."""
 
     engine.repository.process_repositories(site_name, overwrite_existing=True)
+    config.set_global_enc_keys(site_name)
 
     cert_results = engine.secrets.check_cert_expiry(site_name, duration=days)
 
@@ -654,6 +659,7 @@ def generate():
 def generate_passphrases(
         *, site_name, save_location, author, interactive, force_cleartext):
     engine.repository.process_repositories(site_name)
+    config.set_global_enc_keys(site_name)
     engine.secrets.generate_passphrases(
         site_name, save_location, author, interactive, force_cleartext)
 
@@ -682,6 +688,7 @@ def generate_passphrases(
 @click.argument('site_name')
 def encrypt(*, save_location, author, site_name):
     engine.repository.process_repositories(site_name, overwrite_existing=True)
+    config.set_global_enc_keys(site_name)
     if save_location is None:
         save_location = config.get_site_repo()
     engine.secrets.encrypt(save_location, author, site_name=site_name)
@@ -715,6 +722,7 @@ def encrypt(*, save_location, author, site_name):
 @click.argument('site_name')
 def decrypt(*, path, save_location, overwrite, site_name):
     engine.repository.process_repositories(site_name)
+    config.set_global_enc_keys(site_name)
 
     decrypted = engine.secrets.decrypt(path, site_name=site_name)
     if overwrite:
