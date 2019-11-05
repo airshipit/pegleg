@@ -27,6 +27,8 @@
         - airship-pegleg-docker-build-gate-ubuntu_xenial
         - airship-pegleg-docker-build-gate-ubuntu_bionic
         - airship-pegleg-docker-build-gate-opensuse
+        - airship-pegleg-lint-yaml
+
     gate:
       jobs:
         - openstack-tox-pep8
@@ -34,6 +36,7 @@
         - airship-pegleg-docker-build-gate-ubuntu_xenial
         - airship-pegleg-docker-build-gate-ubuntu_bionic
         - airship-pegleg-docker-build-gate-opensuse
+        - airship-pegleg-lint-yaml
     post:
       jobs:
         - airship-pegleg-docker-publish-ubuntu_xenial
@@ -46,6 +49,16 @@
     nodes:
       - name: primary
         label: ubuntu-xenial
+
+- job:
+    name: airship-pegleg-lint-yaml
+    voting: true
+    timeout: 600
+    run: tools/gate/playbooks/lint-yaml.yaml
+    nodeset: ubuntu-bionic
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/.*$
 
 - job:
     name: pegleg-dependency-vulnerability-check
