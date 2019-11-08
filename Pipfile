@@ -25,10 +25,11 @@ python-dateutil = "~=2.7.3"
 GitPython = "~=2.1.11"
 docker = ">=3.7.2"
 PyYAML = "~=5.1"
-deckhand = {git = "https://opendev.org/airship/deckhand.git",ref = "7d2092b100bddcab77fca0acadd9fc99ba59797b"}
-shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "f42e85d7cedb0a22c2f90f53ad4902cc4a62d9a9",subdirectory = "src/bin/shipyard_client"}
-promenade = {git = "https://opendev.org/airship/promenade.git",ref = "1f502d84ad9058a0856bad59a5c6827ada8b23eb"}
+deckhand = {git = "https://opendev.org/airship/deckhand.git",ref = "51dcea4fa12b0bcce65c381c286e61378a0826e2"}
+shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "72ca47e5c9ae8b7b1dcccd7742be6499f0411650",subdirectory = "src/bin/shipyard_client"}
+promenade = {git = "https://opendev.org/airship/promenade.git",ref = "46dffa8b1292202758ebc2a91cfae70362d852fb"}
 oslo-utils = "~=3.41.0"
+six = "<=1.12.0"
 
 [requires]
 python_version = "3.6"
