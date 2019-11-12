@@ -586,7 +586,10 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         with open(file_path, "w") as ceph_fsid_fi:
             yaml.dump(ceph_fsid, ceph_fsid_fi)
 
-        secrets_opts = ['secrets', 'encrypt', '-a', 'test', self.site_name]
+        secrets_opts = [
+            'secrets', 'encrypt', '--save-location', repo_path, '-a', 'test',
+            self.site_name
+        ]
         result = self.runner.invoke(
             commands.site, ['--no-decrypt', '-r', repo_path] + secrets_opts)
 
@@ -955,14 +958,15 @@ class TestCliSiteSubcommandsWithDecryptOption(BaseCLIActionTest):
     @pytest.mark.skipif(
         not pki_utility.PKIUtility.cfssl_exists(),
         reason='cfssl must be installed to execute these tests')
-    def test_check_pki_certs_expired_using_decrypt_option(self):
+    def test_check_pki_certs_expired_using_decrypt_option(self, tmpdir):
         repo_path = self.treasuremap_path
         secrets_opts = ['secrets', 'check-pki-certs', self.site_name]
         result = self.runner.invoke(
-            commands.site, ['--decrypt', '-r', repo_path] + secrets_opts)
+            commands.site,
+            ['--decrypt', '-r', repo_path, '-p', tmpdir] + secrets_opts)
         assert result.exit_code == 1, result.output
         assert self._validate_no_files_encrypted(
-            os.path.join(repo_path, 'site', 'seaworthy', 'secrets'))
+            os.path.join(tmpdir, 'site', 'seaworthy', 'secrets'))
 
     def test_genesis_bundle_using_decrypt_option(self, tmpdir):
         repo_path = self.treasuremap_path

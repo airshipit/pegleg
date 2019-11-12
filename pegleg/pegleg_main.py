@@ -368,7 +368,7 @@ def run_generate_passphrases(
         force_cleartext=force_cleartext)
 
 
-def run_encrypt(author, save_location, site_name):
+def run_encrypt(author, save_location, site_name, path=None):
     """Wraps and encrypts site secret documents
 
     :param author: identifies author generating new certificates for
@@ -376,12 +376,14 @@ def run_encrypt(author, save_location, site_name):
     :param save_location: path to save encrypted documents to, if None the
                           original documents are overwritten
     :param site_name: site name to process
+    :param path: path to the document(s) to encrypt
     :return:
     """
     config.set_global_enc_keys(site_name)
-    if save_location is None:
+    if save_location is None and path is None:
         save_location = config.get_site_repo()
-    engine.secrets.encrypt(save_location, author, site_name=site_name)
+    engine.secrets.encrypt(
+        save_location, author, site_name=site_name, path=path)
 
 
 def run_decrypt(overwrite, path, save_location, site_name):

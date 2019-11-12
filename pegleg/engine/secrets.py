@@ -37,7 +37,7 @@ __all__ = ('encrypt', 'decrypt', 'generate_passphrases', 'wrap_secret')
 LOG = logging.getLogger(__name__)
 
 
-def encrypt(save_location, author, site_name):
+def encrypt(save_location, author, site_name, path=None):
     """
     Encrypt all secrets documents for a site identifies by site_name.
 
@@ -56,21 +56,52 @@ def encrypt(save_location, author, site_name):
     :param str author: Identifies the individual or application, who
     encrypts the secrets documents.
     :param str site_name: The name of the site to encrypt its secrets files.
+    :param str path: The path to the directory or file to be encrypted.
     """
 
     files.check_file_save_location(save_location)
+    LOG.debug('Save location is %s', save_location)
+
+    file_sets = []
+    path_exists = path and os.path.exists(path)
+    if path_exists:
+        if os.path.isfile(path):
+            LOG.debug('Specified path is a file')
+            file_sets = [(None, path)]
+        elif os.path.isdir(path):
+            LOG.debug('Specified path is a directory')
+            file_sets = []
+            for filename in glob(os.path.join(path, '**/*.yaml'),
+                                 recursive=True):
+                LOG.debug('Discovered %s', filename)
+                file_sets.append((None, filename))
+    else:
+        LOG.debug('No path specified, searching all repos')
+        file_sets = list(definition.site_files_by_repo(site_name))
+
     LOG.info('Started encrypting...')
     secrets_found = False
-    for repo_base, file_path in definition.site_files_by_repo(site_name):
+    for repo_base, file_path in file_sets:
+        LOG.debug('Looking at %s in %s repo', file_path, repo_base)
         secrets_found = True
-        PeglegSecretManagement(
-            file_path=file_path, author=author,
-            site_name=site_name).encrypt_secrets(
-                _get_dest_path(repo_base, file_path, save_location))
+        secret = PeglegSecretManagement(
+            file_path=file_path, author=author, site_name=site_name)
+        if path_exists:
+            if save_location:
+                output_path = os.path.join(
+                    save_location.rstrip(os.path.sep),
+                    file_path.lstrip(os.path.sep))
+            else:
+                output_path = file_path
+        else:
+            output_path = _get_dest_path(repo_base, file_path, save_location)
+        LOG.debug('Outputting encrypted data to %s', output_path)
+        secret.encrypt_secrets(output_path)
+
     if secrets_found:
         LOG.info('Encryption of all secret files was completed.')
     else:
-        LOG.warn(
+        LOG.warning(
             'No secret documents were found for site: {}'.format(site_name))
 
 

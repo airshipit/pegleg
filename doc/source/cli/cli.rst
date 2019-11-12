@@ -642,7 +642,13 @@ repository folder structure. The ``encrypt`` command looks up the
 whose ``encryptionPolicy`` is set to ``encrypted``), and encrypts the
 documents in those files.
 
-**-a / \\-\\-author** (Required)
+**-p / \\-\\-path** (Optional).
+
+The file or directory path to encrypt. If a path is not provided, all
+applicable files discovered in the user specified repositories for
+``site_name`` will be encrypted.
+
+**-a / \\-\\-author** (Required).
 
 Author is the identifier for the program or the person, who is encrypting
 the secrets documents.

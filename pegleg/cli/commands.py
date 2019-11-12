@@ -307,7 +307,7 @@ def secrets():
     default=False,
     show_default=True,
     help='Force Pegleg to regenerate all PKI items.')
-@click.argument('site_name')
+@utils.SITE_REPOSITORY_ARGUMENT
 def generate_pki_deprecated(site_name, author, days, regenerate_all):
     """Generate certificates, certificate authorities and keypairs for a given
     site.
@@ -361,7 +361,7 @@ def generate_pki_deprecated(site_name, author, days, regenerate_all):
     default=True,
     show_default=True,
     help='Whether to encrypt the wrapped file.')
-@click.argument('site_name')
+@utils.SITE_REPOSITORY_ARGUMENT
 def wrap_secret_cli(
         *, site_name, author, filename, output_path, schema, name, layer,
         encrypt):
@@ -401,7 +401,7 @@ def genesis_bundle(*, build_dir, validators, site_name):
     'days',
     default=60,
     help='The number of days past today to check if certificates are valid.')
-@click.argument('site_name')
+@utils.SITE_REPOSITORY_ARGUMENT
 def check_pki_certs(site_name, days):
     """Check PKI certificates of a site for expiration."""
     expiring_certs_exist, cert_results = pegleg_main.run_check_pki_certs(
@@ -496,7 +496,7 @@ def generate():
     'generated, wrapped, and encrypted passphrases files will be saved '
     'in: <save_location>/site/<site_name>/secrets/certificates/ '
     'directory. Defaults to site repository path if no value given.')
-@click.argument('site_name')
+@utils.SITE_REPOSITORY_ARGUMENT
 def generate_pki(site_name, author, days, regenerate_all, save_location):
     """Generate certificates, certificate authorities and keypairs for a given
     site.
@@ -508,7 +508,7 @@ def generate_pki(site_name, author, days, regenerate_all, save_location):
 
 
 @generate.command('passphrases', help='Command to generate site passphrases')
-@click.argument('site_name')
+@utils.SITE_REPOSITORY_ARGUMENT
 @click.option(
     '-s',
     '--save-location',
@@ -563,10 +563,19 @@ def generate_passphrases(
     'documents with metadata.storagePolicy set '
     'to encrypted, in pegleg managed documents.')
 @click.option(
+    '-p',
+    '--path',
+    'path',
+    type=click.Path(exists=True, readable=True),
+    required=False,
+    help='The file or directory path to encrypt. '
+    'If path is not provided, all applicable files for the site '
+    'will be encrypted.')
+@click.option(
     '-s',
     '--save-location',
     'save_location',
-    default=None,
+    required=True,
     help='Directory to output the encrypted site secrets files. Created '
     'automatically if it does not already exist. '
     'If save_location is not provided, the output encrypted files will '
@@ -578,9 +587,9 @@ def generate_passphrases(
     required=True,
     help='Identifier for the program or person who is encrypting the secrets '
     'documents')
-@click.argument('site_name')
-def encrypt(*, save_location, author, site_name):
-    pegleg_main.run_encrypt(author, save_location, site_name)
+@utils.SITE_REPOSITORY_ARGUMENT
+def encrypt(*, path, save_location, author, site_name):
+    pegleg_main.run_encrypt(author, save_location, site_name, path=path)
 
 
 @secrets.command(
@@ -608,7 +617,7 @@ def encrypt(*, save_location, author, site_name):
     default=False,
     help='Overwrites original file(s) at path with decrypted data when set. '
     'Overrides --save-location option.')
-@click.argument('site_name')
+@utils.SITE_REPOSITORY_ARGUMENT
 def decrypt(*, path, save_location, overwrite, site_name):
     data = pegleg_main.run_decrypt(overwrite, path, save_location, site_name)
     if data:
