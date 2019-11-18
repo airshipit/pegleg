@@ -465,8 +465,8 @@ level operations for secrets documents of a site.
 
 .. note::
 
-  For the CLI commands ``encrypt``, ``decrypt``, ``generate-pki``, and ``wrap``
-  in the ``secrets`` command
+  For the CLI commands ``encrypt``, ``decrypt``, ``generate certificates``
+  and ``wrap`` in the ``secrets`` command
   group, which encrypt or decrypt site secrets, two  environment variables,
   ``PEGLEG_PASSPHRASE``, and ``PEGLEG_SALT``, are  used to capture the
   master passphrase, and the salt needed for encryption and decryption of the
@@ -482,72 +482,6 @@ level operations for secrets documents of a site.
 ::
 
   ./pegleg.sh site -r <site_repo> -e <extra_repo> secrets <command> <options>
-
-
-Generate PKI
-^^^^^^^^^^^^
-
-Generate certificates and keys according to all PKICatalog documents in the
-site using the :ref:`pki` module. The default behavior is to generate all
-certificates that are not yet present. For example, the first time generate PKI
-is run or when new entries are added to the PKICatalogue, only those new
-entries will be generated on subsequent runs.
-
-Pegleg also supports a full regeneration of all certificates at any time, by
-using the --regenerate-all flag.
-
-Pegleg places generated document files in ``<site>/secrets/passphrases``,
-``<site>/secrets/certificates``, or ``<site>/secrets/keypairs`` as
-appropriate:
-
-* The generated filenames for passphrases will follow the pattern
-  :file:`<passphrase-doc-name>.yaml`.
-* The generated filenames for certificate authorities will follow the pattern
-  :file:`<ca-name>_ca.yaml`.
-* The generated filenames for certificates will follow the pattern
-  :file:`<ca-name>_<certificate-doc-name>_certificate.yaml`.
-* The generated filenames for certificate keys will follow the pattern
-  :file:`<ca-name>_<certificate-doc-name>_key.yaml`.
-* The generated filenames for keypairs will follow the pattern
-  :file:`<keypair-doc-name>.yaml`.
-
-Dashes in the document names will be converted to underscores for consistency.
-
-**site_name** (Required).
-
-Name of site.
-
-**-a / --author** (Optional).
-
-Identifying name of the author generating new certificates. Used for tracking
-provenance information in the PeglegManagedDocuments. An attempt is made to
-automatically determine this value, but should be provided.
-
-**-d / --days** (Optional, Default=365).
-
-Duration (in days) certificates should be valid.
-Minimum=0, no maximum.  Values less than 0 will raise an exception.
-
-NOTE: A generated certificate where days = 0 should only be used for testing.
-A certificate generated in such a way will be valid for 0 seconds.
-
-**--regenerate-all** (Optional, Default=False).
-
-Force Pegleg to regenerate all PKI items.
-
-Examples
-""""""""
-
-::
-
-  ./pegleg.sh site -r <site_repo> -e <extra_repo> \
-    secrets generate-pki \
-    <site_name> \
-    -a <author> \
-    -d <days> \
-    --regenerate-all
-
-.. _command-line-repository-overrides:
 
 
 Check PKI Certs
@@ -855,6 +789,72 @@ secrets documents of a site.
 ::
 
 ./pegleg.sh site -r <site_repo> -e <extra_repo> secrets generate <command> <options>
+
+
+certificates
+^^^^^^^^^^^^
+
+Generate certificates and keys according to all PKICatalog documents in the
+site using the :ref:`pki` module. The default behavior is to generate all
+certificates that are not yet present. For example, the first time generate PKI
+is run or when new entries are added to the PKICatalogue, only those new
+entries will be generated on subsequent runs.
+
+Pegleg also supports a full regeneration of all certificates at any time, by
+using the --regenerate-all flag.
+
+Pegleg places generated document files in ``<site>/secrets/passphrases``,
+``<site>/secrets/certificates``, or ``<site>/secrets/keypairs`` as
+appropriate:
+
+* The generated filenames for passphrases will follow the pattern
+  :file:`<passphrase-doc-name>.yaml`.
+* The generated filenames for certificate authorities will follow the pattern
+  :file:`<ca-name>_ca.yaml`.
+* The generated filenames for certificates will follow the pattern
+  :file:`<ca-name>_<certificate-doc-name>_certificate.yaml`.
+* The generated filenames for certificate keys will follow the pattern
+  :file:`<ca-name>_<certificate-doc-name>_key.yaml`.
+* The generated filenames for keypairs will follow the pattern
+  :file:`<keypair-doc-name>.yaml`.
+
+Dashes in the document names will be converted to underscores for consistency.
+
+**site_name** (Required).
+
+Name of site.
+
+**-a / --author** (Optional).
+
+Identifying name of the author generating new certificates. Used for tracking
+provenance information in the PeglegManagedDocuments. An attempt is made to
+automatically determine this value, but should be provided.
+
+**-d / --days** (Optional, Default=365).
+
+Duration (in days) certificates should be valid.
+Minimum=0, no maximum.  Values less than 0 will raise an exception.
+
+NOTE: A generated certificate where days = 0 should only be used for testing.
+A certificate generated in such a way will be valid for 0 seconds.
+
+**--regenerate-all** (Optional, Default=False).
+
+Force Pegleg to regenerate all PKI items.
+
+Examples
+""""""""
+
+::
+
+  ./pegleg.sh site -r <site_repo> -e <extra_repo> \
+    secrets generate certificates \
+    <site_name> \
+    -a <author> \
+    -d <days> \
+    --regenerate-all
+
+.. _command-line-repository-overrides:
 
 passphrases
 """""""""""

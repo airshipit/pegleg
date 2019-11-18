@@ -516,7 +516,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         not pki_utility.PKIUtility.cfssl_exists(),
         reason='cfssl must be installed to execute these tests')
     def test_site_secrets_generate_pki_using_remote_repo_url(self):
-        """Validates ``generate-pki`` action using remote repo URL."""
+        """Validates ``generate certificates`` action using remote repo URL."""
         # Scenario:
         #
         # 1) Generate PKI using remote repo URL
@@ -524,7 +524,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         repo_url = 'https://opendev.org/airship/%s@%s' % (
             self.repo_name, self.repo_rev)
 
-        secrets_opts = ['secrets', 'generate-pki', self.site_name]
+        secrets_opts = ['secrets', 'generate', 'certificates', self.site_name]
 
         result = self.runner.invoke(cli.site, ['-r', repo_url] + secrets_opts)
         self._validate_generate_pki_action(result)
@@ -533,13 +533,13 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         not pki_utility.PKIUtility.cfssl_exists(),
         reason='cfssl must be installed to execute these tests')
     def test_site_secrets_generate_pki_using_local_repo_path(self):
-        """Validates ``generate-pki`` action using local repo path."""
+        """Validates ``generate certificates`` action using local repo path."""
         # Scenario:
         #
         # 1) Generate PKI using local repo path
 
         repo_path = self.treasuremap_path
-        secrets_opts = ['secrets', 'generate-pki', self.site_name]
+        secrets_opts = ['secrets', 'generate', 'certificates', self.site_name]
 
         result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
         self._validate_generate_pki_action(result)
@@ -553,7 +553,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             "PEGLEG_SALT": "MySecretSalt1234567890]["
         })
     def test_site_secrets_encrypt_and_decrypt_local_repo_path(self):
-        """Validates ``generate-pki`` action using local repo path."""
+        """Validates ``generate certificates`` action using local repo path."""
         # Scenario:
         #
         # 1) Encrypt a file in a local repo
@@ -604,7 +604,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             "PEGLEG_SALT": "123456"
         })
     def test_site_secrets_wrap(self):
-        """Validates ``generate-pki`` action using local repo path."""
+        """Validates ``generate certificates`` action using local repo path."""
         # Scenario:
         #
         # 1) Encrypt a file in a local repo

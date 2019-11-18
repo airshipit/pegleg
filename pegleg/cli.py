@@ -431,53 +431,6 @@ def secrets():
 
 
 @secrets.command(
-    'generate-pki',
-    short_help='Generate certs and keys according to the site PKICatalog',
-    help='Generate certificates and keys according to all PKICatalog '
-    'documents in the site using the PKI module. The default behavior is '
-    'to generate all certificates that are not yet present. For example, '
-    'the first time generate PKI is run or when new entries are added '
-    'to the PKICatalogue, only those new entries will be generated on '
-    'subsequent runs.')
-@click.option(
-    '-a',
-    '--author',
-    'author',
-    help='Identifying name of the author generating new certificates. Used'
-    'for tracking provenance information in the PeglegManagedDocuments. '
-    'An attempt is made to automatically determine this value, '
-    'but should be provided.')
-@click.option(
-    '-d',
-    '--days',
-    'days',
-    default=365,
-    show_default=True,
-    help='Duration in days generated certificates should be valid.')
-@click.option(
-    '--regenerate-all',
-    'regenerate_all',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help='Force Pegleg to regenerate all PKI items.')
-@click.argument('site_name')
-def generate_pki(site_name, author, days, regenerate_all):
-    """Generate certificates, certificate authorities and keypairs for a given
-    site.
-
-    """
-
-    engine.repository.process_repositories(site_name, overwrite_existing=True)
-    config.set_global_enc_keys(site_name)
-    pkigenerator = catalog.pki_generator.PKIGenerator(
-        site_name, author=author, duration=days, regenerate_all=regenerate_all)
-    output_paths = pkigenerator.generate()
-
-    click.echo("Generated PKI files written to:\n%s" % '\n'.join(output_paths))
-
-
-@secrets.command(
     'wrap',
     help='Wrap bare files (e.g. pem or crt) in a PeglegManagedDocument '
     'and encrypt them (by default).')
@@ -621,6 +574,53 @@ def list_types(*, output_stream):
     name='generate', help='Command group to generate site secrets documents.')
 def generate():
     pass
+
+
+@generate.command(
+    'certificates',
+    short_help='Generate certs and keys according to the site PKICatalog',
+    help='Generate certificates and keys according to all PKICatalog '
+    'documents in the site using the PKI module. The default behavior is '
+    'to generate all certificates that are not yet present. For example, '
+    'the first time generate PKI is run or when new entries are added '
+    'to the PKICatalogue, only those new entries will be generated on '
+    'subsequent runs.')
+@click.option(
+    '-a',
+    '--author',
+    'author',
+    help='Identifying name of the author generating new certificates. Used'
+    'for tracking provenance information in the PeglegManagedDocuments. '
+    'An attempt is made to automatically determine this value, '
+    'but should be provided.')
+@click.option(
+    '-d',
+    '--days',
+    'days',
+    default=365,
+    show_default=True,
+    help='Duration in days generated certificates should be valid.')
+@click.option(
+    '--regenerate-all',
+    'regenerate_all',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Force Pegleg to regenerate all PKI items.')
+@click.argument('site_name')
+def generate_pki(site_name, author, days, regenerate_all):
+    """Generate certificates, certificate authorities and keypairs for a given
+    site.
+
+    """
+
+    engine.repository.process_repositories(site_name, overwrite_existing=True)
+    config.set_global_enc_keys(site_name)
+    pkigenerator = catalog.pki_generator.PKIGenerator(
+        site_name, author=author, duration=days, regenerate_all=regenerate_all)
+    output_paths = pkigenerator.generate()
+
+    click.echo("Generated PKI files written to:\n%s" % '\n'.join(output_paths))
 
 
 @generate.command('passphrases', help='Command to generate site passphrases')

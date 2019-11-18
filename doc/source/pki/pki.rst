@@ -20,9 +20,9 @@ Public Key Infrastructure (PKI) Catalog
 =======================================
 
 Configuration for certificate and keypair generation in the cluster.  The
-``pegleg generate-certs`` command will read all ``PKICatalog`` documents and
-either find pre-existing certificates/keys, or generate new ones based on the
-given definition.
+``pegleg secrets generate certificates`` command will read all ``PKICatalog``
+documents and either find pre-existing certificates/keys, or generate new ones
+based on the given definition.
 
 Dependencies
 ------------

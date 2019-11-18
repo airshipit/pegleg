@@ -1,0 +1,4 @@
+---
+deprecations:
+  - |
+    Moved pegleg secrets generate-pki to pegleg secrets generate certificates.
