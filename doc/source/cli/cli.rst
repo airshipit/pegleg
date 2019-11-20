@@ -949,7 +949,6 @@ catalog.
 
 **-a / --author** (Required)
 
-
 ``Author`` is intended to document the application or the individual, who
 generates the site passphrase documents, mostly for tracking purposes. It
 is expected to be leveraged in an operator-specific manner.
@@ -964,6 +963,15 @@ are placed in the following folder structure under ``save_location``:
 ::
 
 <save_location>/site/<site_name>/secrets/passphrases/<passphrase_name.yaml>
+
+**-c / --passphrase-catalog** (Optional).
+
+Specifies a path for a passphrase catalog file to use instead of the catalogs
+found in the repositories specified by the user. The specified catalog
+will be used when this option is specified and all other discovered catalogs
+will be disregarded. This can be used to specify a subset of passphrases to
+generate instead of the whole catalog or for testing new passphrases before
+merging them into production.
 
 **-i / --interactive** (Optional). False by default.
 

@@ -708,6 +708,15 @@ def generate_pki(site_name, author, days, regenerate_all, save_location):
     help='Identifier for the program or person who is generating the secrets '
     'documents')
 @click.option(
+    '-c',
+    '--passphrase-catalog',
+    'passphrase_catalog',
+    required=False,
+    type=click.Path(exists=True, dir_okay=False, readable=True),
+    help='Path to a specific passphrase catalog to generate passphrases from. '
+    'If not specified, defaults to use catalogs discovered in the '
+    'repositories.')
+@click.option(
     '-i',
     '--interactive',
     'interactive',
@@ -722,11 +731,13 @@ def generate_pki(site_name, author, days, regenerate_all, save_location):
     show_default=True,
     help='Force cleartext generation of passphrases. This is not recommended.')
 def generate_passphrases(
-        *, site_name, save_location, author, interactive, force_cleartext):
+        *, site_name, save_location, author, passphrase_catalog, interactive,
+        force_cleartext):
     engine.repository.process_repositories(site_name)
     config.set_global_enc_keys(site_name)
     engine.secrets.generate_passphrases(
-        site_name, save_location, author, interactive, force_cleartext)
+        site_name, save_location, author, passphrase_catalog, interactive,
+        force_cleartext)
 
 
 @secrets.command(

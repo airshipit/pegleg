@@ -68,6 +68,34 @@ data:
 ...
 """)
 
+TEST_OVERRIDE_PASSPHRASES_CATALOG = yaml.safe_load(
+    """
+---
+schema: pegleg/PassphraseCatalog/v1
+metadata:
+  schema: metadata/Document/v1
+  name: cluster-passphrases
+  layeringDefinition:
+    abstract: false
+    layer: site
+  storagePolicy: cleartext
+data:
+  passphrases:
+    - description: 'short description of the passphrase'
+      document_name: ucp_keystone_admin_password
+      encrypted: true
+      length: 24
+    - description: 'short description of the passphrase'
+      document_name: osh_cinder_password
+      encrypted: true
+      length: 25
+    - description: 'short description of the passphrase'
+      document_name: osh_placement_password
+      encrypted: true
+      length: 32
+...
+""")
+
 TEST_GLOBAL_PASSPHRASES_CATALOG = yaml.safe_load(
     """
 ---
@@ -230,6 +258,10 @@ def test_generate_passphrases(*_):
     os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
     PassphraseGenerator('cicd', _dir, 'test_author').generate()
 
+    passphrase_dir = os.path.join(
+        _dir, 'site', 'cicd', 'secrets', 'passphrases')
+    assert 6 == len(os.listdir(passphrase_dir))
+
     for passphrase in TEST_PASSPHRASES_CATALOG['data']['passphrases']:
         passphrase_file_name = '{}.yaml'.format(passphrase['document_name'])
         passphrase_file_path = os.path.join(
@@ -279,6 +311,68 @@ def test_generate_passphrases_exception(capture):
                 'Signature verification to decrypt secrets failed. '
                 'Please check your provided passphrase and salt and '
                 'try again.')))
+
+
+@mock.patch.object(
+    util.definition,
+    'documents_for_site',
+    autospec=True,
+    return_value=TEST_SITE_DOCUMENTS)
+@mock.patch.object(
+    pegleg.config,
+    'get_site_repo',
+    autospec=True,
+    return_value='cicd_site_repo')
+@mock.patch.object(
+    util.definition,
+    'site_files',
+    autospec=True,
+    return_value=[
+        'cicd_site_repo/site/cicd/passphrases/passphrase-catalog.yaml',
+    ])
+@mock.patch.dict(
+    os.environ, {
+        'PEGLEG_PASSPHRASE': 'ytrr89erARAiPE34692iwUMvWqqBvC',
+        'PEGLEG_SALT': 'MySecretSalt1234567890]['
+    })
+def test_generate_passphrases_with_overidden_passphrase_catalog(*_):
+    _dir = tempfile.mkdtemp()
+    os.makedirs(os.path.join(_dir, 'cicd_site_repo'), exist_ok=True)
+    PassphraseGenerator(
+        'cicd', _dir, 'test_author',
+        [TEST_OVERRIDE_PASSPHRASES_CATALOG]).generate()
+
+    passphrase_dir = os.path.join(
+        _dir, 'site', 'cicd', 'secrets', 'passphrases')
+    assert 3 == len(os.listdir(passphrase_dir))
+
+    for passphrase in TEST_OVERRIDE_PASSPHRASES_CATALOG['data']['passphrases']:
+        passphrase_file_name = '{}.yaml'.format(passphrase['document_name'])
+        passphrase_file_path = os.path.join(
+            _dir, 'site', 'cicd', 'secrets', 'passphrases',
+            passphrase_file_name)
+        assert os.path.isfile(passphrase_file_path)
+        with open(passphrase_file_path) as stream:
+            doc = yaml.safe_load(stream)
+            assert doc['schema'] == 'pegleg/PeglegManagedDocument/v1'
+            assert doc['metadata']['storagePolicy'] == 'cleartext'
+            assert 'encrypted' in doc['data']
+            assert doc['data']['encrypted']['by'] == 'test_author'
+            assert 'generated' in doc['data']
+            assert doc['data']['generated']['by'] == 'test_author'
+            assert 'managedDocument' in doc['data']
+            assert doc['data']['managedDocument']['metadata'][
+                'storagePolicy'] == 'encrypted'
+            decrypted_passphrase = encryption.decrypt(
+                doc['data']['managedDocument']['data'],
+                os.environ['PEGLEG_PASSPHRASE'].encode(),
+                os.environ['PEGLEG_SALT'].encode())
+            if passphrase_file_name == 'osh_placement_password.yaml':
+                assert len(decrypted_passphrase) == 32
+            elif passphrase_file_name == 'osh_cinder_password.yaml':
+                assert len(decrypted_passphrase) == 25
+            else:
+                assert len(decrypted_passphrase) == 24
 
 
 @mock.patch.object(

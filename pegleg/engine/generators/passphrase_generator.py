@@ -40,7 +40,12 @@ class PassphraseGenerator(BaseGenerator):
     Generates passphrases for a given environment, specified in a
     passphrase catalog.
     """
-    def __init__(self, sitename, save_location, author):
+    def __init__(
+            self,
+            sitename,
+            save_location,
+            author,
+            override_passphrase_catalog=None):
         """Constructor for ``PassphraseGenerator``.
 
         :param str sitename: Site name for which passphrases are generated.
@@ -49,11 +54,11 @@ class PassphraseGenerator(BaseGenerator):
         :param str author: Identifying name of the author generating new
         certificates.
         """
-
         super(PassphraseGenerator,
               self).__init__(sitename, save_location, author)
         self._catalog = PassphraseCatalog(
-            self._sitename, documents=self._documents)
+            self._sitename,
+            documents=override_passphrase_catalog or self._documents)
 
     def generate(self, interactive=False, force_cleartext=False):
         """

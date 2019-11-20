@@ -138,7 +138,11 @@ def _get_dest_path(repo_base, file_path, save_location):
 
 
 def generate_passphrases(
-        site_name, save_location, author, interactive=False,
+        site_name,
+        save_location,
+        author,
+        passphrase_catalog=None,
+        interactive=False,
         force_cleartext=False):
     """
     Look for the site passphrase catalogs, and for every passphrase entry in
@@ -149,12 +153,19 @@ def generate_passphrases(
     :param str site_name: The site to read from
     :param str save_location: Location to write files to
     :param str author: Author who's generating the files
+    :param path-like passphrase_catalog: Path to file overriding any other
+    discovered passphrase catalogs
     :param bool interactive: Whether to allow user input for passphrases
     :param bool force_cleartext: Whether to generate results in clear text
     """
+    override_passphrase_catalog = passphrase_catalog
+    if passphrase_catalog:
+        override_passphrase_catalog = files.read(passphrase_catalog)
 
-    PassphraseGenerator(site_name, save_location, author).generate(
-        interactive=interactive, force_cleartext=force_cleartext)
+    PassphraseGenerator(
+        site_name, save_location, author,
+        override_passphrase_catalog).generate(
+            interactive=interactive, force_cleartext=force_cleartext)
 
 
 def generate_crypto_string(length):
