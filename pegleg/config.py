@@ -38,7 +38,8 @@ except NameError:
         'global_salt': None,
         'salt_min_length': 24,
         'passphrase_min_length': 24,
-        'default_umask': 0o027
+        'default_umask': 0o027,
+        'decrypt_repos': False
     }
 
 
@@ -214,3 +215,11 @@ def get_global_passphrase():
 def get_global_salt():
     """Get the global salt for encryption and decryption."""
     return GLOBAL_CONTEXT['global_salt']
+
+
+def set_decrypt_repos(decrypt_repos=False):
+    GLOBAL_CONTEXT['decrypt_repos'] = decrypt_repos
+
+
+def get_decrypt_repos():
+    return GLOBAL_CONTEXT['decrypt_repos']

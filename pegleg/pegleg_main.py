@@ -49,7 +49,8 @@ def run_config(
         repo_key,
         repo_username,
         extra_repositories,
-        run_umask=True):
+        run_umask=True,
+        decrypt_repos=True):
     """Initializes pegleg configuration data
 
     :param site_repository: path or URL for site repository
@@ -60,6 +61,7 @@ def run_config(
     :param extra_repositories: list of extra repositories to read in documents
                                from, specified as "type=REPO_URL/PATH"
     :param run_umask: if True, runs set_umask for os file output
+    :param decrypt_repos: if True, decrypts repos before executing command
     :return:
     """
     config.set_site_repo(site_repository)
@@ -70,6 +72,7 @@ def run_config(
     config.set_repo_username(repo_username)
     if run_umask:
         config.set_umask()
+    config.set_decrypt_repos(decrypt_repos)
 
 
 def _run_lint_helper(
@@ -84,6 +87,20 @@ def _run_lint_helper(
         exclude_lint=exclude_lint,
         warn_lint=warn_lint)
     return warns
+
+
+def _run_precommand_decrypt(site_name):
+    if config.get_decrypt_repos():
+        LOG.info('Executing pre-command repository decryption...')
+        repo_list = config.all_repos()
+        for repo in repo_list:
+            secrets_path = os.path.join(
+                repo.rstrip(os.path.sep), 'site', site_name, 'secrets')
+            if os.path.exists(secrets_path):
+                LOG.info('Decrypting %s', secrets_path)
+                run_decrypt(True, secrets_path, None, site_name)
+    else:
+        LOG.debug('Skipping pre-command repository decryption.')
 
 
 def run_lint(exclude_lint, fail_on_missing_sub_src, warn_lint):
@@ -116,6 +133,7 @@ def run_collect(exclude_lint, save_location, site_name, validate, warn_lint):
     :param warn_lint: output warnings for specified rules
     :return:
     """
+    _run_precommand_decrypt(site_name)
     if validate:
         # Lint the primary repo prior to document collection.
         _run_lint_helper(
@@ -154,6 +172,7 @@ def run_render(output_stream, site_name, validate):
     :param validate: if True, validate documents using schema validation
     :return:
     """
+    _run_precommand_decrypt(site_name)
     engine.site.render(site_name, output_stream, validate)
 
 
@@ -167,6 +186,7 @@ def run_lint_site(exclude_lint, fail_on_missing_sub_src, site_name, warn_lint):
     :param warn_lint: output warnings for specified rules
     :return:
     """
+    _run_precommand_decrypt(site_name)
     return _run_lint_helper(
         fail_on_missing_sub_src=fail_on_missing_sub_src,
         exclude_lint=exclude_lint,
@@ -195,6 +215,7 @@ def run_upload(
     :param site_name: site name to process
     :return: response from shipyard instance
     """
+    _run_precommand_decrypt(site_name)
     if not ctx.obj:
         ctx.obj = {}
     # Build API parameters required by Shipyard API Client.
@@ -237,6 +258,7 @@ def run_generate_pki(
     :param save_location: directory to store the generated site certificates in
     :return: list of paths written to
     """
+    _run_precommand_decrypt(site_name)
     engine.repository.process_repositories(site_name, overwrite_existing=True)
     pkigenerator = catalog.pki_generator.PKIGenerator(
         site_name,
@@ -264,7 +286,6 @@ def run_wrap_secret(
     :param site_name: site name to process
     :return:
     """
-    engine.repository.process_repositories(site_name, overwrite_existing=True)
     config.set_global_enc_keys(site_name)
     wrap_secret(
         author,
@@ -285,6 +306,7 @@ def run_genesis_bundle(build_dir, site_name, validators):
     :param validators: if True, runs validation scripts on genesis bundle
     :return:
     """
+    _run_precommand_decrypt(site_name)
     encryption_key = os.environ.get("PROMENADE_ENCRYPTION_KEY")
     config.set_global_enc_keys(site_name)
     bundle.build_genesis(
@@ -299,7 +321,7 @@ def run_check_pki_certs(days, site_name):
     :param site_name: site name to process
     :return:
     """
-    engine.repository.process_repositories(site_name, overwrite_existing=True)
+    _run_precommand_decrypt(site_name)
     config.set_global_enc_keys(site_name)
     expiring_certs_exist, cert_results = engine.secrets.check_cert_expiry(
         site_name, duration=days)
@@ -335,7 +357,7 @@ def run_generate_passphrases(
     discovered catalogs
     :return:
     """
-    engine.repository.process_repositories(site_name)
+    _run_precommand_decrypt(site_name)
     config.set_global_enc_keys(site_name)
     engine.secrets.generate_passphrases(
         site_name,
@@ -356,7 +378,6 @@ def run_encrypt(author, save_location, site_name):
     :param site_name: site name to process
     :return:
     """
-    engine.repository.process_repositories(site_name, overwrite_existing=True)
     config.set_global_enc_keys(site_name)
     if save_location is None:
         save_location = config.get_site_repo()
@@ -375,7 +396,6 @@ def run_decrypt(overwrite, path, save_location, site_name):
     :rtype: list
     """
     decrypted_data = []
-    engine.repository.process_repositories(site_name)
     config.set_global_enc_keys(site_name)
     decrypted = engine.secrets.decrypt(path, site_name=site_name)
     if overwrite:

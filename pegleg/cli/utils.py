@@ -16,7 +16,9 @@ import logging
 
 import click
 
+from pegleg import config
 from pegleg import engine
+from pegleg import pegleg_main
 
 LOG = logging.getLogger(__name__)
 
@@ -40,9 +42,15 @@ def collection_default_callback(ctx, param, value):
     return value
 
 
+def decrypt_repos(site_name):
+    repo_list = config.all_repos()
+    for repo in repo_list:
+        pegleg_main.run_decrypt(True, repo, None, site_name)
+
+
 # Arguments #
 SITE_REPOSITORY_ARGUMENT = click.argument(
-    'site_name', callback=process_repositories_callback)
+    'site_name', callback=process_repositories_callback, is_eager=True)
 
 # Options #
 ALLOW_MISSING_SUBSTITUTIONS_OPTION = click.option(

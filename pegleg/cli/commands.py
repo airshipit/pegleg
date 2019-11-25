@@ -98,9 +98,19 @@ def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
 @utils.EXTRA_REPOSITORY_OPTION
 @utils.REPOSITORY_USERNAME_OPTION
 @utils.REPOSITORY_KEY_OPTION
+@click.option(
+    '--decrypt/--no-decrypt',
+    'decrypt_repos',
+    default=True,
+    help='Automatically attempts to decrypt repositories before executing '
+    'the command. Decryption will happen after repositories are copied to '
+    'the temporary directory created by pegleg or the user specified '
+    '`-p` directory. This means in most situations, pre-command decrypt '
+    'will not overwrite existing files. For overwriting existing files, '
+    'the full decrypt command should still be used.')
 def site(
         *, site_repository, clone_path, extra_repositories, repo_key,
-        repo_username):
+        repo_username, decrypt_repos):
     """Group for site-level actions, which include:
 
     * list: list available sites in a manifests repo
@@ -115,7 +125,8 @@ def site(
         repo_key,
         repo_username,
         extra_repositories or [],
-        run_umask=True)
+        run_umask=True,
+        decrypt_repos=decrypt_repos)
 
 
 @site.command(help='Output complete config for one site')
