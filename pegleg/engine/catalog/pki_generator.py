@@ -48,7 +48,8 @@ class PKIGenerator(object):
             block_strings=True,
             author=None,
             duration=365,
-            regenerate_all=False):
+            regenerate_all=False,
+            save_location=None):
         """Constructor for ``PKIGenerator``.
 
         :param int duration: Duration in days that generated certificates
@@ -66,6 +67,7 @@ class PKIGenerator(object):
         self._sitename = sitename
         self._documents = site.get_rendered_docs(sitename)
         self._author = author
+        self._save_location = save_location or config.get_site_repo()
 
         self.keys = pki_utility.PKIUtility(
             block_strings=block_strings, duration=duration)
@@ -96,7 +98,7 @@ class PKIGenerator(object):
                 document_name = keypair_def['name']
                 self.get_or_gen_keypair(document_name)
 
-        return self._write(config.get_site_repo())
+        return self._write(self._save_location)
 
     def get_or_gen_ca(self, document_name):
         kinds = [

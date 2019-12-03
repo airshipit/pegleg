@@ -607,8 +607,18 @@ def generate():
     default=False,
     show_default=True,
     help='Force Pegleg to regenerate all PKI items.')
+@click.option(
+    '-s',
+    '--save-location',
+    'save_location',
+    required=False,
+    help='Directory to store the generated site certificates in. It will '
+    'be created automatically, if it does not already exist. The '
+    'generated, wrapped, and encrypted passphrases files will be saved '
+    'in: <save_location>/site/<site_name>/secrets/certificates/ '
+    'directory. Defaults to site repository path if no value given.')
 @click.argument('site_name')
-def generate_pki(site_name, author, days, regenerate_all):
+def generate_pki(site_name, author, days, regenerate_all, save_location):
     """Generate certificates, certificate authorities and keypairs for a given
     site.
 
@@ -617,7 +627,11 @@ def generate_pki(site_name, author, days, regenerate_all):
     engine.repository.process_repositories(site_name, overwrite_existing=True)
     config.set_global_enc_keys(site_name)
     pkigenerator = catalog.pki_generator.PKIGenerator(
-        site_name, author=author, duration=days, regenerate_all=regenerate_all)
+        site_name,
+        author=author,
+        duration=days,
+        regenerate_all=regenerate_all,
+        save_location=save_location)
     output_paths = pkigenerator.generate()
 
     click.echo("Generated PKI files written to:\n%s" % '\n'.join(output_paths))
