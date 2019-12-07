@@ -80,7 +80,10 @@ class PeglegManagedSecretsDocument(object):
             [('abstract', False), ('layer', layer)])
         metadata = OrderedDict(
             [
-                ('name', secrets_document['metadata']['name']),
+                (
+                    'name', '{}/{}'.format(
+                        secrets_document['schema'],
+                        secrets_document['metadata']['name'])),
                 ('schema', 'metadata/Document/v1'),
                 ('labels', secrets_document['metadata'].get('labels', {})),
                 ('layeringDefinition', layering_definition),

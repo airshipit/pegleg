@@ -279,7 +279,9 @@ class TestPKIGenerator(object):
             wrapper_storage_policy = document['metadata']['storagePolicy']
             # This document is owned by Pegleg so begins with pegleg.
             assert "pegleg/PeglegManagedDocument/v1" == wrapper_schema
-            assert expected_name == wrapper_name
+            expected_wrapper_name = '{}/{}'.format(
+                wrapped_schema, expected_name)
+            assert expected_wrapper_name == wrapper_name
             assert "cleartext" == wrapper_storage_policy
 
     def _validate_keypairs(self, documents):
