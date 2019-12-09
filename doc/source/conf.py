@@ -52,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pegleg'
-copyright = u'2018 AT&T Intellectual Property.'
+copyright = u'2019 Pegleg Authors.'
 author = u'Pegleg Authors'
 
 # The version info for the project you're documenting, acts as replacement for
