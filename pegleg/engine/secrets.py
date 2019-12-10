@@ -235,7 +235,7 @@ def check_cert_expiry(site_name, duration=60):
     pki_util = PKIUtility(duration=duration)
     # Create a table to output expired/expiring certs for this site.
     cert_table = PrettyTable()
-    cert_table.field_names = ['cert_name', 'expiration_date']
+    cert_table.field_names = ['file', 'cert_name', 'expiration_date']
 
     s = definition.site_files(site_name)
     for doc in s:
@@ -250,7 +250,11 @@ def check_cert_expiry(site_name, duration=60):
                         cert = result['data']
                         cert_info = pki_util.check_expiry(cert)
                         if cert_info['expired'] is True:
-                            cert_table.add_row([doc, cert_info['expiry_date']])
+                            cert_table.add_row(
+                                [
+                                    doc, result['metadata']['name'],
+                                    cert_info['expiry_date']
+                                ])
 
     # Return table of cert names and expiration dates that are expiring
     return cert_table.get_string()
