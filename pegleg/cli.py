@@ -585,11 +585,19 @@ def check_pki_certs(site_name, days):
     engine.repository.process_repositories(site_name, overwrite_existing=True)
     config.set_global_enc_keys(site_name)
 
-    cert_results = engine.secrets.check_cert_expiry(site_name, duration=days)
+    expired_certs_exist, cert_results = engine.secrets.check_cert_expiry(
+        site_name, duration=days)
 
-    click.echo(
-        "The following certs will expire within {} days: \n{}".format(
-            days, cert_results))
+    if expired_certs_exist:
+        click.echo(
+            "The following certs will expire within the next {} days: \n{}".
+            format(days, cert_results))
+        exit(1)
+    else:
+        click.echo(
+            "No certificates will expire within the next {} days.".format(
+                days))
+        exit(0)
 
 
 @main.group(help='Commands related to types')

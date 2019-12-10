@@ -28,7 +28,7 @@ from tests.unit import test_utils
 TEST_PARAMS = {
     "site_name": "seaworthy",
     "site_type": "foundry",
-    "repo_rev": '33bdd46754b7acabb2cbc2f4b335d34ecb80d4ce',
+    "repo_rev": '29c67eb3a0ce046e41cfadbb9381697cd556f659',
     "repo_name": "treasuremap",
     "repo_url": "https://opendev.org/airship/treasuremap.git",
 }
@@ -592,9 +592,18 @@ class TestSiteSecretsActions(BaseCLIActionTest):
     @pytest.mark.skipif(
         not pki_utility.PKIUtility.cfssl_exists(),
         reason='cfssl must be installed to execute these tests')
-    def test_check_pki_certs(self):
+    def test_check_pki_certs_expired(self):
         repo_path = self.treasuremap_path
         secrets_opts = ['secrets', 'check-pki-certs', self.site_name]
+        result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
+        assert result.exit_code == 1, result.output
+
+    @pytest.mark.skipif(
+        not pki_utility.PKIUtility.cfssl_exists(),
+        reason='cfssl must be installed to execute these tests')
+    def test_check_pki_certs(self):
+        repo_path = self.treasuremap_path
+        secrets_opts = ['secrets', 'check-pki-certs', 'airsloop']
         result = self.runner.invoke(cli.site, ['-r', repo_path] + secrets_opts)
         assert result.exit_code == 0, result.output
 

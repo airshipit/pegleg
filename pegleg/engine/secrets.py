@@ -236,6 +236,7 @@ def check_cert_expiry(site_name, duration=60):
     # Create a table to output expired/expiring certs for this site.
     cert_table = PrettyTable()
     cert_table.field_names = ['file', 'cert_name', 'expiration_date']
+    expired_certs_exist = False
 
     s = definition.site_files(site_name)
     for doc in s:
@@ -255,9 +256,10 @@ def check_cert_expiry(site_name, duration=60):
                                     doc, result['metadata']['name'],
                                     cert_info['expiry_date']
                                 ])
+                            expired_certs_exist = True
 
     # Return table of cert names and expiration dates that are expiring
-    return cert_table.get_string()
+    return expired_certs_exist, cert_table.get_string()
 
 
 def get_global_creds(site_name):
