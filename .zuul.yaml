@@ -103,6 +103,7 @@
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node
+    voting: false
     irrelevant-files:
       - '^doc/.*'
     vars:
@@ -155,6 +156,7 @@
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node
+    voting: false
     secrets:
       - airship_pegleg_quay_creds
     irrelevant-files:
