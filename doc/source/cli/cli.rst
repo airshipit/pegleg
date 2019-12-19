@@ -77,11 +77,11 @@ For example:
 CLI Options
 ===========
 
-**-v / --verbose** (Optional, Default=False).
+**-v / \\-\\-verbose** (Optional, Default=False).
 
 Enable debug logging.
 
-**-l / --logging-level** (Optional, Default=40).
+**-l / \\-\\-logging-level** (Optional, Default=40).
 
 Specifies the logging level, as a number, with which to run pegleg. The
 available levels are as follows:
@@ -104,7 +104,7 @@ Allows you to perform repository-level operations.
 Options
 -------
 
-**-r / --site-repository** (Required).
+**-r / \\-\\-site-repository** (Required).
 
 Path to the root of the site repository (containing site_definition.yaml) repo.
 
@@ -116,7 +116,7 @@ The revision can also be specified via (for example):
 
   -r /opt/airship/treasuremap@revision
 
-**-p / --clone-path** (Optional, Default=/tmp/).
+**-p / \\-\\-clone-path** (Optional, Default=/tmp/).
 
 The path where the repo will be cloned. By default the repo will be cloned to
 the /tmp path. If this option is included and the repo already exists, then the
@@ -154,7 +154,7 @@ Allows you to perform site-level operations.
 Options
 -------
 
-**-r / --site-repository** (Required).
+**-r / \\-\\-site-repository** (Required).
 
 Path to the root of the site repository (containing site_definition.yaml) repo.
 
@@ -166,7 +166,7 @@ The revision can also be specified via (for example):
 
   -r /opt/airship/treasuremap@revision
 
-**-e / --extra-repository** (Optional).
+**-e / \\-\\-extra-repository** (Optional).
 
 Path to the root of extra repositories used for overriding those specified
 under the ``repositories`` field in a given :file:`site-definition.yaml`.
@@ -177,7 +177,7 @@ These should be named per the site-definition file, e.g.:
 
   -e global=/opt/global -e secrets=/opt/secrets
 
-**-p / --clone-path** (Optional, Default=/tmp/).
+**-p / \\-\\-clone-path** (Optional, Default=/tmp/).
 
 The path where the repo will be cloned. By default the repo will be cloned to
 the /tmp path. If this option is included and the repo already exists, then the
@@ -202,13 +202,13 @@ site will be leveraged but can be
 
   -e global=/opt/global@revision
 
-**-k / --repo-key** (Optional, SSH only).
+**-k / \\-\\-repo-key** (Optional, SSH only).
 
 The SSH public key to use when cloning remote authenticated repositories.
 
 Required for cloning repositories via SSH protocol.
 
-**-u / --repo-username** (Optional, unless required by repo URL).
+**-u / \\-\\-repo-username** (Optional, unless required by repo URL).
 
 The SSH username to use when cloning remote authenticated repositories
 specified in the site-definition file. Any occurrences of ``REPO_USERNAME``
@@ -241,7 +241,7 @@ Output complete config for one site.
 
 Name of the site.
 
-**-s / --save-location** (Optional).
+**-s / \\-\\-save-location** (Optional).
 
 Where to output collected documents. If omitted, the results will be dumped
 to ``stdout``.
@@ -254,7 +254,7 @@ Will exclude the specified lint option. -w takes priority over -x.
 
 Will warn of lint failures from the specified lint options.
 
-**--validate** (Optional, validation only, Default=False).
+**\\-\\-validate** (Optional, validation only, Default=False).
 
 Perform validation of documents prior to collection. See :ref:`cli-site-lint`
 for additional information on document linting. It is recommended that document
@@ -292,7 +292,7 @@ List
 
 List known sites.
 
-**-o / --output** (Optional, Default=stdout).
+**-o / \\-\\-output** (Optional, Default=stdout).
 
 Where to output.
 
@@ -318,7 +318,7 @@ Show details for one site.
 
 Name of site.
 
-**-o / --output** (Optional, Default=stdout).
+**-o / \\-\\-output** (Optional, Default=stdout).
 
 Where to output.
 
@@ -344,11 +344,11 @@ Render documents via `Deckhand`_ for one site.
 
 Name of site.
 
-**-o / --output** (Optional, Default=stdout).
+**-o / \\-\\-output** (Optional, Default=stdout).
 
 Where to output.
 
-**-v / --validate** (Optional, Default=True).
+**-v / \\-\\-validate** (Optional, Default=True).
 
 Whether to pre-validate documents using built-in schema validation.
 Skips over externally registered DataSchema documents to avoid
@@ -416,20 +416,21 @@ Uploads documents to `Shipyard`_.
 Name of the site. The ``site_name`` must match a ``site`` name in the site
 repository folder structure
 
-**--os-<various>** (Required).
+**\\-\\-os-<various>** (Required).
 
 Shipyard needs these options for authenticating with OpenStack Keystone.
 This option can be set as environment variables or it can be passed via
 the command line.
 
-Please reference Shipyard's `CLI documentation`_ for information related to these options.
+Please reference Shipyard's `CLI documentation`_ for information related to
+these options.
 
-**--context-marker** (Optional).
+**\\-\\-context-marker** (Optional).
 
 Specifies a UUID (8-4-4-4-12 format) that will be used to correlate logs,
 transactions, etc. in downstream activities triggered by this interaction.
 
-**-b / --buffer-mode** (Optional, Default=auto).
+**-b / \\-\\-buffer-mode** (Optional, Default=auto).
 
 Set the buffer mode when uploading documents. Supported buffer modes
 include append, replace, auto.
@@ -440,7 +441,7 @@ collection does not already exist in the Shipyard buffer.
 replace: Clear the Shipyard Buffer before adding the specified
 collection.
 
-**--collection** (Required, Default=<site_name>).
+**\\-\\-collection** (Required, Default=<site_name>).
 
 Specifies the name of the compiled collection of documents that will be
 uploaded to Shipyard.
@@ -484,70 +485,70 @@ level operations for secrets documents of a site.
   ./pegleg.sh site -r <site_repo> -e <extra_repo> secrets <command> <options>
 
 
-  Generate PKI (deprecated)
-  ^^^^^^^^^^^^^^^^^^^^^^^^^
+Generate PKI (deprecated)
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  Generate certificates and keys according to all PKICatalog documents in the
-  site using the :ref:`pki` module. The default behavior is to generate all
-  certificates that are not yet present. For example, the first time generate PKI
-  is run or when new entries are added to the PKICatalogue, only those new
-  entries will be generated on subsequent runs.
+Generate certificates and keys according to all PKICatalog documents in the
+site using the :ref:`pki` module. The default behavior is to generate all
+certificates that are not yet present. For example, the first time generate
+PKI is run or when new entries are added to the PKICatalogue, only those new
+entries will be generated on subsequent runs.
 
-  Pegleg also supports a full regeneration of all certificates at any time, by
-  using the --regenerate-all flag.
+Pegleg also supports a full regeneration of all certificates at any time, by
+using the --regenerate-all flag.
 
-  Pegleg places generated document files in ``<site>/secrets/passphrases``,
-  ``<site>/secrets/certificates``, or ``<site>/secrets/keypairs`` as
-  appropriate:
+Pegleg places generated document files in ``<site>/secrets/passphrases``,
+``<site>/secrets/certificates``, or ``<site>/secrets/keypairs`` as
+appropriate:
 
-  * The generated filenames for passphrases will follow the pattern
-    :file:`<passphrase-doc-name>.yaml`.
-  * The generated filenames for certificate authorities will follow the pattern
-    :file:`<ca-name>_ca.yaml`.
-  * The generated filenames for certificates will follow the pattern
-    :file:`<ca-name>_<certificate-doc-name>_certificate.yaml`.
-  * The generated filenames for certificate keys will follow the pattern
-    :file:`<ca-name>_<certificate-doc-name>_key.yaml`.
-  * The generated filenames for keypairs will follow the pattern
-    :file:`<keypair-doc-name>.yaml`.
+* The generated filenames for passphrases will follow the pattern
+  :file:`<passphrase-doc-name>.yaml`.
+* The generated filenames for certificate authorities will follow the pattern
+  :file:`<ca-name>_ca.yaml`.
+* The generated filenames for certificates will follow the pattern
+  :file:`<ca-name>_<certificate-doc-name>_certificate.yaml`.
+* The generated filenames for certificate keys will follow the pattern
+  :file:`<ca-name>_<certificate-doc-name>_key.yaml`.
+* The generated filenames for keypairs will follow the pattern
+  :file:`<keypair-doc-name>.yaml`.
 
-  Dashes in the document names will be converted to underscores for consistency.
+Dashes in the document names will be converted to underscores for consistency.
 
-  **site_name** (Required).
+**site_name** (Required).
 
-  Name of site.
+Name of site.
 
-  **-a / --author** (Optional).
+**-a / \\-\\-author** (Optional).
 
-  Identifying name of the author generating new certificates. Used for tracking
-  provenance information in the PeglegManagedDocuments. An attempt is made to
-  automatically determine this value, but should be provided.
+Identifying name of the author generating new certificates. Used for tracking
+provenance information in the PeglegManagedDocuments. An attempt is made to
+automatically determine this value, but should be provided.
 
-  **-d / --days** (Optional, Default=365).
+**-d / \\-\\-days** (Optional, Default=365).
 
-  Duration (in days) certificates should be valid.
-  Minimum=0, no maximum.  Values less than 0 will raise an exception.
+Duration (in days) certificates should be valid.
+Minimum=0, no maximum.  Values less than 0 will raise an exception.
 
-  NOTE: A generated certificate where days = 0 should only be used for testing.
-  A certificate generated in such a way will be valid for 0 seconds.
+NOTE: A generated certificate where days = 0 should only be used for testing.
+A certificate generated in such a way will be valid for 0 seconds.
 
-  **--regenerate-all** (Optional, Default=False).
+**\\-\\-regenerate-all** (Optional, Default=False).
 
-  Force Pegleg to regenerate all PKI items.
+Force Pegleg to regenerate all PKI items.
 
-  Examples
-  """"""""
+Examples
+""""""""
 
-  ::
+::
 
-    ./pegleg.sh site -r <site_repo> -e <extra_repo> \
-      secrets generate-pki \
-      <site_name> \
-      -a <author> \
-      -d <days> \
-      --regenerate-all
+  ./pegleg.sh site -r <site_repo> -e <extra_repo> \
+    secrets generate-pki \
+    <site_name> \
+    -a <author> \
+    -d <days> \
+    --regenerate-all
 
-  .. _command-line-repository-overrides:
+.. _command-line-repository-overrides:
 
 
 Check PKI Certs
@@ -557,7 +558,7 @@ Determine if any PKI certificates from a site are expired, or will be expired
 within ``days`` days.  If any are found, print the cert names and expiration
 dates to ``stdout``.
 
-**-d / --days** (Optional, Default=60).
+**-d / \\-\\-days** (Optional, Default=60).
 
 Duration (in days) to check certificate validity from today.
 Minimum=0, no maximum.  Values less than 0 will raise an exception.
@@ -641,7 +642,7 @@ repository folder structure. The ``encrypt`` command looks up the
 whose ``encryptionPolicy`` is set to ``encrypted``), and encrypts the
 documents in those files.
 
-**-a / --author** (Required)
+**-a / \\-\\-author** (Required)
 
 Author is the identifier for the program or the person, who is encrypting
 the secrets documents.
@@ -651,7 +652,7 @@ expected to be leveraged in an operator-specific manner.
 For instance the ``author`` can be the "userid" of the person running the
 command, or the "application-id" of the application executing the command.
 
-**-s / --save-location** (Optional).
+**-s / \\-\\-save-location** (Optional).
 
 Where to output the encrypted and wrapped documents.
 
@@ -710,16 +711,16 @@ repository folder structure. This is used to ensure the correct revision of
 the site and global repositories are used, as specified in the site's
 :file:`site-definition.yaml`.
 
-**--path** (Required).
+**\\-\\-path** (Required).
 
 Path to pegleg managed encrypted secrets file or directory of files.
 
-**-s / --save-location** (Optional).
+**-s / \\-\\-save-location** (Optional).
 
 The desired output path for the decrypted file. If not specified, decrypted
 data will output to stdout.
 
-**-o / --overwrite** (Optional). False by default.
+**-o / \\-\\-overwrite** (Optional). False by default.
 
 When set, encrypted file(s) at the specified path will be overwritten with
 the decrypted data. Overrides ``--save-location`` option.
@@ -753,35 +754,35 @@ Wrap bare files (e.g. pem or crt) in a PeglegManagedDocument and optionally encr
 
 Name of site.
 
-**-a / --author**
+**-a / \\-\\-author**
 
 Identifying name of the author generating new certificates. Used
 for tracking provenance information in the PeglegManagedDocuments.
 An attempt is made to automatically determine this value,
 but should be provided.
 
-**--filename**
+**\\-\\-filename**
 
 The relative path to the file to be wrapped.
 
-**-o / --output-path**
+**-o / \\-\\-output-path**
 
 The output path for the wrapped file. (default: input path with the extension
 replaced with .yaml)
 
-**-s / --schema**
+**-s / \\-\\-schema**
 
 The schema for the document to be wrapped, e.g. deckhand/Certificate/v1
 
-**-n / --name**
+**-n / \\-\\-name**
 
 The name for the document to be wrapped, e.g. new-cert.
 
-**-l / --layer**
+**-l / \\-\\-layer**
 
 The layer for the document to be wrapped, e.g. site.
 
-**--encrypt / --no-encrypt** (Default=True).
+**\\-\\-encrypt / \\-\\-no-encrypt** (Default=True).
 
 A flag specifying whether to encrypt the output file.
 
@@ -808,11 +809,11 @@ Constructs genesis bundle based on a site configuration.
   constraints on its length, but at least 24 characters is recommended.
 
 
-**-b / --build-dir** (Required).
+**-b / \\-\\-build-dir** (Required).
 
 Destination directory for the genesis bundle.
 
-**--include-validators** (Optional, Default=False).
+**\\-\\-include-validators** (Optional, Default=False).
 
 A flag to request build genesis validation scripts as well.
 
@@ -867,7 +868,7 @@ is run or when new entries are added to the PKICatalogue, only those new
 entries will be generated on subsequent runs.
 
 Pegleg also supports a full regeneration of all certificates at any time, by
-using the --regenerate-all flag.
+using the \\-\\-regenerate-all flag.
 
 Pegleg places generated document files in ``<site>/secrets/passphrases``,
 ``<site>/secrets/certificates``, or ``<site>/secrets/keypairs`` as
@@ -890,13 +891,13 @@ Dashes in the document names will be converted to underscores for consistency.
 
 Name of site.
 
-**-a / --author** (Optional).
+**-a / \\-\\-author** (Optional).
 
 Identifying name of the author generating new certificates. Used for tracking
 provenance information in the PeglegManagedDocuments. An attempt is made to
 automatically determine this value, but should be provided.
 
-**-d / --days** (Optional, Default=365).
+**-d / \\-\\-days** (Optional, Default=365).
 
 Duration (in days) certificates should be valid.
 Minimum=0, no maximum.  Values less than 0 will raise an exception.
@@ -904,7 +905,7 @@ Minimum=0, no maximum.  Values less than 0 will raise an exception.
 NOTE: A generated certificate where days = 0 should only be used for testing.
 A certificate generated in such a way will be valid for 0 seconds.
 
-**--regenerate-all** (Optional, Default=False).
+**\\-\\-regenerate-all** (Optional, Default=False).
 
 Force Pegleg to regenerate all PKI items.
 
@@ -919,8 +920,6 @@ Examples
     -a <author> \
     -d <days> \
     --regenerate-all
-
-.. _command-line-repository-overrides:
 
 passphrases
 """""""""""
@@ -947,7 +946,7 @@ parses the passphrase catalog documents it found, and generates one passphrase
 document for each passphrase ``document_name`` declared in the site passphrase
 catalog.
 
-**-a / --author** (Required)
+**-a / \\-\\-author** (Required)
 
 ``Author`` is intended to document the application or the individual, who
 generates the site passphrase documents, mostly for tracking purposes. It
@@ -955,7 +954,7 @@ is expected to be leveraged in an operator-specific manner.
 For instance the ``author`` can be the "userid" of the person running the
 command, or the "application-id" of the application executing the command.
 
-**-s / --save-location** (Required).
+**-s / \\-\\-save-location** (Required).
 
 Where to output generated passphrase documents. The passphrase documents
 are placed in the following folder structure under ``save_location``:
@@ -964,7 +963,7 @@ are placed in the following folder structure under ``save_location``:
 
 <save_location>/site/<site_name>/secrets/passphrases/<passphrase_name.yaml>
 
-**-c / --passphrase-catalog** (Optional).
+**-c / \\-\\-passphrase-catalog** (Optional).
 
 Specifies a path for a passphrase catalog file to use instead of the catalogs
 found in the repositories specified by the user. The specified catalog
@@ -973,13 +972,13 @@ will be disregarded. This can be used to specify a subset of passphrases to
 generate instead of the whole catalog or for testing new passphrases before
 merging them into production.
 
-**-i / --interactive** (Optional). False by default.
+**-i / \\-\\-interactive** (Optional). False by default.
 
 Enables input prompts for "prompt: true" passphrases. Input prompts are
 otherwise disabled by default and prompted passphrases will be
 skipped.
 
-**--force-cleartext** (Optional). False by default.
+**\\-\\-force-cleartext** (Optional). False by default.
 
 Force cleartext generation of passphrases. This is not
 recommended.
@@ -1079,7 +1078,7 @@ Valid Git references for checking out repositories include:
 Linting
 =======
 
-**-f / --fail-on-missing-sub-src** (Optional, Default=True).
+**-f / \\-\\-fail-on-missing-sub-src** (Optional, Default=True).
 
 Raise Deckhand exception on missing substitution sources.
 
@@ -1127,7 +1126,7 @@ Passphrase
 
 Generate a passphrase and print to ``stdout``.
 
-**-l / --length** (Optional, Default=24).
+**-l / \\-\\-length** (Optional, Default=24).
 
 Length of passphrase to generate.
 Minimum length is 24. Lengths less than minimum will default to 24.
@@ -1159,7 +1158,7 @@ Salt
 
 Generate a salt and print to ``stdout``.
 
-**-l / --length** (Optional, Default=24).
+**-l / \\-\\-length** (Optional, Default=24).
 
 Length of salt to generate.
 Minimum length is 24. Lengths less than minimum will default to 24.
