@@ -30,7 +30,7 @@ from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 from tests.unit import test_utils
-from tests.unit.test_cli import TEST_PARAMS
+from tests.unit.cli.test_commands import TEST_PARAMS
 
 TEST_DATA = """
 ---

@@ -28,7 +28,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'pegleg=pegleg.cli:main',
+            'pegleg=pegleg.cli.commands:main',
     ]},
     include_package_data=True,
     package_dir={'pegleg': 'pegleg'},

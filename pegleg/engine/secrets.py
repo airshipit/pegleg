@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from collections import OrderedDict
 from glob import glob
 import logging
@@ -31,7 +32,7 @@ from pegleg.engine.util.pegleg_managed_document import \
     PeglegManagedSecretsDocument as PeglegManagedSecret
 from pegleg.engine.util.pegleg_secret_management import PeglegSecretManagement
 
-__all__ = ('encrypt', 'decrypt', 'generate_passphrases')
+__all__ = ('encrypt', 'decrypt', 'generate_passphrases', 'wrap_secret')
 
 LOG = logging.getLogger(__name__)
 
