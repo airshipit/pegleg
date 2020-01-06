@@ -89,8 +89,11 @@ MAIN_REPOSITORY_OPTION = click.option(
     help='Path or URL to the primary repository (containing '
     'site_definition.yaml) repo.')
 
-OUTPUT_STREAM_OPTION = click.option(
-    '-o', '--output', 'output_stream', help='Where to output.')
+SAVE_LOCATION_OPTION = click.option(
+    '-s',
+    '--save-location',
+    'save_location',
+    help='Where to save the output. Defaults to stdout.')
 
 REPOSITORY_CLONE_PATH_OPTION = click.option(
     '-p',
@@ -105,7 +108,7 @@ REPOSITORY_CLONE_PATH_OPTION = click.option(
     'name is airship/treasuremap and the clone path is '
     '/tmp/mypath then the following directory is '
     'created /tmp/mypath/airship/treasuremap '
-    'which will contain the contents of the repo')
+    'which will contain the contents of the repo.')
 
 REPOSITORY_KEY_OPTION = click.option(
     '-k',

@@ -284,7 +284,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         mock_output = os.path.join(tmpdir, 'output')
         result = self.runner.invoke(
             commands.site, [
-                '--no-decrypt', '-r', repo_path_or_url, 'list', '-o',
+                '--no-decrypt', '-r', repo_path_or_url, 'list', '-s',
                 mock_output
             ])
 
@@ -321,7 +321,7 @@ class TestSiteCliActions(BaseCLIActionTest):
         result = self.runner.invoke(
             commands.site, [
                 '--no-decrypt', '-r', repo_path_or_url, 'show', self.site_name,
-                '-o', mock_output
+                '-s', mock_output
             ])
 
         assert result.exit_code == 0, result.output
@@ -713,7 +713,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         file_dir = os.path.join(
             repo_path, "site", "seaworthy", "secrets", "certificates")
         file_path = os.path.join(file_dir, "test.crt")
-        output_path = os.path.join(file_dir, "test.yaml")
+        save_location = os.path.join(file_dir, "test.yaml")
 
         with open(file_path, "w") as test_crt_fi:
             test_crt_fi.write(TEST_CERT)
@@ -726,7 +726,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             commands.site, ['--no-decrypt', "-r", repo_path] + secrets_opts)
         assert result.exit_code == 0
 
-        with open(output_path, "r") as output_fi:
+        with open(save_location, "r") as output_fi:
             doc = yaml.safe_load(output_fi)
             assert doc["data"]["managedDocument"]["data"] == TEST_CERT
             assert doc["data"]["managedDocument"][
@@ -738,17 +738,17 @@ class TestSiteSecretsActions(BaseCLIActionTest):
             assert doc["data"]["managedDocument"]["metadata"][
                 "storagePolicy"] == "cleartext"
 
-        os.remove(output_path)
+        os.remove(save_location)
         secrets_opts = [
-            'secrets', 'wrap', "-a", "lm734y", "--filename", file_path, "-o",
-            output_path, "-s", "deckhand/Certificate/v1", "-n",
-            "test-certificate", "-l", "site", self.site_name
+            'secrets', 'wrap', "-a", "lm734y", "--filename", file_path,
+            "--save-location", save_location, "-s", "deckhand/Certificate/v1",
+            "-n", "test-certificate", "-l", "site", self.site_name
         ]
         result = self.runner.invoke(
             commands.site, ['--no-decrypt', "-r", repo_path] + secrets_opts)
         assert result.exit_code == 0
 
-        with open(output_path, "r") as output_fi:
+        with open(save_location, "r") as output_fi:
             doc = yaml.safe_load(output_fi)
             assert "encrypted" in doc["data"]
             assert "managedDocument" in doc["data"]
@@ -766,7 +766,7 @@ class TestTypeCliActions(BaseCLIActionTest):
     def _validate_type_list_action(self, repo_path_or_url, tmpdir):
         mock_output = os.path.join(tmpdir, 'output')
         result = self.runner.invoke(
-            commands.type, ['-r', repo_path_or_url, 'list', '-o', mock_output])
+            commands.type, ['-r', repo_path_or_url, 'list', '-s', mock_output])
         with open(mock_output, 'r') as f:
             table_output = f.read()
 
@@ -806,7 +806,7 @@ class TestSiteCliActionsWithSubdirectory(BaseCLIActionTest):
         mock_output = os.path.join(tmpdir, 'output')
         result = self.runner.invoke(
             commands.site, [
-                '--no-decrypt', '-r', repo_path_or_url, 'list', '-o',
+                '--no-decrypt', '-r', repo_path_or_url, 'list', '-s',
                 mock_output
             ])
 

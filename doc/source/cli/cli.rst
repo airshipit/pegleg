@@ -292,9 +292,9 @@ List
 
 List known sites.
 
-**-o / \\-\\-output** (Optional, Default=stdout).
+**-s / \\-\\-save-location** (Optional, Default=stdout).
 
-Where to output.
+Location where the output is saved.
 
 ::
 
@@ -307,7 +307,7 @@ Example:
 
 ::
 
-  ./pegleg site -r /opt/site-manifests list -o /workspace
+  ./pegleg site -r /opt/site-manifests list -s /workspace
 
 Show
 ----
@@ -318,9 +318,9 @@ Show details for one site.
 
 Name of site.
 
-**-o / \\-\\-output** (Optional, Default=stdout).
+**-s / \\-\\-save-location** (Optional, Default=stdout).
 
-Where to output.
+Location where the output is saved.
 
 ::
 
@@ -333,7 +333,7 @@ Example:
 
 ::
 
-  ./pegleg site -r /opt/site-manifests show site_name -o /workspace
+  ./pegleg site -r /opt/site-manifests show site_name -s /workspace
 
 Render
 ------
@@ -344,9 +344,9 @@ Render documents via `Deckhand`_ for one site.
 
 Name of site.
 
-**-o / \\-\\-output** (Optional, Default=stdout).
+**-s / \\-\\-save-location** (Optional, Default=stdout).
 
-Where to output.
+Location where the output is saved.
 
 **-v / \\-\\-validate** (Optional, Default=True).
 
@@ -365,7 +365,7 @@ Example:
 
 ::
 
-  ./pegleg site -r /opt/site-manifests render site_name -o output
+  ./pegleg site -r /opt/site-manifests render site_name -s save_location
 
 .. _cli-site-lint:
 
@@ -774,10 +774,10 @@ but should be provided.
 
 The relative path to the file to be wrapped.
 
-**-o / \\-\\-output-path**
+**\\-\\-save-location**
 
-The output path for the wrapped file. (default: input path with the extension
-replaced with .yaml)
+The output path where the wrapped file is saved. (default: input path with the
+extension replaced with .yaml)
 
 **-s / \\-\\-schema**
 
@@ -802,9 +802,8 @@ Examples
 
   ./pegleg.sh site -r /home/myuser/myrepo \
     secrets wrap -a myuser --filename secrets/certificates/new_cert.crt \
-    -o secrets/certificates/new_cert.yaml -s "deckhand/Certificate/v1" \
-    -n "new-cert" -l site mysite
-
+    --save-location secrets/certificates/new_cert.yaml \
+    -s "deckhand/Certificate/v1" -n "new-cert" -l site mysite
 
 genesis_bundle
 --------------
@@ -914,6 +913,14 @@ Minimum=0, no maximum.  Values less than 0 will raise an exception.
 NOTE: A generated certificate where days = 0 should only be used for testing.
 A certificate generated in such a way will be valid for 0 seconds.
 
+**-s / \\-\\-save-location**
+
+Directory to store the generated site certificates in. It will be created
+automatically, if it does not already exist. The generated, wrapped, and
+encrypted passphrases files will be saved in:
+<save_location>/site/<site_name>/secrets/certificates/ directory. Defaults to
+site repository path if no value given.'
+
 **\\-\\-regenerate-all** (Optional, Default=False).
 
 Force Pegleg to regenerate all PKI items.
@@ -928,6 +935,7 @@ Examples
     <site_name> \
     -a <author> \
     -d <days> \
+    -s <save_location>
     --regenerate-all
 
 passphrases

@@ -33,7 +33,7 @@ CONTEXT_SETTINGS = {
     '--verbose',
     is_flag=True,
     default=False,
-    help='Enable debug logging')
+    help='Enable debug logging.')
 @click.option(
     '-l',
     '--logging-level',
@@ -57,7 +57,7 @@ def main(*, verbose, logging_level):
     pegleg_main.set_logging_level(verbose, logging_level)
 
 
-@main.group(help='Commands related to repositories')
+@main.group(help='Commands related to repositories.')
 @utils.MAIN_REPOSITORY_OPTION
 @utils.REPOSITORY_CLONE_PATH_OPTION
 # TODO(felipemonteiro): Support EXTRA_REPOSITORY_OPTION as well to be
@@ -77,7 +77,7 @@ def repo(*, site_repository, clone_path, repo_key, repo_username):
         run_umask=True)
 
 
-@repo.command('lint', help='Lint all sites in a repository')
+@repo.command('lint', help='Lint all sites in a repository.')
 @utils.ALLOW_MISSING_SUBSTITUTIONS_OPTION
 @utils.EXCLUDE_LINT_OPTION
 @utils.WARN_LINT_OPTION
@@ -92,7 +92,7 @@ def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
             click.echo(w)
 
 
-@main.group(help='Commands related to sites')
+@main.group(help='Commands related to sites.')
 @utils.MAIN_REPOSITORY_OPTION
 @utils.REPOSITORY_CLONE_PATH_OPTION
 @utils.EXTRA_REPOSITORY_OPTION
@@ -129,7 +129,7 @@ def site(
         decrypt_repos=decrypt_repos)
 
 
-@site.command(help='Output complete config for one site')
+@site.command(help='Output complete config for one site.')
 @click.option(
     '-s',
     '--save-location',
@@ -163,21 +163,21 @@ def collect(*, save_location, validate, exclude_lint, warn_lint, site_name):
         exclude_lint, save_location, site_name, validate, warn_lint)
 
 
-@site.command('list', help='List known sites')
-@utils.OUTPUT_STREAM_OPTION
-def list_sites(*, output_stream):
-    pegleg_main.run_list_sites(output_stream)
+@site.command('list', help='List known sites.')
+@utils.SAVE_LOCATION_OPTION
+def list_sites(*, save_location):
+    pegleg_main.run_list_sites(save_location)
 
 
-@site.command(help='Show details for one site')
-@utils.OUTPUT_STREAM_OPTION
+@site.command(help='Show details for one site.')
+@utils.SAVE_LOCATION_OPTION
 @utils.SITE_REPOSITORY_ARGUMENT
-def show(*, output_stream, site_name):
-    pegleg_main.run_show(output_stream, site_name)
+def show(*, save_location, site_name):
+    pegleg_main.run_show(save_location, site_name)
 
 
-@site.command('render', help='Render a site through the deckhand engine')
-@utils.OUTPUT_STREAM_OPTION
+@site.command('render', help='Render a site through the deckhand engine.')
+@utils.SAVE_LOCATION_OPTION
 @click.option(
     '-v',
     '--validate',
@@ -189,11 +189,11 @@ def show(*, output_stream, site_name):
     'Skips over externally registered DataSchema documents to avoid '
     'false positives.')
 @utils.SITE_REPOSITORY_ARGUMENT
-def render(*, output_stream, site_name, validate):
-    pegleg_main.run_render(output_stream, site_name, validate)
+def render(*, save_location, site_name, validate):
+    pegleg_main.run_render(save_location, site_name, validate)
 
 
-@site.command('lint', help='Lint a given site in a repository')
+@site.command('lint', help='Lint a given site in a repository.')
 @utils.ALLOW_MISSING_SUBSTITUTIONS_OPTION
 @utils.EXCLUDE_LINT_OPTION
 @utils.WARN_LINT_OPTION
@@ -210,7 +210,7 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
             click.echo(w)
 
 
-@site.command('upload', help='Upload documents to Shipyard')
+@site.command('upload', help='Upload documents to Shipyard.')
 # Keystone authentication parameters
 @click.option('--os-domain-name', envvar='OS_DOMAIN_NAME', required=False)
 @click.option(
@@ -233,7 +233,7 @@ def lint_site(*, fail_on_missing_sub_src, exclude_lint, warn_lint, site_name):
     '--context-marker',
     help='Specifies a UUID (8-4-4-4-12 format) that will be used to correlate '
     'logs, transactions, etc. in downstream activities triggered by this '
-    'interaction ',
+    'interaction.',
     required=False,
     type=click.UUID)
 @click.option(
@@ -269,7 +269,7 @@ def upload(
     click.echo(resp)
 
 
-@site.group(name='secrets', help='Commands to manage site secrets documents')
+@site.group(name='secrets', help='Commands to manage site secrets documents.')
 def secrets():
     pass
 
@@ -332,23 +332,22 @@ def generate_pki_deprecated(site_name, author, days, regenerate_all):
     'filename',
     help='The relative file path for the file to be wrapped.')
 @click.option(
-    '-o',
-    '--output-path',
-    'output_path',
+    '--save-location',
+    'save_location',
     required=False,
-    help='The output path for the wrapped file. (default: input path with '
-    '.yaml)')
+    help='The output path where the wrapped file is saved. (default: input '
+    'path with .yaml).')
 @click.option(
     '-s',
     '--schema',
     'schema',
     help='The schema for the document to be wrapped, e.g. '
-    'deckhand/Certificate/v1')
+    'deckhand/Certificate/v1.')
 @click.option(
     '-n',
     '--name',
     'name',
-    help='The name for the document to be wrapped, e.g. new-cert')
+    help='The name for the document to be wrapped, e.g. new-cert.')
 @click.option(
     '-l',
     '--layer',
@@ -363,11 +362,12 @@ def generate_pki_deprecated(site_name, author, days, regenerate_all):
     help='Whether to encrypt the wrapped file.')
 @utils.SITE_REPOSITORY_ARGUMENT
 def wrap_secret_cli(
-        *, site_name, author, filename, output_path, schema, name, layer,
+        *, site_name, author, filename, save_location, schema, name, layer,
         encrypt):
     """Wrap a bare secrets file in a YAML and ManagedDocument"""
     pegleg_main.run_wrap_secret(
-        author, encrypt, filename, layer, name, output_path, schema, site_name)
+        author, encrypt, filename, layer, name, save_location, schema,
+        site_name)
 
 
 @site.command(
@@ -419,7 +419,7 @@ def check_pki_certs(site_name, days):
         exit(0)
 
 
-@main.group(help='Commands related to types')
+@main.group(help='Commands related to types.')
 @utils.MAIN_REPOSITORY_OPTION
 @utils.REPOSITORY_CLONE_PATH_OPTION
 @utils.EXTRA_REPOSITORY_OPTION
@@ -442,11 +442,11 @@ def type(
         run_umask=False)
 
 
-@type.command('list', help='List known types')
-@utils.OUTPUT_STREAM_OPTION
-def list_types(*, output_stream):
+@type.command('list', help='List known types.')
+@utils.SAVE_LOCATION_OPTION
+def list_types(*, save_location):
     """List type names for a given repository."""
-    pegleg_main.run_list_types(output_stream)
+    pegleg_main.run_list_types(save_location)
 
 
 @secrets.group(
@@ -507,7 +507,7 @@ def generate_pki(site_name, author, days, regenerate_all, save_location):
     click.echo("Generated PKI files written to:\n%s" % '\n'.join(output_paths))
 
 
-@generate.command('passphrases', help='Command to generate site passphrases')
+@generate.command('passphrases', help='Command to generate site passphrases.')
 @utils.SITE_REPOSITORY_ARGUMENT
 @click.option(
     '-s',
@@ -525,7 +525,7 @@ def generate_pki(site_name, author, days, regenerate_all, save_location):
     'author',
     required=True,
     help='Identifier for the program or person who is generating the secrets '
-    'documents')
+    'documents.')
 @click.option(
     '-c',
     '--passphrase-catalog',
@@ -541,7 +541,7 @@ def generate_pki(site_name, author, days, regenerate_all, save_location):
     'interactive',
     is_flag=True,
     default=False,
-    help='Enables input prompts for "prompt: true" passphrases')
+    help='Enables input prompts for "prompt: true" passphrases.')
 @click.option(
     '--force-cleartext',
     'force_cleartext',
@@ -579,14 +579,14 @@ def generate_passphrases(
     help='Directory to output the encrypted site secrets files. Created '
     'automatically if it does not already exist. '
     'If save_location is not provided, the output encrypted files will '
-    'overwrite the original input files (default behavior)')
+    'overwrite the original input files (default behavior).')
 @click.option(
     '-a',
     '--author',
     'author',
     required=True,
     help='Identifier for the program or person who is encrypting the secrets '
-    'documents')
+    'documents.')
 @utils.SITE_REPOSITORY_ARGUMENT
 def encrypt(*, path, save_location, author, site_name):
     pegleg_main.run_encrypt(author, save_location, site_name, path=path)
@@ -626,14 +626,14 @@ def decrypt(*, path, save_location, overwrite, site_name):
             click.echo(d)
 
 
-@main.group(help='Miscellaneous generate commands')
+@main.group(help='Miscellaneous generate commands.')
 def generate():
     pass
 
 
 @generate.command(
     'passphrase',
-    help='Command to generate a passphrase and print out to stdout')
+    help='Command to generate a passphrase and print out to stdout.')
 @click.option(
     '-l',
     '--length',
@@ -649,7 +649,7 @@ def generate_passphrase(length):
 
 
 @generate.command(
-    'salt', help='Command to generate a salt and print out to stdout')
+    'salt', help='Command to generate a salt and print out to stdout.')
 @click.option(
     '-l',
     '--length',
