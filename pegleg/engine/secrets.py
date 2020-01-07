@@ -16,6 +16,7 @@ from collections import OrderedDict
 from glob import glob
 import logging
 import os
+import re
 
 from prettytable import PrettyTable
 import yaml
@@ -275,6 +276,9 @@ def check_cert_expiry(site_name, duration=60):
     :rtype: str
     """
 
+    cert_schemas = [
+        'deckhand/Certificate/v1', 'deckhand/CertificateAuthority/v1'
+    ]
     pki_util = PKIUtility(duration=duration)
     # Create a table to output expired/expiring certs for this site.
     cert_table = PrettyTable()
@@ -289,17 +293,21 @@ def check_cert_expiry(site_name, duration=60):
                 results = PeglegSecretManagement(
                     docs=results).get_decrypted_secrets()
                 for result in results:
-                    if result['schema'] == \
-                            "deckhand/Certificate/v1":
-                        cert = result['data']
-                        cert_info = pki_util.check_expiry(cert)
-                        if cert_info['expired'] is True:
-                            cert_table.add_row(
-                                [
-                                    doc, result['metadata']['name'],
-                                    cert_info['expiry_date']
-                                ])
-                            expired_certs_exist = True
+                    if result['schema'] in cert_schemas:
+                        text = result['data']
+                        header_pattern = '-----BEGIN CERTIFICATE-----'
+                        find_pattern = r'%s.*?(?=%s|$)' % (
+                            header_pattern, header_pattern)
+                        certs = re.findall(find_pattern, text, re.DOTALL)
+                        for cert in certs:
+                            cert_info = pki_util.check_expiry(cert)
+                            if cert_info['expired'] is True:
+                                cert_table.add_row(
+                                    [
+                                        doc, result['metadata']['name'],
+                                        cert_info['expiry_date']
+                                    ])
+                                expired_certs_exist = True
 
     # Return table of cert names and expiration dates that are expiring
     return expired_certs_exist, cert_table.get_string()
