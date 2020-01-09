@@ -601,7 +601,8 @@ def encrypt(*, path, save_location, author, site_name):
     'path',
     type=click.Path(exists=True, readable=True),
     required=True,
-    help='The file or directory path to decrypt.')
+    multiple=True,
+    help='The file or directory path to decrypt. Multiple entries allowed.')
 @click.option(
     '-s',
     '--save-location',

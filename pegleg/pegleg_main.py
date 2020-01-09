@@ -390,7 +390,7 @@ def run_decrypt(overwrite, path, save_location, site_name):
     """Unwraps and decrypts secret documents for a site
 
     :param overwrite: if True, overwrites original files with decrypted
-    :param path: file or directory to decrypt
+    :param path: file(s) or directory(ies) to decrypt
     :param save_location: if specified saves to the given path, otherwise
                           returns list of decrypted information
     :param site_name: site name to process
@@ -399,18 +399,21 @@ def run_decrypt(overwrite, path, save_location, site_name):
     """
     decrypted_data = []
     config.set_global_enc_keys(site_name)
-    decrypted = engine.secrets.decrypt(path, site_name=site_name)
-    if overwrite:
-        for path, data in decrypted.items():
-            files.write(data, path)
-    elif save_location is None:
-        for data in decrypted.values():
-            decrypted_data.append(data)
-    else:
-        for path, data in decrypted.items():
-            file_name = os.path.split(path)[1]
-            file_save_location = os.path.join(save_location, file_name)
-            files.write(data, file_save_location)
+    if type(path) is not list and type(path) is not tuple:
+        path = [path]
+    for p in path:
+        decrypted = engine.secrets.decrypt(p, site_name=site_name)
+        if overwrite:
+            for file_path, data in decrypted.items():
+                files.write(data, file_path)
+        elif save_location is None:
+            for data in decrypted.values():
+                decrypted_data.append(data)
+        else:
+            for file_path, data in decrypted.items():
+                file_name = os.path.split(file_path)[1]
+                file_save_location = os.path.join(save_location, file_name)
+                files.write(data, file_save_location)
     return decrypted_data
 
 

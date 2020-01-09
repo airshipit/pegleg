@@ -613,6 +613,74 @@ class TestSiteSecretsActions(BaseCLIActionTest):
     @pytest.mark.skipif(
         not pki_utility.PKIUtility.cfssl_exists(),
         reason='cfssl must be installed to execute these tests')
+    @mock.patch.dict(
+        os.environ, {
+            "PEGLEG_PASSPHRASE": "123456789012345678901234567890",
+            "PEGLEG_SALT": "MySecretSalt1234567890]["
+        })
+    def test_site_secrets_encrypt_and_decrypt_multiple_paths(self):
+        """Validates decrypt using multiple paths."""
+        # Scenario:
+        #
+        # 1) Encrypt a file in a local repo
+
+        repo_path = self.treasuremap_path
+        file_path = os.path.join(
+            repo_path, "site", "seaworthy", "secrets", "passphrases",
+            "ceph_fsid.yaml")
+        file_path_2 = os.path.join(
+            repo_path, "site", "seaworthy", "secrets", "passphrases",
+            "ucp_oslo_messaging_password.yaml")
+        with open(file_path, "r") as ceph_fsid_fi:
+            ceph_fsid = yaml.safe_load(ceph_fsid_fi)
+            ceph_fsid["metadata"]["storagePolicy"] = "encrypted"
+            ceph_fsid["metadata"]["layeringDefinition"]["layer"] = "site"
+        with open(file_path_2, "r") as oslo_messaging_file:
+            oslo_messaging = yaml.safe_load(oslo_messaging_file)
+            oslo_messaging["metadata"]["storagePolicy"] = "encrypted"
+            oslo_messaging["metadata"]["layeringDefinition"]["layer"] = "site"
+
+        with open(file_path, "w") as ceph_fsid_fi:
+            yaml.dump(ceph_fsid, ceph_fsid_fi)
+        with open(file_path_2, "w") as oslo_messaging_file:
+            yaml.dump(oslo_messaging, oslo_messaging_file)
+
+        secrets_opts = [
+            'secrets', 'encrypt', '--save-location', repo_path, '-a', 'test',
+            self.site_name
+        ]
+        result = self.runner.invoke(
+            commands.site, ['--no-decrypt', '-r', repo_path] + secrets_opts)
+
+        assert result.exit_code == 0
+
+        with open(file_path, "r") as ceph_fsid_fi:
+            ceph_fsid = yaml.safe_load(ceph_fsid_fi)
+            assert "encrypted" in ceph_fsid["data"]
+            assert "managedDocument" in ceph_fsid["data"]
+        with open(file_path_2, "r") as oslo_messaging_file:
+            oslo_messaging = yaml.safe_load(oslo_messaging_file)
+            assert "encrypted" in oslo_messaging["data"]
+            assert "managedDocument" in oslo_messaging["data"]
+
+        secrets_opts = [
+            'secrets', 'decrypt', '-o', '--path', file_path, '--path',
+            file_path_2, self.site_name
+        ]
+        result = self.runner.invoke(
+            commands.site, ['-r', repo_path] + secrets_opts)
+        assert result.exit_code == 0
+
+        with open(file_path, "r") as ceph_fsid_fi:
+            ceph_fsid = yaml.safe_load(ceph_fsid_fi)
+            assert "managedDocument" not in ceph_fsid["data"]
+        with open(file_path_2, "r") as oslo_messaging_file:
+            oslo_messaging = yaml.safe_load(oslo_messaging_file)
+            assert "managedDocument" not in oslo_messaging["data"]
+
+    @pytest.mark.skipif(
+        not pki_utility.PKIUtility.cfssl_exists(),
+        reason='cfssl must be installed to execute these tests')
     def test_check_pki_certs_expired(self):
         repo_path = self.treasuremap_path
         secrets_opts = ['secrets', 'check-pki-certs', self.site_name]

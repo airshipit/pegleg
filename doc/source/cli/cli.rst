@@ -717,7 +717,7 @@ repository folder structure. This is used to ensure the correct revision of
 the site and global repositories are used, as specified in the site's
 :file:`site-definition.yaml`.
 
-**\\-\\-path** (Required).
+**\\-\\-path** (Required). Multiple entries allowed.
 
 Path to pegleg managed encrypted secrets file or directory of files.
 
@@ -748,8 +748,11 @@ Example:
     ./pegleg.sh site -r /opt/site-manifests \
       -e global=/opt/manifests \
       -e secrets=/opt/security-manifests \
-      secrets decrypt site1 -f \
-      /opt/security-manifests/site/site1/passwords/password1.yaml
+      secrets decrypt site1 \
+      --path /opt/security-manifests/site/site1/passwords/password1.yaml \
+      --path /opt/security-manifests/site/site1/passwords/password2.yaml \
+      --path /opt/security-manifests/site/site1/passwords/passwordN.yaml \
+      --path /opt/security-manifests/site/site1/certificates
 
 Wrap
 ^^^^
