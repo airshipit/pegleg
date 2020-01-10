@@ -50,7 +50,7 @@ def run_config(
         repo_username,
         extra_repositories,
         run_umask=True,
-        decrypt_repos=True):
+        decrypt_repos=False):
     """Initializes pegleg configuration data
 
     :param site_repository: path or URL for site repository

@@ -101,7 +101,7 @@ def lint_repo(*, fail_on_missing_sub_src, exclude_lint, warn_lint):
 @click.option(
     '--decrypt/--no-decrypt',
     'decrypt_repos',
-    default=True,
+    default=False,
     help='Automatically attempts to decrypt repositories before executing '
     'the command. Decryption will happen after repositories are copied to '
     'the temporary directory created by pegleg or the user specified '
