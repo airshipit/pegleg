@@ -59,7 +59,7 @@ class TestFileHelpers(object):
         with open(path, "r") as out_fi:
             assert list(yaml.safe_load_all(out_fi)) == [{"a": 1}]
 
-        with pytest.raises(ValueError) as _:
+        with pytest.raises(ValueError):
             files.write(object(), path)
 
     def test_file_permissions(self, temp_deployment_files):
