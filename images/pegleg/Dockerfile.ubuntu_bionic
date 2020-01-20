@@ -22,6 +22,8 @@ RUN set -ex \
          curl \
          gcc \
          git \
+         gpg \
+         gpg-agent \
          libssl-dev \
          netbase \
          openssh-client \
