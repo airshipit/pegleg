@@ -262,7 +262,12 @@ def wrap_secret(
         output_doc = psm.get_encrypted_secrets()[0][0]
     else:
         output_doc = managed_secret.pegleg_document
-    files.safe_dump(output_doc, output_path, sort_keys=False)
+    files.safe_dump(
+        output_doc,
+        output_path,
+        sort_keys=False,
+        explicit_start=True,
+        explicit_end=True)
 
 
 def check_cert_expiry(site_name, duration=60):
