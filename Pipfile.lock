@@ -229,7 +229,7 @@
         },
         "promenade": {
             "git": "https://opendev.org/airship/promenade.git",
-            "ref": "1a1c69c064a96b3bf0ecdea073abe7ad14bdb06c"
+            "ref": "b65930f205b77f28507dee9296aead00e24f2a18"
         },
         "pycparser": {
             "hashes": [
