@@ -332,11 +332,13 @@ def generate_pki_deprecated(site_name, author, days, regenerate_all):
     'filename',
     help='The relative file path for the file to be wrapped.')
 @click.option(
+    '-o',  # DEPRECATED
+    '--output-path',  # DEPRECATED
     '--save-location',
     'save_location',
     required=False,
     help='The output path where the wrapped file is saved. (default: input '
-    'path with .yaml).')
+    'path with .yaml). -o (--output-path) is deprecated and will be removed.')
 @click.option(
     '-s',
     '--schema',

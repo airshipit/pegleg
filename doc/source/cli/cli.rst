@@ -296,6 +296,10 @@ List known sites.
 
 Location where the output is saved.
 
+**-o / \\-\\-output** (Optional).
+
+Same as -s (--save-location). Deprecated.
+
 ::
 
   ./pegleg <command> <options> list
@@ -322,6 +326,10 @@ Name of site.
 
 Location where the output is saved.
 
+**-o / \\-\\-output** (Optional).
+
+Same as -s (--save-location). Deprecated.
+
 ::
 
   ./pegleg <command> <options> show site_name
@@ -347,6 +355,10 @@ Name of site.
 **-s / \\-\\-save-location** (Optional, Default=stdout).
 
 Location where the output is saved.
+
+**-o / \\-\\-output** (Optional).
+
+Same as -s (--save-location). Deprecated.
 
 **-v / \\-\\-validate** (Optional, Default=True).
 
@@ -778,6 +790,10 @@ The relative path to the file to be wrapped.
 
 The output path where the wrapped file is saved. (default: input path with the
 extension replaced with .yaml)
+
+**-o / \\-\\-output-path**
+
+Same as --save-location. Deprecated.
 
 **-s / \\-\\-schema**
 

@@ -92,8 +92,11 @@ MAIN_REPOSITORY_OPTION = click.option(
 SAVE_LOCATION_OPTION = click.option(
     '-s',
     '--save-location',
+    '-o',  # DEPRECATED
+    '--output',  # DEPRECATED
     'save_location',
-    help='Where to save the output. Defaults to stdout.')
+    help='Where to save the output. Defaults to stdout. '
+    '-o (--output) is deprecated and will be removed.')
 
 REPOSITORY_CLONE_PATH_OPTION = click.option(
     '-p',
