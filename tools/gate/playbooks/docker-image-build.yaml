@@ -73,7 +73,7 @@
             allow_unauthenticated: True
           with_items:
             - docker-ce
-            - python-pip
+            - python3-pip
         - pip:
             name: docker
             version: 2.7.0
