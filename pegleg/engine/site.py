@@ -133,7 +133,27 @@ def get_rendered_docs(site_name, validate=True):
         '', lambda loader, suffix, node: None)
     for filename in util.definition.site_files(site_name):
         with open(filename, 'r') as f:
-            documents.extend(list(yaml.safe_load_all(f)))
+            docs = yaml.safe_load_all(f)
+
+            for doc in docs:
+
+                # Managed documents may be encrypted, and require slight
+                # alteration for rendering without decrypting.
+                if doc['schema'] == 'pegleg/PeglegManagedDocument/v1':
+
+                    # Do not decrypt secret, but convert it from bytes to
+                    # string to pass schema validation.
+                    if 'encrypted' in doc['data'].keys():
+                        doc['data']['managedDocument']['data'] = doc['data'][
+                            'managedDocument']['data'].decode()
+
+                    # Append the document if it was encrypted using the
+                    # encrypted string. If not, using original value.
+                    documents.append(doc['data']['managedDocument'])
+
+                # File was not Pegleg managed, so it can be added directly.
+                else:
+                    documents.append(doc)
 
     rendered_documents, errors = util.deckhand.deckhand_render(
         documents=documents, validate=validate)
