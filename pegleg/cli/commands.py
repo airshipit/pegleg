@@ -177,7 +177,7 @@ def show(*, save_location, site_name):
 
 
 @site.command('render', help='Render a site through the deckhand engine.')
-@utils.SAVE_LOCATION_OPTION
+@utils.SAVE_FILE_OPTION
 @click.option(
     '-v',
     '--validate',

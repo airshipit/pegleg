@@ -95,7 +95,18 @@ SAVE_LOCATION_OPTION = click.option(
     '-o',  # DEPRECATED
     '--output',  # DEPRECATED
     'save_location',
+    type=click.Path(writable=True),
     help='Where to save the output. Defaults to stdout. '
+    '-o (--output) is deprecated and will be removed.')
+
+SAVE_FILE_OPTION = click.option(
+    '-s',
+    '--save-location',
+    '-o',  # DEPRECATED
+    '--output',  # DEPRECATED
+    'save_location',
+    type=click.Path(dir_okay=False, file_okay=True, writable=True),
+    help='File to save the output. Defaults to stdout. '
     '-o (--output) is deprecated and will be removed.')
 
 REPOSITORY_CLONE_PATH_OPTION = click.option(
