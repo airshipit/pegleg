@@ -30,7 +30,7 @@ from tests.unit import test_utils
 TEST_PARAMS = {
     "site_name": "seaworthy",
     "site_type": "foundry",
-    "repo_rev": '29c67eb3a0ce046e41cfadbb9381697cd556f659',
+    "repo_rev": '8459e3faf18c20266c3272e6c3754d59814d12c4',
     "repo_name": "treasuremap",
     "repo_url": "https://opendev.org/airship/treasuremap.git",
 }
@@ -693,7 +693,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
         reason='cfssl must be installed to execute these tests')
     def test_check_pki_certs(self):
         repo_path = self.treasuremap_path
-        secrets_opts = ['secrets', 'check-pki-certs', 'airsloop']
+        secrets_opts = ['secrets', 'check-pki-certs', "airsloop"]
         result = self.runner.invoke(
             commands.site, ['--no-decrypt', '-r', repo_path] + secrets_opts)
         assert result.exit_code == 0, result.output
