@@ -28,6 +28,12 @@ called ``pegleg.sh``.
   The default workspace for the ``pegleg.sh`` script is ``/workspace``. The
   examples below require that this workspace be used.
 
+.. note::
+  Pegleg collect and render commands generate a deployment-version
+  document containing information gathered from the site-definition, which
+  includes the specific commit for each repository used and whether that
+  repository was clean or dirty.
+
 Environment Variables
 =====================
 

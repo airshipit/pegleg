@@ -55,7 +55,7 @@ def _collect_to_stdout(site_name):
                 click.echo("\n".join(line.splitlines()))
         add_representer_ordered_dict()
         res = yaml.safe_dump(
-            get_deployment_data_doc(),
+            get_deployment_data_doc(site_name),
             explicit_start=True,
             explicit_end=True,
             default_flow_style=False)
@@ -88,7 +88,7 @@ def _collect_to_file(site_name, save_location):
         add_representer_ordered_dict()
         save_files[curr_site_repo].writelines(
             yaml.safe_dump(
-                get_deployment_data_doc(),
+                get_deployment_data_doc(site_name),
                 default_flow_style=False,
                 explicit_start=True,
                 explicit_end=True))
@@ -108,7 +108,7 @@ def collect(site_name, save_location):
 
 def render(site_name, output_stream, validate):
     rendered_documents = get_rendered_docs(site_name, validate=validate)
-    rendered_documents.append(get_deployment_data_doc())
+    rendered_documents.append(get_deployment_data_doc(site_name))
     if output_stream:
         files.dump_all(
             rendered_documents,
@@ -213,12 +213,12 @@ def show(site_name, output_stream):
         click.echo(msg)
 
 
-def get_deployment_data_doc():
+def get_deployment_data_doc(site_name):
     stanzas = {
         files.path_leaf(repo): _get_repo_deployment_data_stanza(repo)
         for repo in config.all_repos()
     }
-    return OrderedDict(
+    basedeployment_data = OrderedDict(
         [
             ("schema", "pegleg/DeploymentData/v1"),
             (
@@ -234,6 +234,15 @@ def get_deployment_data_doc():
                         ("storagePolicy", "cleartext"),
                     ])), ("data", OrderedDict([("documents", stanzas)]))
         ])
+    try:
+        data = util.definition.load_as_params(site_name)
+        basedeployment_data['data'].update({'site_type': data['site_type']})
+        return basedeployment_data
+    except Exception as ex:
+        LOG.debug(
+            "Unable to get the site definition data for"
+            " site: %s, Exception :%s", site_name, ex)
+        return basedeployment_data
 
 
 def _get_repo_deployment_data_stanza(repo_path):
