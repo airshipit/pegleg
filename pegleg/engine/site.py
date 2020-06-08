@@ -235,14 +235,21 @@ def get_deployment_data_doc(site_name):
                     ])), ("data", OrderedDict([("documents", stanzas)]))
         ])
     try:
-        data = util.definition.load_as_params(site_name)
-        basedeployment_data['data'].update({'site_type': data['site_type']})
-        return basedeployment_data
+        data = util.definition.load(site_name)
+        basedeployment_data['data'].update(
+            {'site_type': data['data']['site_type']})
     except Exception as ex:
         LOG.debug(
             "Unable to get the site definition data for"
             " site: %s, Exception :%s", site_name, ex)
-        return basedeployment_data
+    try:
+        basedeployment_data['data'].update(
+            {'version': data['data']['repositories']['global']['revision']})
+    except Exception as ex:
+        LOG.debug(
+            "Unable to get the site revision data for global in"
+            " site: %s, Exception :%s", site_name, ex)
+    return basedeployment_data
 
 
 def _get_repo_deployment_data_stanza(repo_path):
