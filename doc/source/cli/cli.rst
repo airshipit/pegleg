@@ -838,6 +838,10 @@ Constructs genesis bundle based on a site configuration.
   genesis bundle data. PEGLEG_SALT must be set as well. There are no
   constraints on its length, but at least 24 characters is recommended.
 
+  PROMENADE_ENCRYPTION_KEY environment variable is required only if
+  manifests specify an encryption policy.
+  There are no constraints on its length or character pools.
+
 
 **-b / \\-\\-build-dir** (Required).
 
