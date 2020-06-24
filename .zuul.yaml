@@ -20,6 +20,16 @@
     vars:
       rtd_webhook_id: '38574'
       rtd_project_name: 'airship-pegleg'
+      proxy: ""
+      no_proxy: ""
+      use_proxy: false
+      docker_registry: "quay.io"
+      docker_registry_login_url: "https://quay.io/api/v1/"
+      deb_docker_repo: "{{ zuul_site_mirror_fqdn }}/deb-docker"
+      image_prefix: "airshipit"
+      base_image_bionic: "ubuntu:18.04"
+      base_image_opensuse: "opensuse/leap:15.1"
+      base_image_xenial: "ubuntu:16.04"
     check:
       jobs:
         - openstack-tox-pep8

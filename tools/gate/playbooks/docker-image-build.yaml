@@ -29,6 +29,21 @@
         - debug:
             msg: "{{ tags | to_json }}"
 
+    - name: Set ubuntu bionic base image
+      set_fact:
+        base_image: "{{ base_image_bionic }}"
+      when: distro == 'ubuntu_bionic'
+
+    - name: Set ubuntu xenial base image
+      set_fact:
+        base_image: "{{ base_image_xenial }}"
+      when: distro == 'ubuntu_xenial'
+
+    - name: Set ubuntu opensuse base image
+      set_fact:
+        base_image: "{{ base_image_opensuse }}"
+      when: distro == 'opensuse_15'
+
     - name: Determine tags
       shell: echo '{{ tags | to_json }}' | python {{ zuul.project.src_dir }}/tools/image_tags.py
       environment:
@@ -67,7 +82,7 @@
         - apt_key:
             url: https://download.docker.com/linux/ubuntu/gpg
         - apt_repository:
-            repo: deb http://{{ zuul_site_mirror_fqdn }}/deb-docker xenial stable
+            repo: "deb http://{{ deb_docker_repo }} xenial stable"
         - apt:
             name: "{{ item }}"
             allow_unauthenticated: True
@@ -95,8 +110,12 @@
             chdir: "{{ zuul.project.src_dir }}"
             target: images
             params:
+              BASE_IMAGE: "{{ base_image }}"
               DISTRO: "{{ distro }}"
               IMAGE_TAG: "{{ item }}"
+              PROXY: "{{ proxy }}"
+              NO_PROXY: "{{ no_proxy }}"
+              USE_PROXY: "{{ use_proxy | lower }}"
           with_items: "{{ image_tags.stdout_lines }}"
 
         - shell: "docker images"
@@ -112,18 +131,22 @@
         - docker_login:
             username: "{{ airship_pegleg_quay_creds.username }}"
             password: "{{ airship_pegleg_quay_creds.password }}"
-            registry_url: "https://quay.io/api/v1/"
+            registry_url: "{{ docker_registry_login_url }}"
 
         - make:
             chdir: "{{ zuul.project.src_dir }}"
             target: images
             params:
-              DOCKER_REGISTRY: "quay.io"
-              IMAGE_PREFIX: "airshipit"
+              BASE_IMAGE: "{{ base_image }}"
+              DOCKER_REGISTRY: "{{ docker_registry }}"
+              IMAGE_PREFIX: "{{ image_prefix }}"
               DISTRO: "{{ distro }}"
               IMAGE_TAG: "{{ item }}"
               COMMIT: "{{ zuul.newrev | default('') }}"
               PUSH_IMAGE: "true"
+              PROXY: "{{ proxy }}"
+              NO_PROXY: "{{ no_proxy }}"
+              USE_PROXY: "{{ use_proxy | lower }}"
           with_items: "{{ image_tags.stdout_lines }}"
 
         - shell: "docker images"
