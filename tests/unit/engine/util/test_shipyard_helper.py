@@ -152,8 +152,8 @@ def _get_data_as_collection(data):
     return yaml.dump_all(collection, Dumper=yaml.SafeDumper)
 
 
-def _get_deployment_data_as_yaml():
-    return yaml.safe_dump(get_deployment_data_doc())
+def _get_deployment_data_as_yaml(site_name):
+    return yaml.safe_dump(get_deployment_data_doc(site_name))
 
 
 def test_shipyard_helper_init_():
@@ -204,7 +204,7 @@ def test_upload_documents(*args):
         # collection name and buffer mode.
         expected_data = '---\n'.join(
             [
-                _get_deployment_data_as_yaml(),
+                _get_deployment_data_as_yaml(context.obj['site_name']),
                 _get_data_as_collection(MULTI_REPO_DATA)
             ])
         mock_api_client.post_configdocs.assert_called_with(

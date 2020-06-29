@@ -146,6 +146,7 @@ def _get_current_ref(repo_url):
             'checked out ref=%s', repo_url, current_ref)
         return current_ref
     except Exception as e:
+        LOG.debug('Exception : %s', str(e))
         return None
 
 
@@ -154,6 +155,7 @@ def get_remote_url(repo_url):
         repo = Repo(repo_url, search_parent_directories=True)
         return repo.remotes.origin.url
     except Exception as e:
+        LOG.debug('Exception : %s', str(e))
         return None
 
 

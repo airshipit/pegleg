@@ -223,3 +223,14 @@ def test_site_render(create_tmp_site_structure):
             doc2['data']['managedDocument']['data'] = doc2['data'][
                 'managedDocument']['data'].decode()
             assert doc2['data']['managedDocument'] == doc
+
+
+def test_deployment_version_doc(create_tmp_site_structure):
+    """
+    This test case checks the deployment-version document,
+    test case passes if the site_type parameter exists
+    """
+    sitename = "test"
+    rootpath = create_tmp_site_structure(sitename)
+    rendered_doc = site.get_deployment_data_doc(sitename)
+    assert rendered_doc['data']['site_type'] == sitename

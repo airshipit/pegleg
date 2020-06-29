@@ -77,7 +77,7 @@ class ShipyardHelper(object):
 
         collected_documents = files.collect_files_by_repo(self.site_name)
 
-        collection_data = [site.get_deployment_data_doc()]
+        collection_data = [site.get_deployment_data_doc(self.site_name)]
         LOG.info("Processing %d collection(s)", len(collected_documents))
         for idx, document in enumerate(collected_documents):
             # Decrypt the documents if encrypted
