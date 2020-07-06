@@ -274,7 +274,7 @@ def _get_repo_deployment_data_stanza(repo_path):
         # If we're at a particular tag, reference it
         tag = [tag.name for tag in repo.tags if tag.commit == commit]
         if tag:
-            tag == ", ".join(tag)
+            tag = ", ".join(tag)
         else:
             # Otherwise just use the branch name
             try:
