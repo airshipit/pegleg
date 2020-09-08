@@ -18,9 +18,12 @@ ARG PROMENADE_VERSION=branch/master
 RUN set -x \
     && zypper up -y \
     && zypper --non-interactive install \
+         automake \
          curl \
          gcc \
          git-core \
+         libtool \
+         make \
          openssh \
          python3 \
          python3-dbm \
@@ -40,6 +43,20 @@ RUN pip3 install -U pip \
          /usr/share/man \
          /var/log/* \
          /var/tmp/*
+
+ENV LD_LIBRARY_PATH=/usr/local/lib
+
+ARG LIBYAML_VERSION=0.2.5
+RUN set -ex \
+    && git clone https://github.com/yaml/libyaml.git \
+    && cd libyaml \
+    && git checkout $LIBYAML_VERSION \
+    && ./bootstrap \
+    && ./configure \
+    && make \
+    && make install \
+    && cd .. \
+    && rm -fr libyaml
 
 VOLUME /var/pegleg
 WORKDIR /var/pegleg

@@ -18,11 +18,14 @@ ARG PROMENADE_VERSION=branch/master
 RUN set -ex \
     && apt-get update -qq \
     && apt-get install -y --no-install-recommends \
+         automake \
          ca-certificates \
          curl \
          gcc \
          git \
          libssl-dev \
+         libtool \
+         make \
          netbase \
          openssh-client \
          python3-dev \
@@ -39,6 +42,20 @@ RUN set -ex \
          /var/lib/apt/lists/* \
          /var/log/* \
          /var/tmp/*
+
+ENV LD_LIBRARY_PATH=/usr/local/lib
+
+ARG LIBYAML_VERSION=0.2.5
+RUN set -ex \
+    && git clone https://github.com/yaml/libyaml.git \
+    && cd libyaml \
+    && git checkout $LIBYAML_VERSION \
+    && ./bootstrap \
+    && ./configure \
+    && make \
+    && make install \
+    && cd .. \
+    && rm -fr libyaml
 
 VOLUME /var/pegleg
 WORKDIR /var/pegleg
