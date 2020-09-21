@@ -25,14 +25,14 @@
       use_proxy: false
       docker_registry: "quay.io"
       docker_registry_login_url: "https://quay.io/api/v1/"
-      deb_docker_repo: "{{ zuul_site_mirror_fqdn }}/deb-docker"
+      deb_docker_repo: "{{ zuul_site_mirror_fqdn }}/deb-docker/{{ ansible_distribution_release }}"
       image_prefix: "airshipit"
       base_image_bionic: "ubuntu:18.04"
       base_image_opensuse: "opensuse/leap:15.1"
       base_image_xenial: "ubuntu:16.04"
     check:
       jobs:
-        - openstack-tox-pep8
+        - openstack-tox-pep8-bionic
         - pegleg-dependency-vulnerability-check
         - airship-pegleg-docker-build-gate-ubuntu_xenial
         - airship-pegleg-docker-build-gate-ubuntu_bionic
@@ -41,7 +41,7 @@
 
     gate:
       jobs:
-        - openstack-tox-pep8
+        - openstack-tox-pep8-bionic
         - pegleg-dependency-vulnerability-check
         - airship-pegleg-docker-build-gate-ubuntu_xenial
         - airship-pegleg-docker-build-gate-ubuntu_bionic
@@ -59,6 +59,11 @@
     nodes:
       - name: primary
         label: ubuntu-xenial
+
+- job:
+    name: openstack-tox-pep8-bionic
+    parent: openstack-tox-pep8
+    nodeset: openstack-single-node-bionic
 
 - job:
     name: airship-pegleg-lint-yaml
