@@ -680,7 +680,7 @@
         },
         "promenade": {
             "git": "https://opendev.org/airship/promenade.git",
-            "ref": "b1f00852e3630612cd9279a1ff84fe9b4edda830"
+            "ref": "c302a083a61c22b94b71eccb9a3665d23c6497dc"
         },
         "psycopg2-binary": {
             "hashes": [
