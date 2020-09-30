@@ -28,7 +28,7 @@ pylibyaml = "~=0.1"
 PyYAML = "~=5.1"
 deckhand = {git = "https://opendev.org/airship/deckhand.git",ref = "e7ba6828a0a1ca27fae596f6e0ee5a857f28001d"}
 shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "70410cc478e6aec4abad88c84d68684edfedb376",subdirectory = "src/bin/shipyard_client"}
-promenade = {git = "https://opendev.org/airship/promenade.git",ref = "c302a083a61c22b94b71eccb9a3665d23c6497dc"}
+promenade = {git = "https://opendev.org/airship/promenade.git",ref = "d603386d491e1df52f9d1ee05d60e4263692b9b3"}
 "oslo.i18n" = "~=3.24.0"
 "oslo.utils" = "~=3.40.2"
 six = "~=1.11.0"
