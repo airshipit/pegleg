@@ -12,7 +12,7 @@ chardet==3.0.4
 click==6.7
 cliff==3.1.0; python_version >= '3.5'
 cmd2==0.8.9
-cryptography==2.3.1
+cryptography>=2.7
 debtcollector==1.22.0
 decorator==4.4.2
 deepdiff==3.3.0
@@ -25,16 +25,17 @@ extras==1.0.0
 falcon==1.4.1
 fasteners==0.15
 fixtures==3.0.0
-flake8==2.6.2
+flake8==3.7.9
 futurist==2.2.0; python_version >= '3.6'
-git+https://opendev.org/airship/deckhand.git@e7ba6828a0a1ca27fae596f6e0ee5a857f28001d#egg=deckhand
-git+https://opendev.org/airship/promenade.git@d603386d491e1df52f9d1ee05d60e4263692b9b3
-git+https://opendev.org/airship/shipyard.git@70410cc478e6aec4abad88c84d68684edfedb376#egg=shipyard-client&subdirectory=src/bin/shipyard_client
+git+https://opendev.org/airship/deckhand.git@1f0c011a1708c1235a2be65edada7d386cd55d2a#egg=deckhand
+git+https://opendev.org/airship/promenade.git@eb748a75f3b4e183c106acc429778676c3e06f51
+git+https://opendev.org/airship/shipyard.git@35e5a7f796a5341e02fb0d3f2d27b41e2fb39131#egg=shipyard-client&subdirectory=src/bin/shipyard_client
 gitdb2==2.0.6; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 gitpython==2.1.15
+setuptools==40.4.3
 google-auth==1.16.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 greenlet==0.4.16
-hacking==1.1.0
+hacking>=3.0.1,<3.1.0
 idna==2.8
 importlib-metadata==1.6.1; python_version < '3.8'
 ipaddress==1.0.23
@@ -42,64 +43,64 @@ iso8601==0.1.12
 jinja2==2.10
 jsonpath-ng==1.4.3
 jsonpickle==1.4.1; python_version >= '2.7'
-jsonschema==2.6.0
-keystoneauth1==3.11.1
+jsonschema>=3.0.1<4
+keystoneauth1>=3.18.0
 keystonemiddleware==5.3.0
 kombu==4.6.10; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
-kubernetes==3.0.0
+kubernetes==11.0.0
 linecache2==1.0.0
 mako==1.1.3; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 markupsafe==1.1.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
-mccabe==0.5.3
+mccabe==0.6.1
 monotonic==1.5
 msgpack==1.0.0
 netaddr==0.7.19
 netifaces==0.10.9
 networkx==2.2
 os-service-types==1.7.0
-oslo.cache==1.31.1
+oslo.cache==1.38.1
 oslo.concurrency==3.28.1
-oslo.config==6.6.2
+oslo.config==7.0.0
 oslo.context==2.21.0
 oslo.db==4.41.1
 oslo.i18n==3.24.0
-oslo.log==3.40.1
+oslo.log==3.45.2
 oslo.messaging==9.1.1
 oslo.middleware==3.36.0
 oslo.policy==1.40.1
-oslo.serialization==2.28.1
+oslo.serialization==2.29.2
 oslo.service==2.2.0; python_version >= '3.6'
-oslo.utils==3.40.2
+oslo.utils==3.42.1
 paste==3.0.1
 pastedeploy==1.5.2
-pbr==5.1.0
+pbr==5.4.5
 ply==3.11
 prettytable==0.7.2
 psycopg2-binary==2.8.4; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 pyasn1-modules==0.2.8
 pyasn1==0.4.8
 pycadf==3.0.0; python_version >= '3.6'
-pycodestyle==2.0.0
+pycodestyle==2.5.0
 pycparser==2.20; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
-pyflakes==1.2.3
+pyflakes==2.1.0
 pyinotify==0.9.6; sys_platform != 'win32' and sys_platform != 'darwin' and sys_platform != 'sunos5'
 pylibyaml==0.1.0
 pyparsing==2.4.7; python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'
 pyperclip==1.8.0
 python-barbicanclient==4.7.0
-python-dateutil==2.7.5
+python-dateutil>=2.8.1
 python-editor==1.0.4
-python-keystoneclient==3.18.0
+python-keystoneclient==3.22.0
 python-memcached==1.59
 python-mimeparse==1.6.0
 pytz==2020.1
-pyyaml==5.3.1
+pyyaml==5.1
 repoze.lru==0.7
 requests==2.22.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 rfc3986==1.4.0
 routes==2.4.1
 rsa==4.0
-six==1.11.0
+six>=1.15.0
 smmap2==3.0.1
 smmap==3.0.4; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 sqlalchemy-migrate==0.13.0
@@ -114,12 +115,12 @@ testscenarios==0.5.0
 testtools==2.4.0
 traceback2==1.4.0
 unittest2==1.1.0
-urllib3==1.24.3; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3' and python_version < '4'
-uwsgi==2.0.17.1
+urllib3==1.25.9; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3' and python_version < '4'
+uwsgi~=2.0.19.1
 vine==1.3.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 wcwidth==0.2.4; sys_platform != 'win32'
 webob==1.8.6; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
-websocket-client==0.40.0
+websocket-client==0.57.0
 werkzeug==0.16.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 wrapt==1.12.1
 yappi==1.2.5
