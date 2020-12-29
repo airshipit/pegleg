@@ -301,8 +301,9 @@ def check_cert_expiry(site_name, duration=60):
                     if result['schema'] in cert_schemas:
                         text = result['data']
                         header_pattern = '-----BEGIN CERTIFICATE-----'
-                        find_pattern = r'%s.*?(?=%s|$)' % (
-                            header_pattern, header_pattern)
+                        footer_pattern = '-----END CERTIFICATE-----'
+                        find_pattern = r'%s.*?%s' % (
+                            header_pattern, footer_pattern)
                         certs = re.findall(find_pattern, text, re.DOTALL)
                         for cert in certs:
                             cert_info = pki_util.check_expiry(cert)
