@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import base64
+from functools import lru_cache
 import logging
 
 from cryptography import fernet
@@ -105,6 +106,7 @@ def decrypt(
         raise
 
 
+@lru_cache(maxsize=None)
 def _generate_key(passphrase, salt, key_length, iterations):
     """
     Use the passphrase and salt and PBKDF2HMAC key derivation algorithm,
