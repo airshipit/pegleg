@@ -25,7 +25,7 @@ python-dateutil = ">=2.8.1"
 GitPython = "~=2.1.11"
 docker = ">=3.7.2"
 pylibyaml = "~=0.1"
-PyYAML = "~=5.1"
+PyYAML = "~=5.4"
 deckhand = {git = "https://opendev.org/airship/deckhand.git",ref = "1f0c011a1708c1235a2be65edada7d386cd55d2a"}
 shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "35e5a7f796a5341e02fb0d3f2d27b41e2fb39131",subdirectory = "src/bin/shipyard_client"}
 promenade = {git = "https://opendev.org/airship/promenade.git",ref = "5bb58863b694a78b935f2d70d45bd3448f17b6a3"}
