@@ -30,7 +30,7 @@ from tests.unit import test_utils
 TEST_PARAMS = {
     "site_name": "seaworthy",
     "site_type": "foundry",
-    "repo_rev": '8459e3faf18c20266c3272e6c3754d59814d12c4',
+    "repo_rev": '48e2afa570541972d4c60719181bc2fcca84a89c',
     "repo_name": "treasuremap",
     "repo_url": "https://opendev.org/airship/treasuremap.git",
 }
