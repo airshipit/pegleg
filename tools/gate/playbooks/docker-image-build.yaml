@@ -57,6 +57,10 @@
       debug:
         var: image_tags
 
+    - name: Remove default mirror config
+      shell: rm /etc/pip.conf
+      become: True
+
     - name: Install Docker (Debian)
       when: ansible_os_family == 'Debian'
       block:
