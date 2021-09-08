@@ -193,7 +193,7 @@
         },
         "deckhand": {
             "git": "https://opendev.org/airship/deckhand.git",
-            "ref": "1f0c011a1708c1235a2be65edada7d386cd55d2a"
+            "ref": "d7d3cbde2bd44eed0d574ec439d1f8194dbcf782"
         },
         "decorator": {
             "hashes": [
@@ -722,7 +722,7 @@
         },
         "promenade": {
             "git": "https://opendev.org/airship/promenade.git",
-            "ref": "5f964eced5c8bb5c7a556799a83ef931bf81d13d"
+            "ref": "bc14e9bbb9857becedd7ce9d6b81d74de77b497b"
         },
         "psycopg2-binary": {
             "hashes": [
