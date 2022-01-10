@@ -31,7 +31,7 @@ RUN set -x \
          python3-pip \
          python3-setuptools \
          which \
-    && zypper --non-interactive ar -f https://download.opensuse.org/repositories/devel:languages:python/openSUSE_Leap_15.3/devel:languages:python.repo \
+    && zypper --non-interactive ar -f https://download.opensuse.org/repositories/devel:/languages:/python/15.3/devel:languages:python.repo \
     && zypper --non-interactive --gpg-auto-import-keys refresh devel_languages_python \
     && zypper --non-interactive install python3-six-1.16.0-lp153.103.1.noarch
 RUN pip3 install -U pip \
