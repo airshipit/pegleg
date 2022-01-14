@@ -27,7 +27,7 @@ fasteners==0.15
 fixtures==3.0.0
 flake8==3.7.9
 futurist==2.2.0; python_version >= '3.6'
-git+https://opendev.org/airship/deckhand.git@d7d3cbde2bd44eed0d574ec439d1f8194dbcf782#egg=deckhand
+git+https://opendev.org/airship/deckhand.git@5cd799cc5d04527ac782270008ff647b3779ff05#egg=deckhand
 git+https://opendev.org/airship/promenade.git@3cac5cbde0c8d32d99acb7d17ef54ab0f8c70f12#egg=promenade
 git+https://opendev.org/airship/shipyard.git@35e5a7f796a5341e02fb0d3f2d27b41e2fb39131#egg=shipyard-client&subdirectory=src/bin/shipyard_client
 gitdb2==2.0.6; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'

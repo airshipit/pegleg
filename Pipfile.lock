@@ -193,7 +193,7 @@
         },
         "deckhand": {
             "git": "https://opendev.org/airship/deckhand.git",
-            "ref": "d7d3cbde2bd44eed0d574ec439d1f8194dbcf782"
+            "ref": "5cd799cc5d04527ac782270008ff647b3779ff05"
         },
         "decorator": {
             "hashes": [
