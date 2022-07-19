@@ -4,8 +4,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pytest = "*"
-pytest-cov = "*"
+pytest = "~=6.1.1"
+pytest-cov = "~=2.10.1"
 testfixtures = "*"
 pytest-xdist = "*"
 requests = ">=2.20.0"
@@ -15,11 +15,11 @@ flake8 = "*"
 yapf = "~=0.28.0"
 hacking = ">=1.1.0"
 flake8-import-order = ">=0.18.1"
-bandit = ">=1.6.0"
+bandit = ">=1.6.0,<=1.7.1"
 
 [packages]
 click = ">=6.7"
-jsonschema = ">=3.0.1<4"
+jsonschema = ">=3.0.1,<4"
 cryptography = ">=2.7"
 python-dateutil = ">=2.8.1"
 GitPython = "~=2.1.11"
@@ -27,13 +27,13 @@ docker = ">=3.7.2"
 pylibyaml = "~=0.1"
 PyYAML = "~=5.1"
 deckhand = {git = "https://opendev.org/airship/deckhand.git",ref = "5cd799cc5d04527ac782270008ff647b3779ff05"}
-shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "35e5a7f796a5341e02fb0d3f2d27b41e2fb39131",subdirectory = "src/bin/shipyard_client"}
-promenade = {git = "https://opendev.org/airship/promenade.git",ref = "363ceca06915a3fe5f3d6819a33b771768323f0a"}
+shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "8240608fe5e73a051a016b0ae100715849c0a771",subdirectory = "src/bin/shipyard_client"}
+promenade = {git = "https://opendev.org/airship/promenade.git",ref = "e207bbe9661716efab8dc017925489072d28a936"}
 "oslo.i18n" = "~=3.24.0"
 "oslo.utils" = ">=3.42.1"
 six = ">=1.15.0"
 debtcollector = "~=1.22.0"
-zipp = "~=1.2.0"
+zipp = "~=3.6.0"
 
 [requires]
 python_version = "3.6"

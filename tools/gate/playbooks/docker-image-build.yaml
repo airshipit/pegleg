@@ -86,7 +86,7 @@
         - apt_key:
             url: https://download.docker.com/linux/ubuntu/gpg
         - apt_repository:
-            repo: "deb http://{{ deb_docker_repo }} xenial stable"
+            repo: "deb http://{{ deb_docker_repo }} bionic stable"
         - apt:
             name: "{{ item }}"
             allow_unauthenticated: True

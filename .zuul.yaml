@@ -14,7 +14,6 @@
     templates:
       - docs-on-readthedocs
       - openstack-python36-jobs
-      - openstack-python37-jobs
       - openstack-cover-jobs
       - release-notes-jobs-python3
     vars:
@@ -34,24 +33,18 @@
       jobs:
         - openstack-tox-pep8-bionic
         - pegleg-dependency-vulnerability-check
-        - airship-pegleg-docker-build-gate-ubuntu_xenial
         - airship-pegleg-docker-build-gate-ubuntu_bionic
-        - airship-pegleg-docker-build-gate-opensuse
         - airship-pegleg-lint-yaml
 
     gate:
       jobs:
         - openstack-tox-pep8-bionic
         - pegleg-dependency-vulnerability-check
-        - airship-pegleg-docker-build-gate-ubuntu_xenial
         - airship-pegleg-docker-build-gate-ubuntu_bionic
-        - airship-pegleg-docker-build-gate-opensuse
         - airship-pegleg-lint-yaml
     post:
       jobs:
-        - airship-pegleg-docker-publish-ubuntu_xenial
         - airship-pegleg-docker-publish-ubuntu_bionic
-        - airship-pegleg-docker-publish-opensuse
         - pegleg-upload-git-mirror
 
 - nodeset:
@@ -59,6 +52,12 @@
     nodes:
       - name: primary
         label: ubuntu-xenial
+
+- nodeset:
+    name: airship-pegleg-single-node-bionic
+    nodes:
+      - name: primary
+        label: ubuntu-bionic
 
 - job:
     name: openstack-tox-pep8-bionic
@@ -86,25 +85,10 @@
       bindep_profile: test py36
 
 - job:
-    name: airship-pegleg-docker-build-gate-ubuntu_xenial
-    voting: false
-    timeout: 1800
-    run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node
-    irrelevant-files:
-      - '^doc/.*'
-    vars:
-      publish: false
-      distro: ubuntu_xenial
-      tags:
-        dynamic:
-          patch_set: true
-
-- job:
     name: airship-pegleg-docker-build-gate-ubuntu_bionic
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node
+    nodeset: airship-pegleg-single-node-bionic
     irrelevant-files:
       - '^doc/.*'
     vars:
@@ -113,47 +97,12 @@
       tags:
         dynamic:
           patch_set: true
-
-- job:
-    name: airship-pegleg-docker-build-gate-opensuse
-    timeout: 1800
-    run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node
-    voting: false
-    irrelevant-files:
-      - '^doc/.*'
-    vars:
-      publish: false
-      distro: opensuse_15
-      tags:
-        dynamic:
-          patch_set: true
-
-- job:
-    name: airship-pegleg-docker-publish-ubuntu_xenial
-    voting: false
-    timeout: 1800
-    run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node
-    secrets:
-      - airship_pegleg_quay_creds
-    irrelevant-files:
-      - '^doc/.*'
-    vars:
-      publish: true
-      distro: ubuntu_xenial
-      tags:
-        dynamic:
-          branch: true
-          commit: true
-        static:
-          - latest
 
 - job:
     name: airship-pegleg-docker-publish-ubuntu_bionic
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node
+    nodeset: airship-pegleg-single-node-bionic
     secrets:
       - airship_pegleg_quay_creds
     irrelevant-files:
@@ -161,26 +110,6 @@
     vars:
       publish: true
       distro: ubuntu_bionic
-      tags:
-        dynamic:
-          branch: true
-          commit: true
-        static:
-          - latest
-
-- job:
-    name: airship-pegleg-docker-publish-opensuse
-    timeout: 1800
-    run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node
-    voting: false
-    secrets:
-      - airship_pegleg_quay_creds
-    irrelevant-files:
-      - '^doc/.*'
-    vars:
-      publish: true
-      distro: opensuse_15
       tags:
         dynamic:
           branch: true
