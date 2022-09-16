@@ -70,7 +70,7 @@ oslo.middleware==3.36.0
 oslo.policy==1.40.1
 oslo.serialization==2.29.2
 oslo.service==2.2.0; python_version >= '3.6'
-oslo.utils==3.42.1
+oslo.utils==4.10.1
 paste==3.0.1
 pastedeploy==1.5.2
 pbr==5.4.5
