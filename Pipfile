@@ -15,7 +15,6 @@ flake8 = "*"
 yapf = "~=0.28.0"
 hacking = ">=1.1.0"
 flake8-import-order = ">=0.18.1"
-bandit = ">=1.6.0,<=1.7.1"
 
 [packages]
 click = ">=6.7"
@@ -27,8 +26,8 @@ docker = ">=3.7.2"
 pylibyaml = "~=0.1"
 PyYAML = "~=5.1"
 deckhand = {git = "https://opendev.org/airship/deckhand.git",ref = "5cd799cc5d04527ac782270008ff647b3779ff05"}
-shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "8240608fe5e73a051a016b0ae100715849c0a771",subdirectory = "src/bin/shipyard_client"}
-promenade = {git = "https://opendev.org/airship/promenade.git",ref = "7da16b3c0b606bb0eaf9525b308335c7e0722858"}
+shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "e3e71f7d1632c0dc13b436a32c238f9da76d6d88",subdirectory = "src/bin/shipyard_client"}
+promenade = {git = "https://opendev.org/airship/promenade.git",ref = "c10165c144e0a18137596a3c89f1339d6ed30d0c"}
 "oslo.i18n" = "~=3.24.0"
 "oslo.utils" = ">=3.42.1"
 six = ">=1.15.0"
