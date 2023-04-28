@@ -32,7 +32,7 @@ For more information, see: https://storyboard.openstack.org/#!/story/2003762
 
 
 class TestSelectableLinting(object):
-    def setup(self):
+    def setup_method(self, *args):
         self.site_yaml_path = os.path.join(os.getcwd(), 'site_yamls')
 
     def _exclude_all(self, except_code):

@@ -13,9 +13,9 @@
 - project:
     templates:
       - docs-on-readthedocs
-      - openstack-python36-jobs
+      - openstack-python38-jobs
       - openstack-cover-jobs
-      - release-notes-jobs-python3
+      # - release-notes-jobs-python3
     vars:
       rtd_webhook_id: '38574'
       rtd_project_name: 'airship-pegleg'
@@ -26,25 +26,26 @@
       docker_registry_login_url: "https://quay.io/api/v1/"
       deb_docker_repo: "{{ zuul_site_mirror_fqdn }}/deb-docker/{{ ansible_distribution_release }}"
       image_prefix: "airshipit"
+      base_image_focal: "ubuntu:20.04"
       base_image_bionic: "ubuntu:18.04"
       base_image_opensuse: "opensuse/leap:15.1"
       base_image_xenial: "ubuntu:16.04"
     check:
       jobs:
-        - openstack-tox-pep8-bionic
+        - openstack-tox-pep8-focal
         - pegleg-dependency-vulnerability-check
-        - airship-pegleg-docker-build-gate-ubuntu_bionic
+        - airship-pegleg-docker-build-gate-ubuntu_focal
         - airship-pegleg-lint-yaml
 
     gate:
       jobs:
-        - openstack-tox-pep8-bionic
+        - openstack-tox-pep8-focal
         - pegleg-dependency-vulnerability-check
-        - airship-pegleg-docker-build-gate-ubuntu_bionic
+        - airship-pegleg-docker-build-gate-ubuntu_focal
         - airship-pegleg-lint-yaml
     post:
       jobs:
-        - airship-pegleg-docker-publish-ubuntu_bionic
+        - airship-pegleg-docker-publish-ubuntu_focal
         - pegleg-upload-git-mirror
 
 - nodeset:
@@ -54,62 +55,62 @@
         label: ubuntu-xenial
 
 - nodeset:
-    name: airship-pegleg-single-node-bionic
+    name: airship-pegleg-single-node-focal
     nodes:
       - name: primary
-        label: ubuntu-bionic
+        label: ubuntu-focal
 
 - job:
-    name: openstack-tox-pep8-bionic
+    name: openstack-tox-pep8-focal
     parent: openstack-tox-pep8
-    nodeset: openstack-single-node-bionic
+    nodeset: openstack-single-node-focal
 
 - job:
     name: airship-pegleg-lint-yaml
     voting: true
     timeout: 600
     run: tools/gate/playbooks/lint-yaml.yaml
-    nodeset: ubuntu-bionic
+    nodeset: ubuntu-focal
     irrelevant-files:
       - ^.*\.rst$
       - ^doc/.*$
 
 - job:
     name: pegleg-dependency-vulnerability-check
-    parent: tox-py36
+    parent: tox-py38
     voting: false
     timeout: 600
-    nodeset: ubuntu-bionic
+    nodeset: ubuntu-focal
     vars:
       tox_envlist: safety
-      bindep_profile: test py36
+      bindep_profile: test py38
 
 - job:
-    name: airship-pegleg-docker-build-gate-ubuntu_bionic
+    name: airship-pegleg-docker-build-gate-ubuntu_focal
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node-bionic
+    nodeset: airship-pegleg-single-node-focal
     irrelevant-files:
       - '^doc/.*'
     vars:
       publish: false
-      distro: ubuntu_bionic
+      distro: ubuntu_focal
       tags:
         dynamic:
           patch_set: true
 
 - job:
-    name: airship-pegleg-docker-publish-ubuntu_bionic
+    name: airship-pegleg-docker-publish-ubuntu_focal
     timeout: 1800
     run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node-bionic
+    nodeset: airship-pegleg-single-node-focal
     secrets:
       - airship_pegleg_quay_creds
     irrelevant-files:
       - '^doc/.*'
     vars:
       publish: true
-      distro: ubuntu_bionic
+      distro: ubuntu_focal
       tags:
         dynamic:
           branch: true

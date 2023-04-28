@@ -5,8 +5,8 @@ posargs=$@
 # cross-platform way to derive the number of logical cores
 readonly num_cores=$(python -c 'import multiprocessing as mp; print(mp.cpu_count())')
 if [ ${#posargs} -ge 1 ]; then
-    pytest -k ${posargs} -n $num_cores
+    pytest -k ${posargs} -n $num_cores -vv
 else
-    pytest -n $num_cores
+    pytest -n $num_cores -vv
 fi
 set +e

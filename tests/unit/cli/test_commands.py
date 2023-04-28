@@ -30,7 +30,7 @@ from tests.unit import test_utils
 TEST_PARAMS = {
     "site_name": "seaworthy",
     "site_type": "foundry",
-    "repo_rev": '342c9eedd58f046a322ee2dd6752a9ec8fa992bb',
+    "repo_rev": '23e4bfc80aa6a3c845b31750d7593898f6e55e82',
     "repo_name": "treasuremap",
     "repo_url": "https://review.opendev.org/airship/treasuremap.git",
 }
@@ -756,7 +756,7 @@ class TestSiteSecretsActions(BaseCLIActionTest):
 
 class TestTypeCliActions(BaseCLIActionTest):
     """Tests type-level CLI actions."""
-    def setup(self):
+    def setup_method(self, *args):
         self.expected_types = ['foundry']
 
     def _assert_table_has_expected_sites(self, table_output):
@@ -795,7 +795,7 @@ class TestTypeCliActions(BaseCLIActionTest):
 
 class TestSiteCliActionsWithSubdirectory(BaseCLIActionTest):
     """Tests site CLI actions with subdirectories in repository paths."""
-    def setup(self):
+    def setup_method(self, *args):
         self.expected_sites = ['demo', 'gate-multinode', 'dev', 'dev-proxy']
 
     def _assert_table_has_expected_sites(self, table_output):
@@ -874,7 +874,7 @@ class TestCliSiteSubcommandsWithDecryptOption(BaseCLIActionTest):
             "PEGLEG_PASSPHRASE": 'ytrr89erARAiPE34692iwUMvWqqBvC',
             "PEGLEG_SALT": "MySecretSalt1234567890]["
         })
-    def setup(self):
+    def setup_method(self, *args):
         pegleg_main.run_config(
             self.treasuremap_path, None, None, None, [], True, False)
         pegleg_main.run_encrypt('zuul-tester', None, self.site_name)

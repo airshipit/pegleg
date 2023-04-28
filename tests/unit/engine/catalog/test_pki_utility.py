@@ -25,7 +25,8 @@ from pegleg.engine.common import managed_document
 CERT_HEADER = '-----BEGIN CERTIFICATE-----\n'
 CERT_KEY_HEADER = '-----BEGIN RSA PRIVATE KEY-----\n'
 PUBLIC_KEY_HEADER = '-----BEGIN PUBLIC KEY-----\n'
-PRIVATE_KEY_HEADER = '-----BEGIN RSA PRIVATE KEY-----\n'
+PRIVATE_KEY_HEADER_PKCS1 = '-----BEGIN RSA PRIVATE KEY-----\n'
+PRIVATE_KEY_HEADER_PKCS8 = '-----BEGIN PRIVATE KEY-----\n'
 
 PEGLEG_MANAGED_DOC_SCHEMA = 'pegleg/PeglegManagedDocument/v1'
 CA_SCHEMA = 'deckhand/CertificateAuthority/v1'
@@ -87,7 +88,8 @@ class TestPKIUtility(object):
 
         assert isinstance(priv_key, dict), priv_key
         assert PRIVATE_KEY_SCHEMA in priv_key['schema']
-        assert PRIVATE_KEY_HEADER in priv_key['data']
+        assert PRIVATE_KEY_HEADER_PKCS1 in priv_key['data'] or \
+            PRIVATE_KEY_HEADER_PKCS8 in priv_key['data']
 
     def test_generate_certificate(self):
         pki_obj = pki_utility.PKIUtility(duration=365)

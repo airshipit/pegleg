@@ -3,13 +3,15 @@
 # process, which may cause wedges in the gate later.
 
 # Documentation
-sphinx>=3.1.0
-oslosphinx>=4.18.0 # Apache-2.0
-sphinx_rtd_theme>=0.4.3
-docutils>=0.17.1
+sphinx>=3.3.1
+oslosphinx # Apache-2.0
+sphinx_rtd_theme>=0.5.0
+docutils>=0.17
+
+
 
 # UML image generation
-plantuml>=0.3.0
+plantuml>=
 
 # Releasenotes
-reno>=3.1.0 # Apache-2.0
+reno>=4.0.0 # Apache-2.0

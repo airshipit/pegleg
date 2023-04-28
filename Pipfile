@@ -4,8 +4,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pytest = "~=6.1.1"
-pytest-cov = "~=2.10.1"
+bandit = "~=1.6.0"
+pytest = "*"
+pytest-cov = "*"
 testfixtures = "*"
 pytest-xdist = "*"
 requests = ">=2.20.0"
@@ -17,22 +18,23 @@ hacking = ">=1.1.0"
 flake8-import-order = ">=0.18.1"
 
 [packages]
-click = ">=6.7"
-jsonschema = ">=3.0.1,<4"
-cryptography = ">=2.7"
-python-dateutil = ">=2.8.1"
-GitPython = "~=2.1.11"
-docker = ">=3.7.2"
-pylibyaml = "~=0.1"
-PyYAML = "~=5.1"
-deckhand = {git = "https://opendev.org/airship/deckhand.git",ref = "5cd799cc5d04527ac782270008ff647b3779ff05"}
-shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "e3e71f7d1632c0dc13b436a32c238f9da76d6d88",subdirectory = "src/bin/shipyard_client"}
-promenade = {git = "https://opendev.org/airship/promenade.git",ref = "c10165c144e0a18137596a3c89f1339d6ed30d0c"}
-"oslo.i18n" = "~=3.24.0"
-"oslo.utils" = ">=3.42.1"
-six = ">=1.15.0"
-debtcollector = "~=1.22.0"
-zipp = "~=3.6.0"
+click = "*"
+jsonschema = "*"
+cryptography = "*"
+python-dateutil = "*"
+GitPython = "*"
+docker = "*"
+pylibyaml = "*"
+PyYAML = "*"
+deckhand = {git = "https://opendev.org/airship/deckhand.git",ref = "03f6932e16aa0b72a32a10fc04a52125c45dd5d7"}
+shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "154a099b2843b1b42a7b8afa5fa98383cf3c1b7c",subdirectory = "src/bin/shipyard_client"}
+promenade = {git = "https://opendev.org/airship/promenade.git",ref = "97e3721a03ca48d312891694972b827a53714bf9"}
+"oslo.i18n" = "*"
+"oslo.utils" = "*"
+six = "*"
+debtcollector = "*"
+zipp = "*"
+psycopg2-binary = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.8"

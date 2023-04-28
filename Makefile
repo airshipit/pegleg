@@ -27,9 +27,9 @@ PUSH_IMAGE        ?= false
 # use this variable for image labels added in internal build process
 LABEL             ?= org.airshipit.build=community
 COMMIT            ?= $(shell git rev-parse HEAD)
-DISTRO            ?= ubuntu_bionic
+DISTRO            ?= ubuntu_focal
 IMAGE             ?= $(DOCKER_REGISTRY)/$(IMAGE_PREFIX)/$(IMAGE_NAME):$(IMAGE_TAG)-${DISTRO}
-PYTHON_BASE_IMAGE ?= python:3.6
+PYTHON_BASE_IMAGE ?= python:3.8
 BASE_IMAGE        ?=
 
 export
