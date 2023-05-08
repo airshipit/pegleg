@@ -10,16 +10,16 @@ bandit==1.6.2
 bcrypt==4.0.1
 Beaker==1.12.0
 cachetools==5.3.0
-certifi==2022.12.7
+certifi==2023.5.7
 cffi==1.15.1
 chardet==3.0.4
 charset-normalizer==3.1.0
-click==6.7
+click==7.1.2
 click-default-group==1.2
 cliff==3.10.1
 cmd2==2.4.3
 configparser==5.3.0
-coverage==7.2.5
+coverage==5.3
 cryptography==3.4.8
 debtcollector==2.5.0
 Deckhand @ git+https://opendev.org/airship/deckhand.git@13c5199f18664d66ccdd3a1e54bb40ad2c293d1a
@@ -30,7 +30,7 @@ dnspython==2.3.0
 docker==5.0.3
 docutils==0.17
 dogpile.cache==1.2.0
-dulwich==0.21.3
+dulwich==0.21.5
 eventlet==0.33.3
 exceptiongroup==1.1.1
 execnet==1.9.0
@@ -41,6 +41,7 @@ filelock==3.12.0
 fixtures==3.0.0
 flake8==3.8.4
 flake8-import-order==0.18.2
+Flask==1.1.0
 futurist==2.4.1
 gitdb==4.0.10
 GitPython==3.1.31
@@ -54,7 +55,8 @@ imagesize==1.4.1
 importlib-metadata==2.1.3
 iniconfig==2.0.0
 iso8601==1.1.0
-Jinja2==3.0.3
+itsdangerous==2.0.1
+Jinja2==2.10.3
 jsonpath-ng==1.5.3
 jsonpath-rw==1.4.0
 jsonpath-rw-ext==1.2.2
@@ -140,7 +142,7 @@ Routes==2.5.1
 rsa==4.9
 selector==0.10.1
 setuptools==45.2.0
-shipyard-client @ git+https://opendev.org/airship/shipyard.git@154a099b2843b1b42a7b8afa5fa98383cf3c1b7c#subdirectory=src/bin/shipyard_client
+shipyard-client @ git+https://opendev.org/airship/shipyard.git@b7e7d253086edcbc62183d17f3d92f009242bd2e#subdirectory=src/bin/shipyard_client
 simplejson==3.19.1
 six==1.16.0
 smmap==5.0.0
@@ -176,7 +178,7 @@ virtualenv-clone==0.5.7
 wcwidth==0.2.6
 WebOb==1.8.7
 websocket-client==1.5.1
-Werkzeug==2.1.2
+Werkzeug==0.16.1
 wheel==0.40.0
 wrapt==1.15.0
 wsgi-intercept==1.11.0
