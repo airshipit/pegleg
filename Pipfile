@@ -26,9 +26,9 @@ GitPython = "*"
 docker = "*"
 pylibyaml = "*"
 PyYAML = "*"
-deckhand = {git = "https://opendev.org/airship/deckhand.git",ref = "03f6932e16aa0b72a32a10fc04a52125c45dd5d7"}
-shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "b7e7d253086edcbc62183d17f3d92f009242bd2e",subdirectory = "src/bin/shipyard_client"}
-promenade = {git = "https://opendev.org/airship/promenade.git",ref = "97e3721a03ca48d312891694972b827a53714bf9"}
+deckhand = {git = "https://opendev.org/airship/deckhand.git",ref = "3a06b1b6040865483a09514e2bf7dc5fae24560e"}
+shipyard-client = {git = "https://opendev.org/airship/shipyard.git",ref = "9c28c832dd9b9125bdf87627cfaa64c9b59d5742",subdirectory = "src/bin/shipyard_client"}
+promenade = {git = "https://opendev.org/airship/promenade.git",ref = "45bcba068eb42fe6ba54d494b12122600dcb2c6c"}
 "oslo.i18n" = "*"
 "oslo.utils" = "*"
 six = "*"

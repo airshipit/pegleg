@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0352bafe262b3fb27fc38ffc8b05b0865270df94e202f71363eb6163b676a278"
+            "sha256": "dbf3ba06ee71d56a658873bddb23531678d876b804603febff894c9ad7002eed"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -399,7 +399,7 @@
         },
         "deckhand": {
             "git": "https://opendev.org/airship/deckhand.git",
-            "ref": "13c5199f18664d66ccdd3a1e54bb40ad2c293d1a"
+            "ref": "3a06b1b6040865483a09514e2bf7dc5fae24560e"
         },
         "decorator": {
             "hashes": [
@@ -635,11 +635,11 @@
         },
         "google-auth": {
             "hashes": [
-                "sha256:ce311e2bc58b130fddf316df57c9b3943c2a7b4f6ec31de9663a9333e4064efc",
-                "sha256:f586b274d3eb7bd932ea424b1c702a30e0393a2e2bc4ca3eae8263ffd8be229f"
+                "sha256:c66b488a8b005b23ccb97b1198b6cece516c91869091ac5b7c267422db2733c7",
+                "sha256:ef3f3a67fa54d421a1c155864570f9a8de9179cedc937bda496b7a8ca338e936"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'",
-            "version": "==2.17.3"
+            "version": "==2.18.0"
         },
         "greenlet": {
             "hashes": [
@@ -1241,11 +1241,11 @@
         },
         "platformdirs": {
             "hashes": [
-                "sha256:47692bc24c1958e8b0f13dd727307cff1db103fca36399f457da8e05f222fdc4",
-                "sha256:7954a68d0ba23558d753f73437c55f89027cf8f5108c19844d4b82e5af396335"
+                "sha256:412dae91f52a6f84830f39a8078cecd0e866cb72294a5c66808e74d5e88d251f",
+                "sha256:e2378146f1964972c03c085bb5662ae80b2b8c06226c54b2ff4aa9483e8a13a5"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==3.5.0"
+            "version": "==3.5.1"
         },
         "ply": {
             "hashes": [
@@ -1264,7 +1264,7 @@
         },
         "promenade": {
             "git": "https://opendev.org/airship/promenade.git",
-            "ref": "97e3721a03ca48d312891694972b827a53714bf9"
+            "ref": "45bcba068eb42fe6ba54d494b12122600dcb2c6c"
         },
         "prometheus-client": {
             "hashes": [
@@ -1726,7 +1726,7 @@
         },
         "shipyard-client": {
             "git": "https://opendev.org/airship/shipyard.git",
-            "ref": "b7e7d253086edcbc62183d17f3d92f009242bd2e",
+            "ref": "9c28c832dd9b9125bdf87627cfaa64c9b59d5742",
             "subdirectory": "src/bin/shipyard_client"
         },
         "simplejson": {
@@ -1974,11 +1974,11 @@
         },
         "stevedore": {
             "hashes": [
-                "sha256:2c428d2338976279e8eb2196f7a94910960d9f7ba2f41f3988511e95ca447021",
-                "sha256:bd5a71ff5e5e5f5ea983880e4a1dd1bb47f8feebbb3d95b592398e2f02194771"
+                "sha256:8cc040628f3cea5d7128f2e76cf486b2251a4e543c7b938f58d9a377f6694a2d",
+                "sha256:a54534acf9b89bc7ed264807013b505bf07f74dbe4bcfa37d32bd063870b087c"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==5.0.0"
+            "version": "==5.1.0"
         },
         "tempita": {
             "hashes": [
@@ -2557,11 +2557,11 @@
         },
         "pytest-xdist": {
             "hashes": [
-                "sha256:1849bd98d8b242b948e472db7478e090bf3361912a8fed87992ed94085f54727",
-                "sha256:37290d161638a20b672401deef1cba812d110ac27e35d213f091d15b8beb40c9"
+                "sha256:76f7683d4f993eaff91c9cb0882de0465c4af9c6dd3debc903833484041edc1a",
+                "sha256:d42c9efb388da35480878ef4b2993704c6cea800c8bafbe85a8cdc461baf0748"
             ],
             "index": "pypi",
-            "version": "==3.2.1"
+            "version": "==3.3.0"
         },
         "pyyaml": {
             "hashes": [
@@ -2633,11 +2633,11 @@
         },
         "stevedore": {
             "hashes": [
-                "sha256:2c428d2338976279e8eb2196f7a94910960d9f7ba2f41f3988511e95ca447021",
-                "sha256:bd5a71ff5e5e5f5ea983880e4a1dd1bb47f8feebbb3d95b592398e2f02194771"
+                "sha256:8cc040628f3cea5d7128f2e76cf486b2251a4e543c7b938f58d9a377f6694a2d",
+                "sha256:a54534acf9b89bc7ed264807013b505bf07f74dbe4bcfa37d32bd063870b087c"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==5.0.0"
+            "version": "==5.1.0"
         },
         "testfixtures": {
             "hashes": [

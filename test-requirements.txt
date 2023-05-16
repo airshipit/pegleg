@@ -22,7 +22,7 @@ configparser==5.3.0
 coverage==5.3
 cryptography==3.4.8
 debtcollector==2.5.0
-Deckhand @ git+https://opendev.org/airship/deckhand.git@13c5199f18664d66ccdd3a1e54bb40ad2c293d1a
+Deckhand @ git+https://opendev.org/airship/deckhand.git@3a06b1b6040865483a09514e2bf7dc5fae24560e
 decorator==5.1.1
 deepdiff==5.8.1
 distlib==0.3.6
@@ -45,7 +45,7 @@ Flask==1.1.0
 futurist==2.4.1
 gitdb==4.0.10
 GitPython==3.1.31
-google-auth==2.17.3
+google-auth==2.18.0
 greenlet==2.0.2
 hacking==4.1.0
 html5lib==0.9999999
@@ -97,13 +97,13 @@ Paste==3.5.0
 PasteDeploy==3.0.1
 PasteScript==3.3.0
 pbr==5.5.1
-pip==23.0.1
+pip==23.1.2
 pipenv==2023.2.4
-platformdirs==3.5.0
+platformdirs==3.5.1
 pluggy==1.0.0
 ply==3.11
 prettytable==3.7.0
-promenade @ git+https://opendev.org/airship/promenade.git@97e3721a03ca48d312891694972b827a53714bf9
+promenade @ git+https://opendev.org/airship/promenade.git@45bcba068eb42fe6ba54d494b12122600dcb2c6c
 prometheus-client==0.16.0
 psycopg2-binary==2.9.6
 PTable==0.9.2
@@ -122,7 +122,7 @@ pyproject_api==1.5.0
 pyrsistent==0.19.3
 pytest==7.3.1
 pytest-cov==4.0.0
-pytest-xdist==3.2.1
+pytest-xdist==3.3.0
 python-barbicanclient==5.2.0
 python-dateutil==2.8.1
 python-editor==1.0.4
@@ -142,7 +142,7 @@ Routes==2.5.1
 rsa==4.9
 selector==0.10.1
 setuptools==45.2.0
-shipyard-client @ git+https://opendev.org/airship/shipyard.git@b7e7d253086edcbc62183d17f3d92f009242bd2e#subdirectory=src/bin/shipyard_client
+shipyard-client @ git+https://opendev.org/airship/shipyard.git@9c28c832dd9b9125bdf87627cfaa64c9b59d5742#subdirectory=src/bin/shipyard_client
 simplejson==3.19.1
 six==1.16.0
 smmap==5.0.0
@@ -159,7 +159,7 @@ SQLAlchemy==1.3.20
 sqlalchemy-migrate==0.13.0
 sqlparse==0.4.4
 statsd==4.0.1
-stevedore==5.0.0
+stevedore==5.1.0
 Tempita==0.5.2
 testfixtures==7.1.0
 testrepository==0.0.20
