@@ -17,14 +17,16 @@ ARG PROMENADE_VERSION=branch/master
 
 RUN set -ex \
     && apt-get update -qq \
+    && apt upgrade -y \
     && apt-get install -y --no-install-recommends \
          automake \
          ca-certificates \
          curl \
-         gcc \
+         build-essential \
          git \
          gpg \
          gpg-agent \
+         libpq-dev \
          libssl-dev \
          libtool \
          make \
@@ -62,10 +64,10 @@ RUN set -ex \
 VOLUME /var/pegleg
 WORKDIR /var/pegleg
 
-COPY requirements.txt /opt/pegleg/requirements.txt
-RUN pip3 install -r https://opendev.org/airship/deckhand/raw/${DECKHAND_VERSION}/requirements.txt \
-    && pip3 install -r https://opendev.org/airship/promenade/raw/${PROMENADE_VERSION}/requirements.txt \
-    && pip3 install -r https://opendev.org/airship/shipyard/raw/${SHIPYARD_VERSION}/src/bin/shipyard_client/requirements.txt \
+COPY requirements-frozen-bionic.txt /opt/pegleg/requirements.txt
+RUN pip3 install -r https://opendev.org/airship/deckhand/raw/${DECKHAND_VERSION}/requirements-frozen-bionic.txt \
+    && pip3 install -r https://opendev.org/airship/promenade/raw/${PROMENADE_VERSION}/requirements-frozen-bionic.txt \
+    && pip3 install -r https://opendev.org/airship/shipyard/raw/${SHIPYARD_VERSION}/src/bin/shipyard_client/requirements-frozen-bionic.txt \
     && pip3 install --no-cache-dir -r /opt/pegleg/requirements.txt
 
 COPY tools/install-cfssl.sh /opt/pegleg/tools/install-cfssl.sh

@@ -45,7 +45,7 @@ run_images: run_pegleg
 # Run the Pegleg container and exercise simple tests
 .PHONY: run_pegleg
 run_pegleg: build_pegleg
-	tools/pegleg.sh --help
+	IMAGE=quay.io/airshipit/pegleg:latest-${DISTRO} tools/pegleg.sh --help
 
 .PHONY: tests
 tests: run_tests

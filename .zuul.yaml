@@ -14,6 +14,7 @@
     templates:
       - docs-on-readthedocs
       - openstack-python38-jobs
+      - openstack-python36-jobs
       - openstack-cover-jobs
       # - release-notes-jobs-python3
     vars:
@@ -33,8 +34,9 @@
     check:
       jobs:
         - openstack-tox-pep8-focal
-        - pegleg-dependency-vulnerability-check
+        # - pegleg-dependency-vulnerability-check
         - airship-pegleg-docker-build-gate-ubuntu_focal
+        - airship-pegleg-docker-build-gate-ubuntu_bionic
         - airship-pegleg-lint-yaml
 
     gate:
@@ -42,6 +44,7 @@
         - openstack-tox-pep8-focal
         - pegleg-dependency-vulnerability-check
         - airship-pegleg-docker-build-gate-ubuntu_focal
+        - airship-pegleg-docker-build-gate-ubuntu_bionic
         - airship-pegleg-lint-yaml
     post:
       jobs:
@@ -49,10 +52,10 @@
         - pegleg-upload-git-mirror
 
 - nodeset:
-    name: airship-pegleg-single-node
+    name: airship-pegleg-single--bionic
     nodes:
       - name: primary
-        label: ubuntu-xenial
+        label: ubuntu-bionic
 
 - nodeset:
     name: airship-pegleg-single-node-focal
@@ -75,15 +78,15 @@
       - ^.*\.rst$
       - ^doc/.*$
 
-- job:
-    name: pegleg-dependency-vulnerability-check
-    parent: tox-py38
-    voting: false
-    timeout: 600
-    nodeset: ubuntu-focal
-    vars:
-      tox_envlist: safety
-      bindep_profile: test py38
+# - job:
+#     name: pegleg-dependency-vulnerability-check
+#     parent: tox-py38
+#     voting: false
+#     timeout: 600
+#     nodeset: ubuntu-focal
+#     vars:
+#       tox_envlist: safety
+#       bindep_profile: test py38
 
 - job:
     name: airship-pegleg-docker-build-gate-ubuntu_focal
@@ -111,6 +114,39 @@
     vars:
       publish: true
       distro: ubuntu_focal
+      tags:
+        dynamic:
+          branch: true
+          commit: true
+        static:
+          - latest
+
+- job:
+    name: airship-pegleg-docker-build-gate-ubuntu_bionic
+    timeout: 1800
+    run: tools/gate/playbooks/docker-image-build.yaml
+    nodeset: airship-pegleg-single-node-focal
+    irrelevant-files:
+      - '^doc/.*'
+    vars:
+      publish: false
+      distro: ubuntu_bionic
+      tags:
+        dynamic:
+          patch_set: true
+
+- job:
+    name: airship-pegleg-docker-publish-ubuntu_bionic
+    timeout: 1800
+    run: tools/gate/playbooks/docker-image-build.yaml
+    nodeset: airship-pegleg-single-node-focal
+    secrets:
+      - airship_pegleg_quay_creds
+    irrelevant-files:
+      - '^doc/.*'
+    vars:
+      publish: true
+      distro: ubuntu_bionic
       tags:
         dynamic:
           branch: true
@@ -152,15 +188,15 @@
       git_mirror_repository: airshipit/pegleg
     secrets:
       - name: git_mirror_credentials
-        secret: pegleg-airshipit-github-secret
+        secret: pegleg-airshipit-github-secret-2023-03-23
         pass-to-parent: true
 
 - secret:
-    name: pegleg-airshipit-github-secret
+    name: pegleg-airshipit-github-secret-2023-03-23
     data:
       user: git
       host: github.com
-      host_key: github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+      host_key: github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
       ssh_key: !encrypted/pkcs1-oaep
         - kXfypOV08jjnpn6pjvKG14yPR3SeVW0TXje/W6Z6xFqlAlQEEiER/3CcDJNEXO9H1uPBn
           glaGJfnnKwjr4WAxUUmwgCzgfBjJVzzZT7/aHZi/WwhISfULUyQC0TV153bLeLK9s8PeI

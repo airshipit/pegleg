@@ -17,6 +17,7 @@ ARG PROMENADE_VERSION=branch/master
 
 RUN set -ex \
     && apt update -qq \
+    && apt upgrade -y \
     && apt install -y --no-install-recommends \
          automake \
          ca-certificates \
@@ -25,6 +26,7 @@ RUN set -ex \
          git \
          gpg \
          gpg-agent \
+         libpq-dev \
          libssl-dev \
          libtool \
          make \
@@ -62,7 +64,7 @@ RUN set -ex \
 VOLUME /var/pegleg
 WORKDIR /var/pegleg
 
-COPY requirements.txt /opt/pegleg/requirements.txt
+COPY requirements-frozen.txt /opt/pegleg/requirements.txt
 RUN pip3 install -r https://opendev.org/airship/deckhand/raw/${DECKHAND_VERSION}/requirements.txt \
     && pip3 install -r https://opendev.org/airship/promenade/raw/${PROMENADE_VERSION}/requirements.txt \
     && pip3 install -r https://opendev.org/airship/shipyard/raw/${SHIPYARD_VERSION}/src/bin/shipyard_client/requirements.txt \

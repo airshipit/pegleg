@@ -1,0 +1,177 @@
+-i https://pypi.org/simple
+alabaster==0.7.13 ; python_version >= '3.6'
+alembic==1.4.3 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+amqp==2.6.1 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+argcomplete==3.0.8 ; python_version >= '3.6'
+arrow==0.17.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+attrs==23.1.0 ; python_version >= '3.7'
+autopage==0.5.1 ; python_version >= '3.6'
+babel==2.12.1 ; python_version >= '3.7'
+bcrypt==4.0.1 ; python_version >= '3.6'
+beaker==1.12.0
+cachetools==5.3.0 ; python_version ~= '3.7'
+certifi==2023.5.7 ; python_version >= '3.6'
+cffi==1.15.1
+chardet==3.0.4
+charset-normalizer==3.1.0 ; python_full_version >= '3.7.0'
+click==7.1.2
+click-default-group==1.2
+cliff==3.10.1 ; python_version >= '3.6'
+cmd2==2.4.3 ; python_version >= '3.6'
+configparser==5.3.0 ; python_version >= '3.7'
+coverage==5.3 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'
+cryptography==3.4.8
+debtcollector==2.5.0
+git+https://opendev.org/airship/deckhand.git@3a06b1b6040865483a09514e2bf7dc5fae24560e#egg=deckhand
+decorator==5.1.1 ; python_version >= '3.5'
+deepdiff==5.8.1 ; python_version >= '3.6'
+distlib==0.3.6
+dnspython==2.3.0 ; python_version >= '3.7' and python_version < '4.0'
+docker==5.0.3
+docutils==0.17 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+dogpile.cache==1.2.0 ; python_version >= '3.6'
+dulwich==0.21.5 ; python_version >= '3.7'
+eventlet==0.33.3
+extras==1.0.0
+falcon==3.1.1 ; python_version >= '3.5'
+fasteners==0.18 ; python_version >= '3.6'
+filelock==3.12.0 ; python_version >= '3.7'
+fixtures==3.0.0
+flake8==3.8.4 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+flask==1.1.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+futurist==2.4.1 ; python_version >= '3.6'
+gitdb==4.0.10 ; python_version >= '3.7'
+gitpython==3.1.31
+google-auth==2.18.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'
+greenlet==2.0.2 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+hacking==4.1.0 ; python_version >= '3.5'
+html5lib==0.9999999
+httpexceptor==1.4.0
+idna==2.10 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+imagesize==1.4.1 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+importlib-metadata==2.1.3 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+iso8601==1.1.0 ; python_full_version >= '3.6.2' and python_version < '4.0'
+itsdangerous==2.0.1 ; python_version >= '3.6'
+jinja2==2.10.3
+jsonpath-ng==1.5.3
+jsonpath-rw==1.4.0
+jsonpath-rw-ext==1.2.2
+jsonpickle==1.4.1 ; python_version >= '2.7'
+jsonschema==3.2.0
+keystoneauth1==5.1.1
+keystonemiddleware==10.2.0 ; python_version >= '3.8'
+kombu==4.6.11 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+kubernetes==26.1.0 ; python_version >= '3.6'
+mako==1.2.4 ; python_version >= '3.7'
+markupsafe==2.0.1 ; python_version >= '3.6'
+mccabe==0.6.1
+mock==5.0.2 ; python_version >= '3.6'
+msgpack==1.0.5
+netaddr==0.8.0
+netifaces==0.11.0
+networkx==3.1 ; python_version >= '3.8'
+nose==1.3.7
+oauthlib==3.2.2 ; python_version >= '3.6'
+ordered-set==4.1.0 ; python_version >= '3.7'
+os-service-types==1.7.0
+oslo.cache==2.10.1 ; python_version >= '3.6'
+oslo.concurrency==5.1.1 ; python_version >= '3.8'
+oslo.config==8.7.1 ; python_version >= '3.6'
+oslo.context==4.1.0 ; python_version >= '3.6'
+oslo.db==10.0.0 ; python_version >= '3.6'
+oslo.i18n==6.0.0
+oslo.log==4.6.0 ; python_version >= '3.6'
+oslo.messaging==12.13.0 ; python_version >= '3.6'
+oslo.metrics==0.6.0 ; python_version >= '3.8'
+oslo.middleware==4.4.0 ; python_version >= '3.6'
+oslo.policy==3.10.1 ; python_version >= '3.6'
+oslo.serialization==4.2.0 ; python_version >= '3.6'
+oslo.service==3.1.1 ; python_version >= '3.8'
+oslo.utils==4.12.3
+packaging==21.3 ; python_version >= '3.6'
+paste==3.5.0
+pastedeploy==3.0.1 ; python_version >= '3.7'
+pastescript==3.3.0
+pbr==5.5.1 ; python_version >= '2.6'
+platformdirs==3.5.1 ; python_version >= '3.7'
+ply==3.11
+prettytable==3.7.0 ; python_version >= '3.7'
+git+https://opendev.org/airship/promenade.git@45bcba068eb42fe6ba54d494b12122600dcb2c6c#egg=promenade
+prometheus-client==0.16.0 ; python_version >= '3.6'
+psycopg2-binary==2.9.6
+ptable==0.9.2
+pyasn1==0.5.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'
+pyasn1-modules==0.3.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'
+pycadf==3.1.1 ; python_version >= '3.6'
+pycodestyle==2.6.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+pycparser==2.21
+pyflakes==2.2.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+pygments==2.14.0 ; python_version >= '3.6'
+pyinotify==0.9.6 ; sys_platform != 'win32' and sys_platform != 'darwin' and sys_platform != 'sunos5'
+pylibyaml==0.1.0
+pymongo==4.3.3 ; python_version >= '3.7'
+pyparsing==2.4.7 ; python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2'
+pyperclip==1.8.2
+pyproject-api==1.5.0 ; python_version >= '3.7'
+pyrsistent==0.19.3 ; python_version >= '3.7'
+python-barbicanclient==5.2.0
+python-dateutil==2.8.1
+python-editor==1.0.4
+python-keystoneclient==5.1.0 ; python_version >= '3.8'
+python-memcached==1.59
+python-mimeparse==1.6.0
+python-subunit==1.4.0
+pytz==2023.3
+pyyaml==5.4.1
+reno==4.0.0 ; python_version >= '3.6'
+repoze.lru==0.7
+requests==2.23.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+requests-oauthlib==1.3.1 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+resolver==0.2.1
+rfc3986==2.0.0 ; python_version >= '3.7'
+routes==2.5.1
+rsa==4.9 ; python_version >= '3.6'
+selector==0.10.1
+setuptools==45.2.0 ; python_version >= '3.5'
+git+https://opendev.org/airship/shipyard.git@9c28c832dd9b9125bdf87627cfaa64c9b59d5742#egg=shipyard-client&subdirectory=src/bin/shipyard_client
+simplejson==3.19.1 ; python_version >= '2.5' and python_version not in '3.0, 3.1, 3.2'
+six==1.16.0
+smmap==5.0.0 ; python_version >= '3.6'
+snowballstemmer==2.2.0
+sphinx==3.3.1 ; python_version >= '3.5'
+sphinx-rtd-theme==0.5.0
+sphinxcontrib-applehelp==1.0.4 ; python_version >= '3.8'
+sphinxcontrib-devhelp==1.0.2 ; python_version >= '3.5'
+sphinxcontrib-htmlhelp==2.0.1 ; python_version >= '3.8'
+sphinxcontrib-jsmath==1.0.1 ; python_version >= '3.5'
+sphinxcontrib-qthelp==1.0.3 ; python_version >= '3.5'
+sphinxcontrib-serializinghtml==1.1.5 ; python_version >= '3.5'
+sqlalchemy==1.3.20 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+sqlalchemy-migrate==0.13.0
+sqlparse==0.4.4 ; python_version >= '3.5'
+statsd==4.0.1
+stevedore==5.1.0 ; python_version >= '3.8'
+tempita==0.5.2
+testrepository==0.0.20
+testresources==2.0.1
+testscenarios==0.5.0
+testtools==2.5.0 ; python_version >= '3.5'
+tiddlyweb==2.4.3
+tomli==2.0.1 ; python_version < '3.11'
+tomlkit==0.11.8 ; python_version >= '3.7'
+typing-extensions==3.7.2
+urllib3==1.25.11 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'
+uwsgi==2.0.21
+vine==1.3.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+virtualenv==20.23.0 ; python_version >= '3.7'
+wcwidth==0.2.6
+webob==1.8.7 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'
+websocket-client==1.5.1 ; python_version >= '3.7'
+werkzeug==0.16.1 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+wheel==0.40.0 ; python_version >= '3.7'
+wrapt==1.15.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+wsgi-intercept==1.11.0
+xmltodict==0.13.0 ; python_version >= '3.4'
+yappi==1.4.0
+yq==3.2.1 ; python_version >= '3.6'
+zipp==3.15.0

@@ -41,6 +41,10 @@
         base_image: "{{ base_image_focal }}"
       when: distro == 'ubuntu_focal'
 
+    - name: Set ubuntu bionic base image
+      set_fact:
+        base_image: "{{ base_image_bionic }}"
+      when: distro == 'ubuntu_bionic'
 
     - name: Determine tags
       shell: echo '{{ tags | to_json }}' | python3 {{ zuul.project.src_dir }}/tools/image_tags.py
@@ -66,6 +70,16 @@
             version: 4.4.4
             executable: pip3
       become: True
+
+    - name: Make images - verbosive
+      when: not publish
+      shell: |
+                make images
+      args:
+        chdir: "{{ zuul.project.src_dir }}"
+        executable: /bin/bash
+      become: True
+
 
     - name: Make images
       when: not publish
