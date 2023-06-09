@@ -97,7 +97,7 @@ pip==21.3.1
 platformdirs==2.4.0
 ply==3.11
 prettytable==2.5.0
-promenade @ git+https://opendev.org/airship/promenade.git@3c68fb2281d7ab9ce1274c94057f5dbb78bccf1c
+promenade @ git+https://opendev.org/airship/promenade.git@16debd81747fcde8e0628e141ee67d697b06c46d
 prometheus-client==0.17.0
 psycopg2-binary==2.9.6
 PTable==0.9.2
