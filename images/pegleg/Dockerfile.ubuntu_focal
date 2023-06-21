@@ -23,6 +23,7 @@ RUN set -ex \
          ca-certificates \
          curl \
          build-essential \
+         gettext-base \
          git \
          gpg \
          gpg-agent \
