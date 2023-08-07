@@ -1,16 +1,14 @@
-click==7.1.2
 jsonschema
-cryptography==3.4.8
-python-dateutil==2.8.1
+python-dateutil
 GitPython
 docker
-pylibyaml==0.1.0
-PyYAML<=5.4.1
-deckhand @ git+https://opendev.org/airship/deckhand.git@06b1631d8a31a1e7147e8751025d0ef2ff4b31f5#egg=deckhand
-shipyard-client @ git+https://opendev.org/airship/shipyard.git@7ea83c25efc4e689e5cb0df19614d9ca538eda22#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@16debd81747fcde8e0628e141ee67d697b06c46d#egg=promenade
-oslo.i18n
-oslo.utils<=4.12.3
+pylibyaml
+PyYAML
+deckhand @ git+https://opendev.org/airship/deckhand.git@37ba567da5bf7f146f54a468478a025c70793574#egg=deckhand
+shipyard-client @ git+https://opendev.org/airship/shipyard.git@81066ae98fe2afd3a9c8c5c8556e9438ac47d5a2#egg=shipyard-client&subdirectory=src/bin/shipyard_client
+promenade @ git+https://opendev.org/airship/promenade.git@69a74590e76e810916f7780fc525c63ec58c7dc1#egg=promenade
+oslo.i18n==6.0.0
+oslo.utils==4.12.3
 six
 debtcollector
 zipp
