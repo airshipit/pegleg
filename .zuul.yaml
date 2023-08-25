@@ -49,6 +49,7 @@
     post:
       jobs:
         - airship-pegleg-docker-publish-ubuntu_focal
+        - airship-pegleg-docker-publish-ubuntu_bionic
         - pegleg-upload-git-mirror
 
 - nodeset:
@@ -90,7 +91,7 @@
 
 - job:
     name: airship-pegleg-docker-build-gate-ubuntu_focal
-    timeout: 1800
+    timeout: 3600
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node-focal
     irrelevant-files:
@@ -104,7 +105,7 @@
 
 - job:
     name: airship-pegleg-docker-publish-ubuntu_focal
-    timeout: 1800
+    timeout: 3600
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node-focal
     secrets:
@@ -123,7 +124,7 @@
 
 - job:
     name: airship-pegleg-docker-build-gate-ubuntu_bionic
-    timeout: 1800
+    timeout: 3600
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node-focal
     irrelevant-files:
@@ -137,7 +138,7 @@
 
 - job:
     name: airship-pegleg-docker-publish-ubuntu_bionic
-    timeout: 1800
+    timeout: 3600
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node-focal
     secrets:
