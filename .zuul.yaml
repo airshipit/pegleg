@@ -119,8 +119,6 @@
         dynamic:
           branch: true
           commit: true
-        static:
-          - latest
 
 - job:
     name: airship-pegleg-docker-build-gate-ubuntu_bionic
@@ -152,8 +150,7 @@
         dynamic:
           branch: true
           commit: true
-        static:
-          - latest
+
 
 - secret:
     name: airship_pegleg_quay_creds
