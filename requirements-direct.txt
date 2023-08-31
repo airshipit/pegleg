@@ -5,7 +5,7 @@ docker
 pylibyaml
 PyYAML
 deckhand @ git+https://opendev.org/airship/deckhand.git@37ba567da5bf7f146f54a468478a025c70793574#egg=deckhand
-shipyard-client @ git+https://opendev.org/airship/shipyard.git@81066ae98fe2afd3a9c8c5c8556e9438ac47d5a2#egg=shipyard-client&subdirectory=src/bin/shipyard_client
+shipyard-client @ git+https://opendev.org/airship/shipyard.git@1ba0e726280307551ebfe499c74e79717400dcb8#egg=shipyard-client&subdirectory=src/bin/shipyard_client
 promenade @ git+https://opendev.org/airship/promenade.git@69a74590e76e810916f7780fc525c63ec58c7dc1#egg=promenade
 oslo.i18n==6.0.0
 oslo.utils==4.12.3

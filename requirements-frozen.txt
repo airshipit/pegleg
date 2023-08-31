@@ -115,7 +115,7 @@ Routes==2.5.1
 rsa==4.9
 selector==0.10.1
 setuptools==67.7.2
-shipyard-client @ git+https://opendev.org/airship/shipyard.git@81066ae98fe2afd3a9c8c5c8556e9438ac47d5a2#subdirectory=src/bin/shipyard_client
+shipyard-client @ git+https://opendev.org/airship/shipyard.git@1ba0e726280307551ebfe499c74e79717400dcb8#subdirectory=src/bin/shipyard_client
 simplejson==3.19.1
 six==1.16.0
 smmap==5.0.0
