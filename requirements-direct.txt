@@ -6,7 +6,7 @@ pylibyaml
 PyYAML
 deckhand @ git+https://opendev.org/airship/deckhand.git@37ba567da5bf7f146f54a468478a025c70793574#egg=deckhand
 shipyard-client @ git+https://opendev.org/airship/shipyard.git@1ba0e726280307551ebfe499c74e79717400dcb8#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@69a74590e76e810916f7780fc525c63ec58c7dc1#egg=promenade
+promenade @ git+https://opendev.org/airship/promenade.git@6d90e785ff363436157dd48be6842199cc80de3f#egg=promenade
 oslo.i18n==6.0.0
 oslo.utils==4.12.3
 six
