@@ -4,12 +4,40 @@ GitPython
 docker
 pylibyaml
 PyYAML
-deckhand @ git+https://opendev.org/airship/deckhand.git@5d2765e513fa55be74aef4456d6b353d24bc7097#egg=deckhand
-shipyard-client @ git+https://opendev.org/airship/shipyard.git@20593bc746dc0bf417d7057420b40e7c5bb30998#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@1a0ea41f286980bf1ccdb185578d9795983512eb#egg=promenade
-oslo.i18n==6.0.0
-oslo.utils==4.12.3
 six
 debtcollector
 zipp
 psycopg2-binary
+
+# Airship dependencies
+deckhand @ git+https://opendev.org/airship/deckhand.git@32e9950db405b5d1eb74da0c4e8df344a8638eff#egg=deckhand
+shipyard-client @ git+https://opendev.org/airship/shipyard.git@6c356a902d8d5e07cf87d8fe94e4030a066e7def#egg=shipyard-client&subdirectory=src/bin/shipyard_client
+promenade @ git+https://opendev.org/airship/promenade.git@d21e3434f641e1f1e7400a44e77fccb5b87a2824#egg=promenade
+
+
+# Openstack Antelope 2023.1
+# https://releases.openstack.org/antelope/index.html
+barbican==16.0.0
+
+python-barbicanclient==5.5.0
+python-keystoneclient==5.1.0
+
+keystoneauth1==5.1.2
+keystonemiddleware==10.2.0
+
+oslo.cache==3.3.1
+oslo.concurrency==5.1.1
+oslo.config==9.1.1
+oslo.context==5.1.1
+oslo.db==12.3.1
+oslo.i18n==6.0.0
+oslo.log==5.2.0
+oslo.messaging==14.2.4
+oslo.metrics==0.6.0
+oslo.middleware==5.1.1
+oslo.policy==4.1.1
+oslo.serialization==5.1.1
+oslo.service==3.1.1
+oslo.upgradecheck==2.1.1
+oslo.utils==6.1.0
+oslo.versionedobjects==3.1.0
