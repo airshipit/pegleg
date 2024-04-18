@@ -120,7 +120,7 @@
       - airship/treasuremap
     vars:
       CLONE_PEGLEG: false
-      HTK_COMMIT: 97ce6d7d8e9a090c748800d69a57bbd9af698b60
+      HTK_COMMIT: d31027cfb4c686e23790ed50a024e8ee976549d7
       PEGLEG_IMAGE_DISTRO: ubuntu_focal
     irrelevant-files:
       - ^.*\.rst$

@@ -12,7 +12,7 @@ psycopg2-binary
 # Airship dependencies
 deckhand @ git+https://opendev.org/airship/deckhand.git@32e9950db405b5d1eb74da0c4e8df344a8638eff#egg=deckhand
 shipyard-client @ git+https://opendev.org/airship/shipyard.git@6c356a902d8d5e07cf87d8fe94e4030a066e7def#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@d21e3434f641e1f1e7400a44e77fccb5b87a2824#egg=promenade
+promenade @ git+https://opendev.org/airship/promenade.git@12f448963f4285cd78fcf857563fadf4a7fb4c13#egg=promenade
 
 
 # Openstack Antelope 2023.1
