@@ -10,9 +10,9 @@ zipp
 psycopg2-binary
 
 # Airship dependencies
-deckhand @ git+https://opendev.org/airship/deckhand.git@32e9950db405b5d1eb74da0c4e8df344a8638eff#egg=deckhand
-shipyard-client @ git+https://opendev.org/airship/shipyard.git@6c356a902d8d5e07cf87d8fe94e4030a066e7def#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@e4c9fdb8619517d6e8c88e74fc3c1bdcf343a2ce#egg=promenade
+deckhand @ git+https://opendev.org/airship/deckhand.git@be9f97b846b1edc6b74777e5e639aa9edce8cfa6#egg=deckhand
+shipyard-client @ git+https://opendev.org/airship/shipyard.git@e917c9dca721fcf3384c583c1c0d8fe9654a7987#egg=shipyard-client&subdirectory=src/bin/shipyard_client
+promenade @ git+https://opendev.org/airship/promenade.git@ac573b9fb53fd543172c50bbbcdfac3656fb8e66#egg=promenade
 
 
 # Openstack Antelope 2023.1

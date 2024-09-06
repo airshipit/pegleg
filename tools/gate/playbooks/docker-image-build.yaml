@@ -36,6 +36,11 @@
         - debug:
             msg: "{{ tags | to_json }}"
 
+    - name: Set ubuntu jammy base image
+      set_fact:
+        base_image: "{{ base_image_jammy }}"
+      when: distro == 'ubuntu_jammy'
+
     - name: Set ubuntu focal base image
       set_fact:
         base_image: "{{ base_image_focal }}"

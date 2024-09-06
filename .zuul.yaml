@@ -13,10 +13,8 @@
 - project:
     templates:
       # commented out because openstack-tox-docs fails on jammy zuul nodes
-      # - docs-on-readthedocs
-      - openstack-python38-jobs
-      # - openstack-cover-jobs
-      # - release-notes-jobs-python3
+      - docs-on-readthedocs
+      - release-notes-jobs-python3
     vars:
       rtd_webhook_id: '38574'
       rtd_project_name: 'airship-pegleg'
@@ -27,33 +25,35 @@
       docker_registry_login_url: "https://quay.io/api/v1/"
       deb_docker_repo: "{{ zuul_site_mirror_fqdn }}/deb-docker/{{ ansible_distribution_release }}"
       image_prefix: "airshipit"
+      base_image_jammy: "ubuntu:22.04"
       base_image_focal: "ubuntu:20.04"
       base_image_bionic: "ubuntu:18.04"
       base_image_opensuse: "opensuse/leap:15.1"
       base_image_xenial: "ubuntu:16.04"
     check:
       jobs:
-        - openstack-tox-pep8-focal
-        - openstack-tox-cover-focal
-        #- openstack-tox-docs-focal
+        - openstack-tox-py310
+        - openstack-tox-pep8-jammy
+        - openstack-tox-cover-jammy
+        - openstack-tox-docs-jammy
         - pegleg-dependency-vulnerability-check
-        - airship-pegleg-validate-airskiff-manifests-focal
-        - airship-pegleg-docker-build-gate-ubuntu_focal
+        - airship-pegleg-validate-airskiff-manifests-jammy
+        - airship-pegleg-docker-build-gate-ubuntu_jammy
         - airship-pegleg-lint-yaml
 
     gate:
       jobs:
-        - openstack-tox-pep8-focal
-        - openstack-tox-cover-focal
-        #- openstack-tox-docs-focal
+        - openstack-tox-py310
+        - openstack-tox-pep8-jammy
+        - openstack-tox-cover-jammy
+        - openstack-tox-docs-jammy
         - pegleg-dependency-vulnerability-check
-        - airship-pegleg-validate-airskiff-manifests-focal
-        - airship-pegleg-docker-build-gate-ubuntu_focal
+        - airship-pegleg-validate-airskiff-manifests-jammy
+        - airship-pegleg-docker-build-gate-ubuntu_jammy
         - airship-pegleg-lint-yaml
     post:
       jobs:
-        - airship-pegleg-docker-publish-ubuntu_focal
-        - airship-pegleg-docker-publish-ubuntu_bionic
+        - airship-pegleg-docker-publish-ubuntu_jammy
         - pegleg-upload-git-mirror
 
 - nodeset:
@@ -63,25 +63,25 @@
         label: ubuntu-bionic
 
 - nodeset:
-    name: airship-pegleg-single-node-focal
+    name: airship-pegleg-single-node-jammy
     nodes:
       - name: primary
-        label: ubuntu-focal
+        label: ubuntu-jammy
 
 - job:
-    name: openstack-tox-pep8-focal
+    name: openstack-tox-pep8-jammy
     parent: openstack-tox-pep8
-    nodeset: openstack-single-node-focal
-
-#- job:
-#    name: openstack-tox-docs-focal
-#    parent: openstack-tox-docs
-#    nodeset: openstack-single-node-focal
+    nodeset: openstack-single-node-jammy
 
 - job:
-    name: openstack-tox-cover-focal
+    name: openstack-tox-docs-jammy
+    parent: openstack-tox-docs
+    nodeset: openstack-single-node-jammy
+
+- job:
+    name: openstack-tox-cover-jammy
     parent: openstack-tox-cover
-    nodeset: openstack-single-node-focal
+    nodeset: openstack-single-node-jammy
 
 
 - job:
@@ -89,78 +89,173 @@
     voting: true
     timeout: 600
     run: tools/gate/playbooks/lint-yaml.yaml
-    nodeset: ubuntu-focal
+    nodeset: ubuntu-jammy
     irrelevant-files:
       - ^.*\.rst$
       - ^doc/.*$
 
 - job:
     name: pegleg-dependency-vulnerability-check
-    parent: tox-py38
+    parent: tox-py310
     voting: false
     timeout: 600
-    nodeset: ubuntu-focal
+    nodeset: ubuntu-jammy
     vars:
       tox_envlist: safety
-      bindep_profile: test py38
+      bindep_profile: test py310
+
+# - job:
+#     name: airship-pegleg-validate-airskiff-manifests-jammy
+#     nodeset: airship-pegleg-single-node-jammy
+#     description: |
+#       Test pegleg Airskiff site manifest validation
+#     timeout: 9600
+#     voting: true
+#     pre-run:
+#       - tools/gate/playbooks/airskiff-reduce-site.yaml
+#       - tools/gate/playbooks/git-config.yaml
+#     run: tools/gate/playbooks/airskiff-validate.yaml
+#     post-run: tools/gate/playbooks/debug-report.yaml
+#     required-projects:
+#       - airship/treasuremap
+#     vars:
+#       CLONE_PEGLEG: false
+#       HTK_COMMIT: d31027cfb4c686e23790ed50a024e8ee976549d7
+#       PEGLEG_IMAGE_DISTRO: ubuntu_jammy
+#     irrelevant-files:
+#       - ^.*\.rst$
+#       - ^doc/.*$
+#       - ^releasenotes/.*$
+
 
 - job:
-    name: airship-pegleg-validate-airskiff-manifests-focal
-    nodeset: airship-pegleg-single-node-focal
-    description: |
-      Test pegleg Airskiff site manifest validation
-    timeout: 9600
-    voting: true
-    pre-run:
-      - tools/gate/playbooks/airskiff-reduce-site.yaml
-      - tools/gate/playbooks/git-config.yaml
-    run: tools/gate/playbooks/airskiff-validate.yaml
-    post-run: tools/gate/playbooks/debug-report.yaml
-    required-projects:
-      - airship/treasuremap
-    vars:
-      CLONE_PEGLEG: false
-      HTK_COMMIT: d31027cfb4c686e23790ed50a024e8ee976549d7
-      PEGLEG_IMAGE_DISTRO: ubuntu_focal
-    irrelevant-files:
-      - ^.*\.rst$
-      - ^doc/.*$
-      - ^releasenotes/.*$
-
-
-- job:
-    name: airship-pegleg-docker-build-gate-ubuntu_focal
+    name: airship-pegleg-docker-build-gate-ubuntu_jammy
     timeout: 7200
     run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node-focal
+    nodeset: airship-pegleg-single-node-jammy
     irrelevant-files:
       - '^doc/.*'
     vars:
       publish: false
-      distro: ubuntu_focal
+      distro: ubuntu_jammy
       tags:
         dynamic:
           patch_set: true
 
 - job:
-    name: airship-pegleg-docker-publish-ubuntu_focal
+    name: pegleg-base
+    abstract: true
+    roles:
+      - zuul: openstack/openstack-helm-infra
+      - zuul: zuul/zuul-jobs
+    required-projects:
+      - name: openstack/openstack-helm
+      - name: openstack/openstack-helm-infra
+      - name: openstack/openstack-helm-plugin
+      - name: airship/treasuremap
+        override-checkout: v1.9
+    irrelevant-files: &irrelevant-files
+      - ^.*\.rst$
+      - ^doc/.*$
+      - ^etc/.*$
+      - ^releasenotes/.*$
+      - ^setup.cfg$
+      - ^deckhand/tests/unit/.*$
+    timeout: 10800
+    pre-run:
+      - tools/gate/playbooks/checkout-treasuremap-ref.yaml
+      - tools/gate/playbooks/prepare-hosts.yaml
+      - tools/gate/playbooks/mount-volumes.yaml
+      - tools/gate/playbooks/deploy-env.yaml
+    run:
+      - tools/gate/playbooks/airship-run-scripts.yaml
+    post-run:
+      - tools/gate/playbooks/osh-infra-collect-logs.yaml
+    vars:
+      treasuremap_ref: refs/changes/43/927643/6
+      extra_volume:
+        size: 80G
+        type: Linux
+        mount_point: /opt/ext_vol
+      docker:
+        root_path: "/opt/ext_vol/docker"
+      containerd:
+        root_path: "/opt/ext_vol/containerd"
+      kubeadm:
+        pod_network_cidr: "10.244.0.0/16"
+        service_cidr: "10.96.0.0/16"
+      osh_plugin_repo: "{{ zuul.project.src_dir }}/../../openstack/openstack-helm-plugin"
+      loopback_setup: true
+      loopback_device: /dev/loop100
+      loopback_image: "/opt/ext_vol/openstack-helm/ceph-loop.img"
+      ceph_osd_data_device: /dev/loop100
+      kube_version_repo: "v1.30"
+      kube_version: "1.30.3-1.1"
+      calico_setup: true
+      calico_version: "v3.27.4"
+      cilium_setup: false
+      cilium_version: "1.16.0"
+      flannel_setup: false
+      flannel_version: v0.25.4
+      helm_version: "v3.15.4"
+      crictl_version: "v1.30.1"
+      zuul_osh_relative_path: ../../openstack/openstack-helm
+      zuul_osh_infra_relative_path: ../../openstack/openstack-helm-infra
+      zuul_treasuremap_relative_path: ../../airship/treasuremap
+      gate_scripts_relative_path: ../../openstack/openstack-helm-infra
+      run_helm_tests: "no"
+
+- job:
+    name: airship-pegleg-validate-airskiff-manifests-jammy
+    nodeset: treasuremap-airskiff-1node-ubuntu_jammy
+    description: |
+      Test pegleg Airskiff site manifest validation
+    parent: pegleg-base
+    run:
+      - tools/gate/playbooks/airship-run-scripts.yaml
+      - tools/gate/playbooks/airskiff-validate.yaml
+    vars:
+      site: airskiff
+      HELM_ARTIFACT_URL: https://get.helm.sh/helm-v3.15.4-linux-amd64.tar.gz
+      HTK_COMMIT: 43fd7143481b6ddda0dbd2f26bf6ec39a417b15b
+      OSH_INFRA_COMMIT: 43fd7143481b6ddda0dbd2f26bf6ec39a417b15b
+      OSH_COMMIT: 540df5cb0dbdaed63c202e2d6f2b7891062f8203
+      TREASUREMAP_COMMIT: refs/changes/43/927643/6
+      DISTRO: ubuntu_jammy
+      DOCKER_REGISTRY: localhost:5000
+      MAKE_PEGLEG_IMAGES: true
+      CLONE_PEGLEG: false
+      gate_scripts_relative_path: ../../airship/treasuremap
+      gate_scripts:
+        - ./tools/deployment/airskiff/developer/000-prepare-k8s.sh
+        - ./tools/deployment/airskiff/developer/009-setup-apparmor.sh
+        - ./tools/deployment/airskiff/developer/000-clone-dependencies.sh
+        - ./tools/deployment/airskiff/developer/020-setup-client.sh
+        - ./tools/deployment/airskiff/developer/015-make-all-charts.sh
+        - ./tools/deployment/airskiff/developer/017-make-all-images.sh
+        - ./tools/deployment/airskiff/developer/025-start-artifactory.sh
+        - ./tools/deployment/airskiff/developer/026-reduce-site.sh
+
+
+- job:
+    name: airship-pegleg-docker-publish-ubuntu_jammy
     timeout: 7200
     run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node-focal
+    nodeset: airship-pegleg-single-node-jammy
     secrets:
       - airship_pegleg_quay_creds
     irrelevant-files:
       - '^doc/.*'
     vars:
       publish: true
-      distro: ubuntu_focal
+      distro: ubuntu_jammy
       tags:
         dynamic:
           branch: true
           commit: true
         static:
           - latest
-          - airflow_2.8.2
+          - airflow_2.10.2
 
 - secret:
     name: airship_pegleg_quay_creds

@@ -1,0 +1,21 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+- hosts: all
+  roles:
+    - bindep
+    - start-zuul-console
+    - role: add-authorized-keys
+      public_keys:
+        - public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDA7eM8WFJrqQmki8rR0O3QBHyl8xq42jb1RduwuRwjWoGYJI5cX7Fx+7VR4A9ITCoiqxKS8DMfgKbt5jKC6SmvMALULZsnYlthB34KywurgxsW6fgp68DHWQ7J4CCBhoIpl0W3JW7s6b0vHLhab59r0E+AYemBVuWUqbFEy8nDAHcQv1S/2o1udhmljIN7c2ogO4KAJ7Lge0BoIP9ps4u6AVwyQZixp4anU9DHGNA/UQj4M5UyuALj5buEAuATBe9Vqj4sOvZjObPJAGPUrNRrGEWAFk+lSZHRzKXo0eeWtPqoh5UN9UDb5Pocg1krncMIZwjHKovlD1z/O1y91aY5LM1wxm/7aaIiX8eCihyVZaOuDCLF7WDT2SMs7ABcotX2MDtVQTrNNV3MmMAScFNDflzPKszd7cdjLl6PBq8bvPxmCkLmnitPTGOoh9d8i+JlbINvgx1pguYrpeciIyreCO1rjTW3MgB0tyoMEa31V+7HrauBMeNnE68YTqLTIB0= smarkin@mirantis.com
+...

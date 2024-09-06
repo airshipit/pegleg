@@ -27,8 +27,10 @@ PUSH_IMAGE        ?= false
 # use this variable for image labels added in internal build process
 LABEL             ?= org.airshipit.build=community
 COMMIT            ?= $(shell git rev-parse HEAD)
-DISTRO            ?= ubuntu_focal
+DISTRO             ?= ubuntu_jammy
+DISTRO_ALIAS	   ?= ubuntu_focal
 IMAGE             ?= $(DOCKER_REGISTRY)/$(IMAGE_PREFIX)/$(IMAGE_NAME):$(IMAGE_TAG)-${DISTRO}
+IMAGE_ALIAS              := ${DOCKER_REGISTRY}/${IMAGE_PREFIX}/${IMAGE_NAME}:${IMAGE_TAG}-${DISTRO_ALIAS}
 PYTHON_BASE_IMAGE ?= python:3.8
 BASE_IMAGE        ?=
 
@@ -100,6 +102,13 @@ else
 		--build-arg DECKHAND_VERSION=${DECKHAND_VERSION} \
 		--build-arg PROMENADE_VERSION=${PROMENADE_VERSION} \
 		--build-arg SHIPYARD_VERSION=${SHIPYARD_VERSION}
+endif
+ifneq ($(DISTRO), $(DISTRO_ALIAS))
+	docker tag $(IMAGE) $(IMAGE_ALIAS)
+endif
+ifeq ($(DOCKER_REGISTRY), localhost:5000)
+	docker push $(IMAGE)
+	docker push $(IMAGE_ALIAS)
 endif
 ifeq ($(PUSH_IMAGE), true)
 	docker push $(IMAGE)
