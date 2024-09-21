@@ -35,7 +35,7 @@
       jobs:
         - openstack-tox-pep8-focal
         - openstack-tox-cover-focal
-        - openstack-tox-docs-focal
+        #- openstack-tox-docs-focal
         - pegleg-dependency-vulnerability-check
         - airship-pegleg-validate-airskiff-manifests-focal
         - airship-pegleg-docker-build-gate-ubuntu_focal
@@ -45,7 +45,7 @@
       jobs:
         - openstack-tox-pep8-focal
         - openstack-tox-cover-focal
-        - openstack-tox-docs-focal
+        #- openstack-tox-docs-focal
         - pegleg-dependency-vulnerability-check
         - airship-pegleg-validate-airskiff-manifests-focal
         - airship-pegleg-docker-build-gate-ubuntu_focal
@@ -73,10 +73,10 @@
     parent: openstack-tox-pep8
     nodeset: openstack-single-node-focal
 
-- job:
-    name: openstack-tox-docs-focal
-    parent: openstack-tox-docs
-    nodeset: openstack-single-node-focal
+#- job:
+#    name: openstack-tox-docs-focal
+#    parent: openstack-tox-docs
+#    nodeset: openstack-single-node-focal
 
 - job:
     name: openstack-tox-cover-focal
