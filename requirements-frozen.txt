@@ -15,7 +15,7 @@ click==8.1.7
 click-default-group==1.2.4
 cliff==4.7.0
 cmd2==2.4.3
-cryptography==42.0.8
+cryptography==43.0.1
 debtcollector==3.0.0
 Deckhand @ git+https://opendev.org/airship/deckhand.git@be9f97b846b1edc6b74777e5e639aa9edce8cfa6
 decorator==5.1.1
