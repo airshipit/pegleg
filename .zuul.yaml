@@ -12,9 +12,8 @@
 
 - project:
     templates:
-      # commented out because openstack-tox-docs fails on jammy zuul nodes
-      - docs-on-readthedocs
       - release-notes-jobs-python3
+      - docs-on-readthedocs
     vars:
       rtd_webhook_id: '38574'
       rtd_project_name: 'airship-pegleg'
@@ -35,7 +34,7 @@
         - openstack-tox-py310
         - openstack-tox-pep8-jammy
         - openstack-tox-cover-jammy
-        - openstack-tox-docs-jammy
+        # - openstack-tox-docs-jammy
         - pegleg-dependency-vulnerability-check
         - airship-pegleg-validate-airskiff-manifests-jammy
         - airship-pegleg-docker-build-gate-ubuntu_jammy
@@ -46,7 +45,7 @@
         - openstack-tox-py310
         - openstack-tox-pep8-jammy
         - openstack-tox-cover-jammy
-        - openstack-tox-docs-jammy
+        # - openstack-tox-docs-jammy
         - pegleg-dependency-vulnerability-check
         - airship-pegleg-validate-airskiff-manifests-jammy
         - airship-pegleg-docker-build-gate-ubuntu_jammy
@@ -55,6 +54,7 @@
       jobs:
         - airship-pegleg-docker-publish-ubuntu_jammy
         - pegleg-upload-git-mirror
+        - trigger-readthedocs-webhook
 
 - nodeset:
     name: airship-pegleg-single--bionic
@@ -73,10 +73,10 @@
     parent: openstack-tox-pep8
     nodeset: openstack-single-node-jammy
 
-- job:
-    name: openstack-tox-docs-jammy
-    parent: openstack-tox-docs
-    nodeset: openstack-single-node-jammy
+# - job:
+#     name: openstack-tox-docs-jammy
+#     parent: openstack-tox-docs
+#     nodeset: openstack-single-node-jammy
 
 - job:
     name: openstack-tox-cover-jammy
@@ -172,7 +172,7 @@
     post-run:
       - tools/gate/playbooks/osh-infra-collect-logs.yaml
     vars:
-      treasuremap_ref: refs/changes/43/927643/6
+      treasuremap_ref: v1.9
       extra_volume:
         size: 80G
         type: Linux
@@ -220,7 +220,6 @@
       HTK_COMMIT: 43fd7143481b6ddda0dbd2f26bf6ec39a417b15b
       OSH_INFRA_COMMIT: 43fd7143481b6ddda0dbd2f26bf6ec39a417b15b
       OSH_COMMIT: 540df5cb0dbdaed63c202e2d6f2b7891062f8203
-      TREASUREMAP_COMMIT: refs/changes/43/927643/6
       DISTRO: ubuntu_jammy
       DOCKER_REGISTRY: localhost:5000
       MAKE_PEGLEG_IMAGES: true
