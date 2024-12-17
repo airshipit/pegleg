@@ -16,9 +16,9 @@ import logging
 import os
 import shutil
 import textwrap
+import yaml
 
 import click
-import pkg_resources
 from prettytable import PrettyTable
 
 from pegleg import config
@@ -29,6 +29,7 @@ from pegleg.engine.errorcodes import REPOS_MISSING_DIRECTORIES_FLAG
 from pegleg.engine.errorcodes import SCHEMA_STORAGE_POLICY_MISMATCH_FLAG
 from pegleg.engine.errorcodes import SECRET_NOT_ENCRYPTED_POLICY
 from pegleg.engine import util
+from importlib.resources import files
 
 __all__ = ['full']
 
@@ -367,7 +368,10 @@ def _expected_layer(filename):
 
 def _load_schemas():
     schemas = {}
+
     for key, filename in DECKHAND_SCHEMAS.items():
-        schemas[key] = util.files.slurp(
-            pkg_resources.resource_filename('pegleg', filename))
+        filename_path = files('pegleg') / filename
+        filename_contents = filename_path.read_text(encoding='utf-8')
+        schemas[key] = yaml.safe_load(filename_contents)
+
     return schemas
