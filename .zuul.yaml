@@ -24,7 +24,7 @@
       docker_registry_login_url: "https://quay.io/api/v1/"
       deb_docker_repo: "{{ zuul_site_mirror_fqdn }}/deb-docker/{{ ansible_distribution_release }}"
       image_prefix: "airshipit"
-      base_image_jammy: "ubuntu:22.04"
+      base_image_jammy: "public.ecr.aws/ubuntu/ubuntu:jammy"
       base_image_focal: "ubuntu:20.04"
       base_image_bionic: "ubuntu:18.04"
       base_image_opensuse: "opensuse/leap:15.1"
