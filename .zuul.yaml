@@ -24,7 +24,7 @@
       docker_registry_login_url: "https://quay.io/api/v1/"
       deb_docker_repo: "{{ zuul_site_mirror_fqdn }}/deb-docker/{{ ansible_distribution_release }}"
       image_prefix: "airshipit"
-      base_image_jammy: "public.ecr.aws/ubuntu/ubuntu:jammy"
+      base_image_jammy: "quay.io/airshipit/ubuntu:jammy"
       base_image_focal: "ubuntu:20.04"
       base_image_bionic: "ubuntu:18.04"
       base_image_opensuse: "opensuse/leap:15.1"
@@ -34,7 +34,6 @@
         - openstack-tox-py310
         - openstack-tox-pep8-jammy
         - openstack-tox-cover-jammy
-        # - openstack-tox-docs-jammy
         - pegleg-dependency-vulnerability-check
         - airship-pegleg-validate-airskiff-manifests-jammy
         - airship-pegleg-docker-build-gate-ubuntu_jammy
@@ -45,7 +44,6 @@
         - openstack-tox-py310
         - openstack-tox-pep8-jammy
         - openstack-tox-cover-jammy
-        # - openstack-tox-docs-jammy
         - pegleg-dependency-vulnerability-check
         - airship-pegleg-validate-airskiff-manifests-jammy
         - airship-pegleg-docker-build-gate-ubuntu_jammy
@@ -73,10 +71,6 @@
     parent: openstack-tox-pep8
     nodeset: openstack-single-node-jammy
 
-# - job:
-#     name: openstack-tox-docs-jammy
-#     parent: openstack-tox-docs
-#     nodeset: openstack-single-node-jammy
 
 - job:
     name: openstack-tox-cover-jammy

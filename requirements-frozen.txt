@@ -17,7 +17,7 @@ cliff==4.8.0
 cmd2==2.5.8
 cryptography==42.0.8
 debtcollector==3.0.0
-Deckhand @ git+https://opendev.org/airship/deckhand.git@4d500e48e880ea7f9a3582324c55c61373a855ea
+Deckhand @ git+https://opendev.org/airship/deckhand.git@211b2d20c080ec806d196f3ec6b0d0472b00fa1b
 decorator==5.1.1
 deepdiff==8.1.1
 dnspython==2.7.0
@@ -84,7 +84,7 @@ pecan==1.5.1
 pip==24.1
 ply==3.11
 prettytable==3.12.0
-promenade @ git+https://opendev.org/airship/promenade.git@e491bc4ca7a9764325ab4a2cf1ae10daf6a26efb
+promenade @ git+https://opendev.org/airship/promenade.git@40fd108fd976c19bc142d10cc52b24d48de37100
 prometheus_client==0.21.1
 psycopg2-binary==2.9.10
 PTable==0.9.2
@@ -115,7 +115,7 @@ rpds-py==0.22.3
 rsa==4.9
 selector==0.10.1
 setuptools==70.1.0
-shipyard_client @ git+https://opendev.org/airship/shipyard.git@2fb62659c5a3eecafcf0d0dedaabf2a00fc5d88f#subdirectory=src/bin/shipyard_client
+shipyard_client @ git+https://opendev.org/airship/shipyard.git@40b424e82a6880136541af18b9b5752b4ebd9c96#subdirectory=src/bin/shipyard_client
 simplejson==3.19.3
 six==1.17.0
 smmap==5.0.1

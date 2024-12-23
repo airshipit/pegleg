@@ -10,9 +10,9 @@ zipp
 psycopg2-binary
 
 # Airship dependencies
-deckhand @ git+https://opendev.org/airship/deckhand.git@4d500e48e880ea7f9a3582324c55c61373a855ea#egg=deckhand
-shipyard-client @ git+https://opendev.org/airship/shipyard.git@2fb62659c5a3eecafcf0d0dedaabf2a00fc5d88f#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@e491bc4ca7a9764325ab4a2cf1ae10daf6a26efb#egg=promenade
+deckhand @ git+https://opendev.org/airship/deckhand.git@211b2d20c080ec806d196f3ec6b0d0472b00fa1b#egg=deckhand
+shipyard-client @ git+https://opendev.org/airship/shipyard.git@40b424e82a6880136541af18b9b5752b4ebd9c96#egg=shipyard-client&subdirectory=src/bin/shipyard_client
+promenade @ git+https://opendev.org/airship/promenade.git@40fd108fd976c19bc142d10cc52b24d48de37100#egg=promenade
 
 
 # Openstack Caracal 2024.1
