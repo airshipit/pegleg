@@ -191,7 +191,7 @@
       cilium_version: "1.16.0"
       flannel_setup: false
       flannel_version: v0.25.4
-      helm_version: "v3.15.4"
+      helm_version: "v3.17.3"
       crictl_version: "v1.30.1"
       zuul_osh_relative_path: ../../openstack/openstack-helm
       zuul_osh_infra_relative_path: ../../openstack/openstack-helm
