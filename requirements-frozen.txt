@@ -114,7 +114,7 @@ Routes==2.5.1
 rpds-py==0.22.3
 rsa==4.9
 selector==0.10.1
-setuptools==70.1.0
+setuptools==78.1.1
 shipyard_client @ git+https://opendev.org/airship/shipyard.git@40b424e82a6880136541af18b9b5752b4ebd9c96#subdirectory=src/bin/shipyard_client
 simplejson==3.19.3
 six==1.17.0
