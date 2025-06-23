@@ -8,11 +8,12 @@ six
 debtcollector
 zipp
 psycopg2-binary
+pytz
 
 # Airship dependencies
-deckhand @ git+https://opendev.org/airship/deckhand.git@211b2d20c080ec806d196f3ec6b0d0472b00fa1b#egg=deckhand
-shipyard-client @ git+https://opendev.org/airship/shipyard.git@40b424e82a6880136541af18b9b5752b4ebd9c96#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@eb9db6e50f109eac6b4b06e5fe645e1ec60b1ebe#egg=promenade
+deckhand @ git+https://opendev.org/airship/deckhand.git@d8cc9f3ed2c9f2b9d9bf271a72c9bf301f16f647#egg=deckhand
+shipyard-client @ git+https://opendev.org/airship/shipyard.git@95b37b822eaf8ad39c644f7007b2c1a07293e5ab#egg=shipyard-client&subdirectory=src/bin/shipyard_client
+promenade @ git+https://opendev.org/airship/promenade.git@63bf9dd5693b6e1bf372addadab703cade80cce3#egg=promenade
 
 
 # Openstack Caracal 2024.1
