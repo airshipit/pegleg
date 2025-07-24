@@ -98,30 +98,6 @@
       tox_envlist: safety
       bindep_profile: test py310
 
-# - job:
-#     name: airship-pegleg-validate-airskiff-manifests-jammy
-#     nodeset: airship-pegleg-single-node-jammy
-#     description: |
-#       Test pegleg Airskiff site manifest validation
-#     timeout: 9600
-#     voting: true
-#     pre-run:
-#       - tools/gate/playbooks/airskiff-reduce-site.yaml
-#       - tools/gate/playbooks/git-config.yaml
-#     run: tools/gate/playbooks/airskiff-validate.yaml
-#     post-run: tools/gate/playbooks/debug-report.yaml
-#     required-projects:
-#       - airship/treasuremap
-#     vars:
-#       CLONE_PEGLEG: false
-#       HTK_COMMIT: d31027cfb4c686e23790ed50a024e8ee976549d7
-#       PEGLEG_IMAGE_DISTRO: ubuntu_jammy
-#     irrelevant-files:
-#       - ^.*\.rst$
-#       - ^doc/.*$
-#       - ^releasenotes/.*$
-
-
 - job:
     name: airship-pegleg-docker-build-gate-ubuntu_jammy
     timeout: 7200
@@ -137,97 +113,29 @@
           patch_set: true
 
 - job:
-    name: pegleg-base
-    abstract: true
-    roles:
-      - zuul: airship/kubernetes-entrypoint
-      - zuul: openstack/openstack-helm
-      - zuul: zuul/zuul-jobs
-    required-projects:
-      - name: openstack/openstack-helm
-      - name: openstack/openstack-helm-plugin
-      - name: airship/treasuremap
-        override-checkout: v1.9
-    irrelevant-files: &irrelevant-files
-      - ^.*\.rst$
-      - ^doc/.*$
-      - ^etc/.*$
-      - ^releasenotes/.*$
-      - ^setup.cfg$
-      - ^deckhand/tests/unit/.*$
-    timeout: 10800
-    pre-run:
-      - tools/gate/playbooks/checkout-treasuremap-ref.yaml
-      - tools/gate/playbooks/prepare-hosts.yaml
-      - tools/gate/playbooks/mount-volumes.yaml
-      - tools/gate/playbooks/deploy-env.yaml
-    run:
-      - tools/gate/playbooks/airship-run-scripts.yaml
-    post-run:
-      - tools/gate/playbooks/osh-infra-collect-logs.yaml
-    vars:
-      treasuremap_ref: v1.9
-      extra_volume:
-        size: 80G
-        type: Linux
-        mount_point: /opt/ext_vol
-      docker:
-        root_path: "/opt/ext_vol/docker"
-      containerd:
-        root_path: "/opt/ext_vol/containerd"
-      kubeadm:
-        pod_network_cidr: "10.244.0.0/16"
-        service_cidr: "10.96.0.0/16"
-      osh_plugin_repo: "{{ zuul.project.src_dir }}/../../openstack/openstack-helm-plugin"
-      loopback_setup: true
-      loopback_device: /dev/loop100
-      loopback_image: "/opt/ext_vol/openstack-helm/ceph-loop.img"
-      ceph_osd_data_device: /dev/loop100
-      kube_version_repo: "v1.32"
-      kube_version: "1.32.1-1.1"
-      calico_setup: true
-      calico_version: "v3.27.4"
-      cilium_setup: false
-      cilium_version: "1.16.0"
-      flannel_setup: false
-      flannel_version: v0.25.4
-      helm_version: "v3.17.3"
-      crictl_version: "v1.30.1"
-      zuul_osh_relative_path: ../../openstack/openstack-helm
-      zuul_osh_infra_relative_path: ../../openstack/openstack-helm
-      zuul_treasuremap_relative_path: ../../airship/treasuremap
-      gate_scripts_relative_path: ../../openstack/openstack-helm
-      run_helm_tests: "no"
-
-- job:
     name: airship-pegleg-validate-airskiff-manifests-jammy
-    nodeset: treasuremap-airskiff-1node-ubuntu_jammy
     description: |
       Test pegleg Airskiff site manifest validation
-    parent: pegleg-base
+    parent: treasuremap-airskiff-infra-deploy-base
+    nodeset: treasuremap-airskiff-1node-ubuntu_jammy
     run:
       - tools/gate/playbooks/airship-run-scripts.yaml
       - tools/gate/playbooks/airskiff-validate.yaml
+    required-projects:
+      - name: airship/treasuremap
+        override-checkout: v1.9
+    roles:
+      - zuul: airship/treasuremap
     vars:
-      site: airskiff
-      HELM_ARTIFACT_URL: https://get.helm.sh/helm-v3.16.4-linux-amd64.tar.gz
-      HTK_COMMIT: 49c117443391cec75e0bd52bb4a9d033325927ad
-      OSH_COMMIT: 49c117443391cec75e0bd52bb4a9d033325927ad
-      DISTRO: ubuntu_jammy
-      DOCKER_REGISTRY: localhost:5000
-      MAKE_PEGLEG_IMAGES: true
+      treasuremap_ref: v1.9
       CLONE_PEGLEG: false
+      MAKE_PEGLEG_IMAGES: true
+      USE_ARMADA_GO: false
       gate_scripts_relative_path: ../../airship/treasuremap
       gate_scripts:
-        - ./tools/deployment/airskiff/developer/000-prepare-k8s.sh
-        - ./tools/deployment/airskiff/developer/009-setup-apparmor.sh
         - ./tools/deployment/airskiff/developer/000-clone-dependencies.sh
-        - ./tools/deployment/airskiff/developer/020-setup-client.sh
-        - ./tools/deployment/airskiff/developer/015-make-all-charts.sh
         - ./tools/deployment/airskiff/developer/017-make-all-images.sh
-        - ./tools/deployment/airskiff/developer/025-start-artifactory.sh
-        - ./tools/deployment/airskiff/developer/026-reduce-site.sh
-
+        - ./tools/deployment/airskiff/developer/022-generate_security_keys.sh
 
 - job:
     name: airship-pegleg-docker-publish-ubuntu_jammy

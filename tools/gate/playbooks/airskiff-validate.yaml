@@ -22,7 +22,7 @@
         ./tools/airship pegleg --verbose site    -r . list
       args:
         chdir: "{{ zuul.projects['opendev.org/airship/treasuremap'].src_dir }}"
-      become: yes
+      become: false
 
     - name: Lint Airskiff site
       shell: |
@@ -30,7 +30,7 @@
         ./tools/airship pegleg --verbose site    -r . lint airskiff -w P001 -w P003
       args:
         chdir: "{{ zuul.projects['opendev.org/airship/treasuremap'].src_dir }}"
-      become: yes
+      become: false
 
     - name: Validate Airskiff site
       shell: |
@@ -38,7 +38,7 @@
         ./tools/airship pegleg --verbose site    -r . render  airskiff --validate
       args:
         chdir: "{{ zuul.projects['opendev.org/airship/treasuremap'].src_dir }}"
-      become: yes
+      become: false
 
     - name: Render Airskiff site
       shell: |
@@ -46,7 +46,7 @@
         ./tools/airship pegleg  --verbose site -r . render airskiff -o airskiff.yaml
       args:
         chdir: "{{ zuul.projects['opendev.org/airship/treasuremap'].src_dir }}"
-      become: yes
+      become: false
 
     - name: Show Airskiff site
       shell: |
@@ -54,7 +54,7 @@
         ./tools/airship pegleg  --verbose site -r . show airskiff
       args:
         chdir: "{{ zuul.projects['opendev.org/airship/treasuremap'].src_dir }}"
-      become: yes
+      become: false
 
     - name: Collect Airskiff site
       shell: |
@@ -62,7 +62,7 @@
         ./tools/airship pegleg  --verbose site -r . collect airskiff -s peggles
       args:
         chdir: "{{ zuul.projects['opendev.org/airship/treasuremap'].src_dir }}"
-      become: yes
+      become: false
 
     - name: Stop artifactory
       shell: |
@@ -71,4 +71,4 @@
         docker rm artifacts --force || true
       args:
         chdir: "{{ zuul.project.src_dir }}"
-      become: yes
+      become: false
