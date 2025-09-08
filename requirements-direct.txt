@@ -13,7 +13,7 @@ pytz
 # Airship dependencies
 deckhand @ git+https://opendev.org/airship/deckhand.git@d8cc9f3ed2c9f2b9d9bf271a72c9bf301f16f647#egg=deckhand
 shipyard-client @ git+https://opendev.org/airship/shipyard.git@95b37b822eaf8ad39c644f7007b2c1a07293e5ab#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@96f711794a42c8c56ab981c087761c1179540c17#egg=promenade
+promenade @ git+https://opendev.org/airship/promenade.git@035ad5fd357efcc16857b9ddf671a02a5cda42c7#egg=promenade
 
 
 # Openstack Caracal 2024.1
