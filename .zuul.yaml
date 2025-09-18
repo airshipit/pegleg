@@ -131,6 +131,8 @@
       CLONE_PEGLEG: false
       MAKE_PEGLEG_IMAGES: true
       USE_ARMADA_GO: false
+      DISTRO: ubuntu_jammy
+      DOCKER_REGISTRY: localhost:5000
       gate_scripts_relative_path: ../../airship/treasuremap
       gate_scripts:
         - ./tools/deployment/airskiff/developer/000-clone-dependencies.sh

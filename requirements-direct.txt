@@ -11,34 +11,34 @@ psycopg2-binary
 pytz
 
 # Airship dependencies
-deckhand @ git+https://opendev.org/airship/deckhand.git@d8cc9f3ed2c9f2b9d9bf271a72c9bf301f16f647#egg=deckhand
-shipyard-client @ git+https://opendev.org/airship/shipyard.git@95b37b822eaf8ad39c644f7007b2c1a07293e5ab#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@84189ac1cae841529ca27aa2ad4a6568e3bbcc64#egg=promenade
+deckhand @ git+https://opendev.org/airship/deckhand.git@1da4b273a5e1160008e819b27faa7650f2defab5#egg=deckhand
+shipyard-client @ git+https://opendev.org/airship/shipyard.git@7ba581dc5d4b854ca06128b29a711393edda6bb6#egg=shipyard-client&subdirectory=src/bin/shipyard_client
+promenade @ git+https://opendev.org/airship/promenade.git@4e3e541f5ebd40aea4d25391e646242698493654#egg=promenade
 
 
-# Openstack Caracal 2024.1
-# https://releases.openstack.org/caracal/index.html
-barbican==18.0.0
+# Openstack Epoxy 2025.1
+# https://releases.openstack.org/epoxy/index.html
+barbican==20.0.0
 
-python-barbicanclient==5.7.0
-python-keystoneclient==5.4.0
+python-barbicanclient==7.1.0
+python-keystoneclient==5.6.0
 
-keystoneauth1==5.6.0
-keystonemiddleware==10.6.0
+keystoneauth1==5.10.0
+keystonemiddleware==10.9.0
 
-oslo.cache==3.7.0
-oslo.concurrency==6.0.0
-oslo.config==9.4.0
-oslo.context==5.5.0
-oslo.db==15.0.0
-oslo.i18n==6.3.0
-oslo.log==5.5.1
-oslo.messaging==14.7.2
-oslo.metrics==0.8.0
-oslo.middleware==6.1.0
-oslo.policy==4.3.0
-oslo.serialization==5.4.1
-oslo.service==3.4.1
-oslo.upgradecheck==2.3.0
-oslo.utils==7.1.0
-oslo.versionedobjects==3.3.0
+oslo.cache==3.10.2
+oslo.concurrency==7.1.0
+oslo.config==9.7.1
+oslo.context==5.7.1
+oslo.db==17.2.1
+oslo.i18n==6.5.1
+oslo.log==7.1.0
+oslo.messaging==16.1.0
+oslo.metrics==0.11.0
+oslo.middleware==6.3.1
+oslo.policy==4.5.1
+oslo.serialization==5.7.0
+oslo.service==4.1.1
+oslo.upgradecheck==2.5.0
+oslo.utils==8.2.0
+oslo.versionedobjects==3.6.0
