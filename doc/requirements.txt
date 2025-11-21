@@ -11,7 +11,8 @@ docutils
 
 
 # UML image generation
-plantuml
+# Using httpx for direct PlantUML server integration (Python 3.12 compatible)
+httpx
 
 # Releasenotes
 reno
