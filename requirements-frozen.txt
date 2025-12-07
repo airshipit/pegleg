@@ -85,7 +85,7 @@ pecan==1.7.0
 pip==24.3.1
 ply==3.11
 prettytable==3.16.0
-promenade @ git+https://opendev.org/airship/promenade.git@32b5a57e89e84961f7dbcc631330d43bfdab96bc
+promenade @ git+https://opendev.org/airship/promenade.git@9854e66e33a6cf619d9a21618a52a83eb71b6dd8
 prometheus_client==0.22.1
 psutil==7.0.0
 psycopg2-binary==2.9.10
