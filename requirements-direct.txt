@@ -13,7 +13,7 @@ pytz
 # Airship dependencies
 deckhand @ git+https://opendev.org/airship/deckhand.git@1da4b273a5e1160008e819b27faa7650f2defab5#egg=deckhand
 shipyard-client @ git+https://opendev.org/airship/shipyard.git@7ba581dc5d4b854ca06128b29a711393edda6bb6#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@9854e66e33a6cf619d9a21618a52a83eb71b6dd8#egg=promenade
+promenade @ git+https://opendev.org/airship/promenade.git@50feb656f59082eeb1da8040c52a67ab2a5f84aa#egg=promenade
 
 
 # Openstack Epoxy 2025.1
