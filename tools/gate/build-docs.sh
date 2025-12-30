@@ -6,7 +6,7 @@
 set -ex
 
 # Generate architectural images and move them into place.
-python -m plantuml doc/source/diagrams/*.uml
+python "${BASH_SOURCE%/*}/plantuml_generate.py" doc/source/diagrams/*.uml
 mv doc/source/diagrams/*.png doc/source/images
 
 # Build documentation.
