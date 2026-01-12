@@ -145,7 +145,7 @@
     run: tools/gate/playbooks/docker-image-build.yaml
     nodeset: airship-pegleg-single-node-jammy
     secrets:
-      - airship_pegleg_quay_creds
+      - airship_pegleg_quay_creds_2026
     irrelevant-files:
       - '^doc/.*'
     vars:
@@ -184,6 +184,32 @@
           s6YbtUXzthM/TgsE5KMZ2QP4udetj11RGDC+7fz/edtLcrpL3Nrq2rkJ2tRV+yR1ElKGx
           b2YX7cwM/vx3DPhWRBPJJfOoSRl+ZJByDM1KKWmAB91LT9vB3oVk/vq2XUsbTH2w20LcK
           xBXFJMtVHOavHIIWM7qHvkvZzWSBON7ydspje9MbYtTS5/97ccdLxDHA0MX0wM=
+
+- secret:
+    name: airship_pegleg_quay_creds_2026
+    data:
+      username: !encrypted/pkcs1-oaep
+        - pmIJFWWIDSSzy2X8ZaHWUvUnGXIjNABgnKTvMQl9iaBsVZBPBwsBtzJEf+mhgWMxGJ6H5
+          jOrf9hG5zJd7sjaYcjuwywxLZkDx9oIuZ1msz5uX0rt7Uh+XlaGOvE7Xd367kOVZEKbPY
+          WhafG267Y5DYYWzT1rnfM1spbpI3hdPTBH9ocQrk42twNAJdAkB1nuOHxnI+qSd6zZEYy
+          ih8yhhi3IXVqCEJDRoBWBXrD0bo7Mr5my3pWTnmkI8aTixaWLvH2Re3+5tFLRs0O2RKHX
+          8sh70mG563HR3DUc3nuniUrxIi25NleJUIqkaklvHH0hY7Et5G0yD95MXhiNwwCiKIplI
+          kH0bmOk22o8AjACwcEkYiskuk23qiwBrFFKYaQxb9a2Y3ZZqXNyTg0vlvwANSu4xU8uI3
+          cmvOPz0ztrmnXxUwr+vRY6iVh1oKKNaDQnatRpDl0teIT37STsNYKxL4VGNYfpj1gHjrR
+          oh100+SL0WqLjLqQO0ZegPzU4B5br/QaM6wlYusL+3MjJoDcKw899Ds+6zcASwzJ3ch6I
+          GC7zUTuMPJNEUDAZF6jnOY1jgmrOJJQfoWzBKeeome3kkfEXz2y0T6jfpHfvMXdfc1BA+
+          41QqUZ6G/Bet5RFSB5YFhVWk+7rdgGafO2kOapw965O1Y9JI5EFO/UlMCe4qZI=
+      password: !encrypted/pkcs1-oaep
+        - h1zw4QR/bbv09wosF936x6VwLwNwLBb+Qv1VFk0nX8rbeI15oP19t6d83fM3Jrnh7vRMz
+          erFjBdg6EzGm4RdXMoNGhazFiV5RAuhHdpe0Cf4uZ54CYa1HQslRx4UTi3Qyij/zWTQ0+
+          +wTrWg93ICRWpDKdlbIjjB7coZkBnnhVcO77K4zkbpIeY4+K5LYr3+JNm/uuSk9vZSnmA
+          GwLDzEUSRt0/OaaC+dRhpRPO/H9Wi9hftm8p1vQd2B0srfNYiU7en7vXi+FTK8uFaFFc5
+          P6rc9IQ8PquR8rGqe8CfWnO/uassP4v/dpVopGebNNl8I7vPsgzldaOxavDaF2vBgV/ow
+          njRqiEhAn2u6MKemhf/3PqBAODaXR4glVhoWS5cbPJZFEM8N0ImdANNQxb99FrHEAhd85
+          Wn/AaHv2g2L7iLKEzwnR2ZIMJxIDjNxoBdcHi9PPeEVg8+I9vzatj67iWQe2JwBnSv8sB
+          cS3+ZDFVYs3JdYLOlk26kt6N2ZHMHjHn/i6mMkdA+x7CKt54a61xdE5A0Lk/IaFyV4D+W
+          pqurO9g0I429GtQPLVzkRDLmabXXZ55qStLfj8+5Bn6HL7zxsw+g/Cre3ohZMBdeS94GJ
+          N5lCztJAc/DfsV+u8GorGBT3KoLk2g72UF7Wi3Fpsil/3Eha5mdUrJXm91n298=
 
 - job:
     name: pegleg-upload-git-mirror
