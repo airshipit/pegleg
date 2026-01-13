@@ -219,7 +219,7 @@
       git_mirror_repository: airshipit/pegleg
     secrets:
       - name: git_mirror_credentials
-        secret: pegleg-airshipit-github-secret-2023-03-23
+        secret: pegleg-airshipit-github-ed25519-secret-2026-01-13
         pass-to-parent: true
 
 - secret:
@@ -269,3 +269,21 @@
           hvgxXcvFOnO0093UfJwBvXuOar5sP81bPgxpI113RK1h9VZGExLMDIsLj3XihuA6g7YFi
           XvZoT27Uindk2L3R0sudQO+g++kkAl8E46AxAemu1fVWaKuH7Df9qqws9CPAQyAIrI1C7
           ZlgZ10RQPc8qhUQJ0lOLZ2jasaUrGxOI8LdISSPecoDf3rAIK2bbUcixZuTVn4=
+
+- secret:
+    name: pegleg-airshipit-github-ed25519-secret-2026-01-13
+    data:
+      user: git
+      host: github.com
+      host_key: github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+      ssh_key: !encrypted/pkcs1-oaep
+        - qp1NzNH2tBc4HVWkt20i3K6p2wj/G8tCY3EzQHQRNcmfx5tCG0cjSbxYE6gPwwENcaPOu
+          ZEi+Yh0Qc0SSkI4awT71RzbAFkhaOHQotOUHw57VvAHKS7znV06hJYeyky+bPzWhE7n8+
+          0yFjHYhReFP313+dUE4N9oK6Aje/up0FyzfXKKar1/qSOzsFjPiS1h3kXCqYiM+EjVg4B
+          3C5TZyKUvaq8Xg97ScrPGSmO2Jl/ulDgTkaLu+jym5H0L7rpc9qrdoSQolGQNu8z5ch0s
+          FCqKPG47tHwZn7yilKN1iakGtzc4MMdCkxb5C1Ok9ws322s7KmeeIVLbkxfQ1paMB00Hu
+          BYBqh8GBPoqYKpKjNCitFpLslUqI97oVKzF1tVat77LHLzuYaMDzviJe+Uq0qSqNb2Jzw
+          waqUYyo1fan3cHHNW32tvTC88OlTyohyVsjMpREr0X2LgBS5HCPA9ItJsBsKkEKs6oZDl
+          hGLJpy+hGxK3woUBk0Ac+aTakKTpi9Ave5yn8ML4XvoV6tymgBX9UVxLnoT6XKOmztrAD
+          XDN65v8s1cdiJViTeshm4fryu3gA58GbVTBa9CfhmkGDXxC1+t5KT0jSmB3ogL6I/o+u6
+          8ye/1gpzp2RyKsqwnxARhGtuRlDrNoqjI2e+y1DbgZqDJOvGEOsg+fLmiAJWaw=
