@@ -1,0 +1,98 @@
+#
+# In order to fix rate limit error
+#
+# 429 Too Many Requests - Server message: too many requests:
+#   You have reached your pull rate limit.
+#   You may increase the limit by authenticating and upgrading: https://www.docker.com/increase-rate-limit
+ARG FROM=quay.io/airshipit/ubuntu:noble
+FROM ${FROM}
+ARG CFSSLURL=
+
+LABEL org.opencontainers.image.authors='airship-discuss@lists.airshipit.org, irc://#airshipit@freenode'
+LABEL org.opencontainers.image.url='https://airshipit.org'
+LABEL org.opencontainers.image.documentation='https://airship-pegleg.readthedocs.org'
+LABEL org.opencontainers.image.source='https://opendev.org/airship/pegleg'
+LABEL org.opencontainers.image.vendor='The Airship Authors'
+LABEL org.opencontainers.image.licenses='Apache-2.0'
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+ARG DECKHAND_VERSION=branch/master
+ARG SHIPYARD_VERSION=branch/master
+ARG PROMENADE_VERSION=branch/master
+
+RUN set -ex \
+    && apt update -qq \
+    && apt upgrade -y \
+    && apt install -y --no-install-recommends \
+         ca-certificates \
+         curl \
+         gettext-base \
+         gpg \
+         gpg-agent \
+         netbase \
+         openssh-client \
+         python3-dev \
+         python3-setuptools \
+         # this will install golang-cfssl 1.2.0 in Jammy
+         golang-cfssl \
+    && apt autoremove -yqq --purge \
+    && apt clean \
+    && rm -rf \
+         /tmp/* \
+         /usr/share/doc \
+         /usr/share/doc-base \
+         /usr/share/man \
+         /var/lib/apt/lists/* \
+         /var/log/* \
+         /var/tmp/* \
+    && rm -rf /root/.cache/pip
+
+
+
+VOLUME /var/pegleg
+WORKDIR /var/pegleg
+
+COPY requirements-frozen.txt /opt/pegleg/requirements.txt
+RUN set -ex \
+        && buildDeps=' \
+        automake \
+        gcc \
+        libffi-dev \
+        libpq-dev \
+        libssl-dev \
+        libtool \
+        libyaml-dev \
+        libvirt-dev \
+        make \
+        python3-pip \
+        pkg-config \
+        ' \
+        && apt-get -qq update \
+        # Keep git separate so it's not removed below
+        && apt-get install -y $buildDeps git --no-install-recommends \
+        && python3 -m pip install -U pip --break-system-packages --ignore-installed \
+        && pip3 install -r https://opendev.org/airship/deckhand/raw/${DECKHAND_VERSION}/requirements-frozen.txt --break-system-packages \
+        && pip3 install -r https://opendev.org/airship/promenade/raw/${PROMENADE_VERSION}/requirements-frozen.txt --break-system-packages \
+        && pip3 install -r https://opendev.org/airship/shipyard/raw/${SHIPYARD_VERSION}/src/bin/shipyard_client/requirements-frozen.txt --break-system-packages \
+        && pip3 install --no-cache-dir -r /opt/pegleg/requirements.txt --break-system-packages \
+        && apt-get purge -y --auto-remove $buildDeps \
+        && apt-get autoremove -yqq --purge \
+        && apt-get clean \
+        && rm -rf \
+            /var/lib/apt/lists/* \
+            /tmp/* \
+            /var/tmp/* \
+            /usr/share/man \
+            /usr/share/doc \
+            /usr/share/doc-base
+
+COPY . /opt/pegleg
+RUN pip3 install -e /opt/pegleg --use-pep517 --break-system-packages
+
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["pegleg", "--help"]

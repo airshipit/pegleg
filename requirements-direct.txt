@@ -11,9 +11,9 @@ psycopg2-binary
 pytz
 
 # Airship dependencies
-deckhand @ git+https://opendev.org/airship/deckhand.git@83adc3a1f54f9c38099d67f95f11fd76b65dfee2#egg=deckhand
-shipyard-client @ git+https://opendev.org/airship/shipyard.git@525a1992ededc6fe210cea5ef92f0eafe544707d#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@ca8f103c641a902f1ba2115326c90ef1b815158b#egg=promenade
+deckhand @ git+https://opendev.org/airship/deckhand.git@5924c5806670141606e78b8b156546d15825d6ef#egg=deckhand
+shipyard-client @ git+https://opendev.org/airship/shipyard.git@497e3c15e9a05cf41978d1983f6e4d1ddf0975b6#egg=shipyard-client&subdirectory=src/bin/shipyard_client
+promenade @ git+https://opendev.org/airship/promenade.git@74443011a752616adab410846e9380db4a5ade59#egg=promenade
 
 
 # Openstack Epoxy 2025.1

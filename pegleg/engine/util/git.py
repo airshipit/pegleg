@@ -199,7 +199,7 @@ def _try_git_clone(
     ssh_cmd = env_vars.get('GIT_SSH_COMMAND')
 
     try:
-        if proxy_server:
+        if proxy_server and proxy_server.strip():
             LOG.debug('Cloning [%s] with proxy [%s]', repo_url, proxy_server)
             # TODO(felipemonteiro): proxy_server can be finicky. Need a config
             # option to retry up to N times.

@@ -36,6 +36,11 @@
         - debug:
             msg: "{{ tags | to_json }}"
 
+    - name: Set ubuntu noble base image
+      set_fact:
+        base_image: "{{ base_image_noble }}"
+      when: distro == 'ubuntu_noble'
+
     - name: Set ubuntu jammy base image
       set_fact:
         base_image: "{{ base_image_jammy }}"
@@ -73,6 +78,7 @@
         - pip:
             name: docker
             executable: pip3
+            break_system_packages: yes
       become: True
 
     - name: Make images - verbosive

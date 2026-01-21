@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 from pegleg import config
@@ -108,7 +108,7 @@ class PeglegManagedSecretsDocument(object):
 
         if generated:
             doc['data'][GENERATED] = {
-                'at': datetime.utcnow().isoformat(),
+                'at': datetime.now(timezone.utc).isoformat(),
                 'by': author,
                 'specifiedBy': {
                     'repo': git.repo_url(config.get_site_repo()),
@@ -170,7 +170,7 @@ class PeglegManagedSecretsDocument(object):
 
     def set_encrypted(self, author=None):
         """Mark the pegleg managed document as encrypted."""
-        self.data[ENCRYPTED] = {'at': datetime.utcnow().isoformat()}
+        self.data[ENCRYPTED] = {'at': datetime.now(timezone.utc).isoformat()}
         if author:
             self.data[ENCRYPTED]['by'] = author
 

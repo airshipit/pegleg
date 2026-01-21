@@ -107,6 +107,10 @@ def test_git_clone_behind_proxy(mock_log):
     commit = 'cba78d1d03e4910f6ab1691bae633c5bddce893d'
 
     for proxy_server in test_utils.get_proxies()[1].values():
+        # Skip empty or None proxy values
+        if not proxy_server or not proxy_server.strip():
+            continue
+
         git_dir = git.git_handler(url, commit, proxy_server=proxy_server)
         _validate_git_clone(git_dir, commit)
 

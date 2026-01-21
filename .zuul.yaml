@@ -24,6 +24,7 @@
       docker_registry_login_url: "https://quay.io/api/v1/"
       deb_docker_repo: "{{ zuul_site_mirror_fqdn }}/deb-docker/{{ ansible_distribution_release }}"
       image_prefix: "airshipit"
+      base_image_noble: "quay.io/airshipit/ubuntu:noble"
       base_image_jammy: "quay.io/airshipit/ubuntu:jammy"
       base_image_focal: "ubuntu:20.04"
       base_image_bionic: "ubuntu:18.04"
@@ -31,34 +32,34 @@
       base_image_xenial: "ubuntu:16.04"
     check:
       jobs:
-        - openstack-tox-py310
-        - openstack-tox-pep8-jammy
-        - openstack-tox-cover-jammy
+        - openstack-tox-py312
+        - openstack-tox-pep8-noble
+        - openstack-tox-cover-noble
         - pegleg-dependency-vulnerability-check
-        - airship-pegleg-validate-airskiff-manifests-jammy
-        - airship-pegleg-docker-build-gate-ubuntu_jammy
+        - airship-pegleg-validate-airskiff-manifests-noble
+        - airship-pegleg-docker-build-gate-ubuntu_noble
         - airship-pegleg-lint-yaml
 
     gate:
       jobs:
-        - openstack-tox-py310
-        - openstack-tox-pep8-jammy
-        - openstack-tox-cover-jammy
+        - openstack-tox-py312
+        - openstack-tox-pep8-noble
+        - openstack-tox-cover-noble
         - pegleg-dependency-vulnerability-check
-        - airship-pegleg-validate-airskiff-manifests-jammy
-        - airship-pegleg-docker-build-gate-ubuntu_jammy
+        - airship-pegleg-validate-airskiff-manifests-noble
+        - airship-pegleg-docker-build-gate-ubuntu_noble
         - airship-pegleg-lint-yaml
     post:
       jobs:
-        - airship-pegleg-docker-publish-ubuntu_jammy
+        - airship-pegleg-docker-publish-ubuntu_noble
         - pegleg-upload-git-mirror
         - trigger-readthedocs-webhook
 
 - nodeset:
-    name: airship-pegleg-single--bionic
+    name: airship-pegleg-single-node-noble
     nodes:
       - name: primary
-        label: ubuntu-bionic
+        label: ubuntu-noble
 
 - nodeset:
     name: airship-pegleg-single-node-jammy
@@ -67,15 +68,15 @@
         label: ubuntu-jammy
 
 - job:
-    name: openstack-tox-pep8-jammy
+    name: openstack-tox-pep8-noble
     parent: openstack-tox-pep8
-    nodeset: openstack-single-node-jammy
+    nodeset: openstack-single-node-noble
 
 
 - job:
-    name: openstack-tox-cover-jammy
+    name: openstack-tox-cover-noble
     parent: openstack-tox-cover
-    nodeset: openstack-single-node-jammy
+    nodeset: openstack-single-node-noble
 
 
 - job:
@@ -83,41 +84,41 @@
     voting: true
     timeout: 600
     run: tools/gate/playbooks/lint-yaml.yaml
-    nodeset: ubuntu-jammy
+    nodeset: ubuntu-noble
     irrelevant-files:
       - ^.*\.rst$
       - ^doc/.*$
 
 - job:
     name: pegleg-dependency-vulnerability-check
-    parent: tox-py310
+    parent: tox-py312
     voting: false
     timeout: 600
-    nodeset: ubuntu-jammy
+    nodeset: ubuntu-noble
     vars:
       tox_envlist: safety
-      bindep_profile: test py310
+      bindep_profile: test py312
 
 - job:
-    name: airship-pegleg-docker-build-gate-ubuntu_jammy
+    name: airship-pegleg-docker-build-gate-ubuntu_noble
     timeout: 7200
     run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node-jammy
+    nodeset: airship-pegleg-single-node-noble
     irrelevant-files:
       - '^doc/.*'
     vars:
       publish: false
-      distro: ubuntu_jammy
+      distro: ubuntu_noble
       tags:
         dynamic:
           patch_set: true
 
 - job:
-    name: airship-pegleg-validate-airskiff-manifests-jammy
+    name: airship-pegleg-validate-airskiff-manifests-noble
     description: |
       Test pegleg Airskiff site manifest validation
     parent: treasuremap-airskiff-infra-deploy-base
-    nodeset: treasuremap-airskiff-1node-ubuntu_jammy
+    nodeset: treasuremap-airskiff-1node-ubuntu_noble
     run:
       - tools/gate/playbooks/airship-run-scripts.yaml
       - tools/gate/playbooks/airskiff-validate.yaml
@@ -131,7 +132,7 @@
       CLONE_PEGLEG: false
       MAKE_PEGLEG_IMAGES: true
       USE_ARMADA_GO: false
-      DISTRO: ubuntu_jammy
+      DISTRO: ubuntu_noble
       DOCKER_REGISTRY: localhost:5000
       gate_scripts_relative_path: ../../airship/treasuremap
       gate_scripts:
@@ -140,17 +141,17 @@
         - ./tools/deployment/airskiff/developer/022-generate_security_keys.sh
 
 - job:
-    name: airship-pegleg-docker-publish-ubuntu_jammy
+    name: airship-pegleg-docker-publish-ubuntu_noble
     timeout: 7200
     run: tools/gate/playbooks/docker-image-build.yaml
-    nodeset: airship-pegleg-single-node-jammy
+    nodeset: airship-pegleg-single-node-noble
     secrets:
       - airship_pegleg_quay_creds_2026
     irrelevant-files:
       - '^doc/.*'
     vars:
       publish: true
-      distro: ubuntu_jammy
+      distro: ubuntu_noble
       tags:
         dynamic:
           branch: true
@@ -158,32 +159,6 @@
         static:
           - latest
           - airflow_3.1.5
-
-- secret:
-    name: airship_pegleg_quay_creds
-    data:
-      username: !encrypted/pkcs1-oaep
-        - BI1sCnCyps8RaXf/BQ2ZtobrXn4MfnimRr5wE5Rv3U95NCCK5EoUwBEvnz7yNmQ8m99D7
-          9Gx4qA0N1ry7QL+o2Ll0D/ahb/HsaVBNU3CeVfe+3shpEVEuSi2xrA8K9LQPfIK1237vr
-          wVvN/R+y/uYm7mpPr/aEPjQwJf3wgEK8xV/ZTvqYSVCpGylbfV0tWxm6uEVdBc1kMPLJN
-          8uItJPaAaYMkFEasnVlI/DV8suiK13BLT7bNpNZBQsQ3AlcBCoq9mt50C3slV1wIneaz9
-          qK+O++z7r8OTWUDMQqWE5d1m6jz1WIp5DROmnOvb9dfS73XsTcgmXwilrQt3VSvFCToga
-          gAVHcoWbIKfxgrbOhoLFr+68id3VwVKN+NXgkoxTAJSzFCWwrs0X4n4W6D4O9buQyFTiZ
-          s9o5rB1f2bdF5iI8Npqg6YchPtWn2eR78w1hRyge2HJk2RQgN1CqjpbiQ0uiEy0QA/Ksu
-          VTtuONyV3T7FUYXaK3cHYrCwhV/idquSNRCWnKQAbs8mU8w298UbpOq4lZk1Njeg9StIs
-          0DYyG1SX2k4mBS4//9i488qBSss2CBMhZWHbesSDi/OW4fNzz/2wm2FaW1uaJJSOTXEyJ
-          E3p4+eejcYknXR+XD6BWfSvSwabsCezGSCg7wg7CRFsuTYXx5a4y/+P8Jh+Y7Y=
-      password: !encrypted/pkcs1-oaep
-        - x/0RHX1OlOfFgyb5ed0sknZQi8waSQLzWv+Aog0CziVMf9r3MtZ29LAcrqp9VUdFRYGCk
-          Hf71TJb1Zb8b+WNcUJH2JjVo//Z1smU5F5xEqzhz0gTm1HYQjMAlqd1VNDYv0IpWl2dLE
-          sGnEOT/Uq0RfH3rRt+33GagmXBUNuOIMdx41ubrMaF6ddg8IbjISRaCdfPOlNIrj24gCj
-          a16UNiSyAhvqkod2G2HO7JE7Nv2//5hI1MD1o7sip8/eub12XtHMjpDRKR+KymX81LGAS
-          PeCAn+Hw41uUKnxI/OTW47YtNvQVZZ4gRTOKTumsSNSceFfbf5ljm/JHTWx0SO6Z/kvzH
-          RAJwBmLPHg7leD2wF9vWXwcmlyWJFyeEW/K/+6gYycQ2H0OnRuRxzYaNpSa96zPWUfNsA
-          3TEKJcXjFXJSr00KnWmUZw8ZmPYAziu+pZoBXpkIhYoP1MAtggv/pvVsODDHmokP9nVE6
-          s6YbtUXzthM/TgsE5KMZ2QP4udetj11RGDC+7fz/edtLcrpL3Nrq2rkJ2tRV+yR1ElKGx
-          b2YX7cwM/vx3DPhWRBPJJfOoSRl+ZJByDM1KKWmAB91LT9vB3oVk/vq2XUsbTH2w20LcK
-          xBXFJMtVHOavHIIWM7qHvkvZzWSBON7ydspje9MbYtTS5/97ccdLxDHA0MX0wM=
 
 - secret:
     name: airship_pegleg_quay_creds_2026
@@ -221,54 +196,6 @@
       - name: git_mirror_credentials
         secret: pegleg-airshipit-github-ed25519-secret-2026-01-13
         pass-to-parent: true
-
-- secret:
-    name: pegleg-airshipit-github-secret-2023-03-23
-    data:
-      user: git
-      host: github.com
-      host_key: github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
-      ssh_key: !encrypted/pkcs1-oaep
-        - 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
 
 - secret:
     name: pegleg-airshipit-github-ed25519-secret-2026-01-13
