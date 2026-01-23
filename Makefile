@@ -28,7 +28,7 @@ PUSH_IMAGE        ?= false
 LABEL             ?= org.airshipit.build=community
 COMMIT            ?= $(shell git rev-parse HEAD)
 DISTRO             ?= ubuntu_noble
-DISTRO_ALIAS	   ?= ubuntu_jammy
+DISTRO_ALIAS	   ?= ubuntu_noble
 IMAGE             ?= $(DOCKER_REGISTRY)/$(IMAGE_PREFIX)/$(IMAGE_NAME):$(IMAGE_TAG)-${DISTRO}
 IMAGE_ALIAS              := ${DOCKER_REGISTRY}/${IMAGE_PREFIX}/${IMAGE_NAME}:${IMAGE_TAG}-${DISTRO_ALIAS}
 PYTHON_BASE_IMAGE ?= python:3.8

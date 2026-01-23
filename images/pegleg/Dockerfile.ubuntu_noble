@@ -35,7 +35,7 @@ RUN set -ex \
          openssh-client \
          python3-dev \
          python3-setuptools \
-         # this will install golang-cfssl 1.2.0 in Jammy
+         # this will install golang-cfssl 1.2.0 in Noble
          golang-cfssl \
     && apt autoremove -yqq --purge \
     && apt clean \
@@ -48,8 +48,6 @@ RUN set -ex \
          /var/log/* \
          /var/tmp/* \
     && rm -rf /root/.cache/pip
-
-
 
 VOLUME /var/pegleg
 WORKDIR /var/pegleg
