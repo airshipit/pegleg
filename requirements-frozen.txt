@@ -82,7 +82,7 @@ PasteDeploy==3.1.0
 PasteScript==3.7.0
 pbr==7.0.3
 pecan==1.7.0
-pip==24.0
+pip==26.0
 ply==3.11
 prettytable==3.17.0
 promenade @ git+https://opendev.org/airship/promenade.git@74443011a752616adab410846e9380db4a5ade59
