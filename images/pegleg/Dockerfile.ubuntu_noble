@@ -49,6 +49,12 @@ RUN set -ex \
          /var/tmp/* \
     && rm -rf /root/.cache/pip
 
+# Fix for OpenSSH 9.x: use legacy SCP protocol (-O) for Gerrit compatibility
+# Noble's OpenSSH defaults to SFTP which older Gerrit servers don't support
+RUN mv /usr/bin/scp /usr/bin/scp.real && \
+    printf '#!/bin/sh\nexec /usr/bin/scp.real -O "$@"\n' > /usr/bin/scp && \
+    chmod +x /usr/bin/scp
+
 VOLUME /var/pegleg
 WORKDIR /var/pegleg
 
