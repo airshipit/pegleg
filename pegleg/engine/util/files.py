@@ -136,7 +136,8 @@ def directories_for(*, site_name, site_type):
     ]
 
     return [
-        os.path.join(b, l) for b in config.all_repos() for l in library_list
+        os.path.join(b, lib) for b in config.all_repos()
+        for lib in library_list
     ]
 
 
@@ -155,7 +156,7 @@ def directories_for_each_repo(*, site_name, site_type):
 
     dir_map = dict()
     for r in config.all_repos():
-        dir_map[r] = [os.path.join(r, l) for l in library_list]
+        dir_map[r] = [os.path.join(r, lib) for lib in library_list]
 
     return dir_map
 
@@ -420,7 +421,7 @@ def check_file_save_location(save_location):
         # In case save_location already exists and isn't a directory.
         if not os.path.isdir(save_location):
             raise click.ClickException(
-                'save_location %s already exists, '
+                'save_location {} already exists, '
                 'but is not a directory'.format(save_location))
 
 

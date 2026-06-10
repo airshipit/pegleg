@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from collections import OrderedDict
-from datetime import datetime, timezone
+from datetime import datetime
+from datetime import timezone
 import logging
 
 from pegleg import config

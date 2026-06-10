@@ -37,8 +37,6 @@ LOG = logging.getLogger(__name__)
 
 @atexit.register
 def _clean_temp_folders():
-    global __REPO_FOLDERS
-
     for r in __REPO_FOLDERS.values():
         shutil.rmtree(r, ignore_errors=True)
 
@@ -155,8 +153,6 @@ def _process_repository(
     :param overwrite_existing: Whether to overwrite an existing directory
 
     """
-
-    global __REPO_FOLDERS
 
     if os.path.exists(repo_url_or_path) and not overwrite_existing:
         repo_name = util.git.repo_name(repo_url_or_path)

@@ -102,8 +102,7 @@ def encrypt(save_location, author, site_name, path=None):
     if secrets_found:
         LOG.info('Encryption of all secret files was completed.')
     else:
-        LOG.warning(
-            'No secret documents were found for site: {}'.format(site_name))
+        LOG.warning('No secret documents were found for site: %s', site_name)
 
 
 def decrypt(path, site_name=None):
@@ -125,8 +124,8 @@ def decrypt(path, site_name=None):
 
     if not os.path.exists(path):
         LOG.error(
-            'Path: {} was not found. Check your path and site name, '
-            'and try again.'.format(path))
+            'Path: %s was not found. Check your path and site name, '
+            'and try again.', path)
         return file_dict
 
     if os.path.isfile(path):
@@ -136,8 +135,7 @@ def decrypt(path, site_name=None):
         match = os.path.join(path, '**', '*.yaml')
         file_list = glob(match, recursive=True)
         if not file_list:
-            LOG.warning(
-                'No YAML files were discovered in path: {}'.format(path))
+            LOG.warning('No YAML files were discovered in path: %s', path)
         for file_path in file_list:
             file_dict[file_path] = PeglegSecretManagement(
                 file_path).decrypt_secrets()

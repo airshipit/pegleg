@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from importlib.resources import files
 import logging
 import os
 import shutil
 import textwrap
-import yaml
 
 import click
 from prettytable import PrettyTable
+import yaml
 
 from pegleg import config
 from pegleg.engine.errorcodes import DOCUMENT_LAYER_MISMATCH
@@ -29,7 +30,6 @@ from pegleg.engine.errorcodes import REPOS_MISSING_DIRECTORIES_FLAG
 from pegleg.engine.errorcodes import SCHEMA_STORAGE_POLICY_MISMATCH_FLAG
 from pegleg.engine.errorcodes import SECRET_NOT_ENCRYPTED_POLICY
 from pegleg.engine import util
-from importlib.resources import files
 
 __all__ = ['full']
 

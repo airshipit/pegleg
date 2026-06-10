@@ -84,8 +84,7 @@ def build_genesis(build_path, encryption_key, validators, debug, site_name):
             Builder(c, validators=validators).build_all(output_dir=build_path)
 
     except exceptions.PromenadeException as e:
-        LOG.error(
-            'Build genesis bundle failed! {}.'.format(e.display(debug=debug)))
+        LOG.error('Build genesis bundle failed! %s.', e.display(debug=debug))
         raise GenesisBundleGenerateException()
 
     LOG.info('=== Done! ===')

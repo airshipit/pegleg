@@ -211,8 +211,8 @@ def _try_git_clone(
                 allow_unsafe_options=True)
         else:
             LOG.debug('Cloning [%s]', repo_url)
-            repo = Repo.clone_from(repo_url, temp_dir, env=env_vars,
-                allow_unsafe_options=True)
+            repo = Repo.clone_from(
+                repo_url, temp_dir, env=env_vars, allow_unsafe_options=True)
     except git_exc.GitCommandError as e:
         LOG.exception(
             'Failed to clone repo_url=%s using ref=%s.', repo_url, ref)

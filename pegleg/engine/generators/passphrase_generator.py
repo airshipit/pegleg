@@ -127,8 +127,8 @@ class PassphraseGenerator(BaseGenerator):
             if force_cleartext:
                 storage_policy = passphrase_catalog.P_CLEARTEXT
                 LOG.warning(
-                    "Passphrases for {} will be "
-                    "generated in clear text.".format(p_name))
+                    "Passphrases for %s will be generated in clear text.",
+                    p_name)
             else:
                 storage_policy = self._catalog.get_storage_policy(p_name)
 

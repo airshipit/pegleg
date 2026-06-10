@@ -235,10 +235,10 @@ def mock_passphrase_and_salt_env_variables(tmpdir):
             return rand_salt
         return unmocked_env_get(key, *args, **kwargs)
 
-    mock_env_get = mock.patch(
-        'os.environ.get', side_effect=mock_environ_get).start()
+    patcher = mock.patch('os.environ.get', side_effect=mock_environ_get)
+    patcher.start()
     yield
-    mock_env_get.stop()
+    patcher.stop()
 
 
 @pytest.mark.skipif(
@@ -293,8 +293,8 @@ class TestPKIGenerator(object):
 
         def _filter_keypairs(x):
             return (
-                x['data']['managedDocument']['schema'] in valid_keypair_schemas
-            )
+                x['data']['managedDocument']['schema']
+                in valid_keypair_schemas)
 
         keypairs = list(filter(_filter_keypairs, documents))
         self._validate_documents(

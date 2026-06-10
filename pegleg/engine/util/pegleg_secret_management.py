@@ -107,9 +107,8 @@ class PeglegSecretManagement(object):
             click.echo('Wrote encrypted data to: {}'.format(save_path))
         else:
             LOG.debug(
-                'All documents in file: {} are either already encrypted '
-                'or have cleartext storage policy. '
-                'Skipping.'.format(self.file_path))
+                'All documents in file: %s are either already encrypted '
+                'or have cleartext storage policy. Skipping.', self.file_path)
 
     def get_encrypted_secrets(self):
         """
@@ -149,7 +148,7 @@ class PeglegSecretManagement(object):
                 salt = config.get_global_salt()
 
             secret_doc = doc.get_secret()
-            if type(secret_doc) != bytes:
+            if not isinstance(secret_doc, bytes):
                 secret_doc = secret_doc.encode()
             doc.set_secret(encrypt(secret_doc, passphrase, salt))
             doc.set_encrypted(self._author)

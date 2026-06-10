@@ -74,8 +74,8 @@ class BaseCatalog(ABC):
             # Cound not find the Catalog for this generated passphrase
             # raise an exception.
             LOG.error(
-                'Catalog path: {} was not found in repo: {}'.format(
-                    catalog_name, repo_name))
+                'Catalog path: %s was not found in repo: %s', catalog_name,
+                repo_name)
             raise PassphraseCatalogNotFoundException()
 
     def _get_document_name(self, name):
