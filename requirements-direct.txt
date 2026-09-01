@@ -11,9 +11,9 @@ psycopg2-binary
 pytz
 
 # Airship dependencies
-deckhand @ git+https://opendev.org/airship/deckhand.git@0531c10fd6cd645493210ce730a4bd1b75a7e584#egg=deckhand
+deckhand @ git+https://opendev.org/airship/deckhand.git@d53c3f955ab9485cc00a2eb64903f017ffd0303a#egg=deckhand
 shipyard-client @ git+https://opendev.org/airship/shipyard.git@349e7ae72b819d4ab1b788722e576749811b2f67#egg=shipyard-client&subdirectory=src/bin/shipyard_client
-promenade @ git+https://opendev.org/airship/promenade.git@0ebe24d832e58fa361106151d143f501b693052d#egg=promenade
+promenade @ git+https://opendev.org/airship/promenade.git@5e64f58d5f9c2a6b116f2044419d665fac7de465#egg=promenade
 
 # Openstack Gazpacho 2026.1
 # https://releases.openstack.org/gazpacho/index.html
