@@ -83,7 +83,7 @@ PasteDeploy==3.1.0
 PasteScript==3.7.0
 pbr==7.0.3
 pecan==1.8.0
-pip==24.0
+pip==26.2
 prettytable==3.17.0
 promenade @ git+https://opendev.org/airship/promenade.git@0ebe24d832e58fa361106151d143f501b693052d
 prometheus_client==0.25.0
