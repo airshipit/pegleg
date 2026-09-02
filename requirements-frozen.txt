@@ -20,7 +20,7 @@ cmd2==2.7.0
 cotyledon==2.2.0
 cryptography==48.0.0
 debtcollector==3.1.0
-Deckhand @ git+https://opendev.org/airship/deckhand.git@d53c3f955ab9485cc00a2eb64903f017ffd0303a
+Deckhand @ git+https://opendev.org/airship/deckhand.git@08bda7015baccd9e392e19a31b7fef978b2f5c04
 decorator==5.3.1
 deepdiff==9.1.0
 dnspython==2.8.0
@@ -85,7 +85,7 @@ pbr==7.0.3
 pecan==1.8.0
 pip==24.0
 prettytable==3.17.0
-promenade @ git+https://opendev.org/airship/promenade.git@5e64f58d5f9c2a6b116f2044419d665fac7de465
+promenade @ git+https://opendev.org/airship/promenade.git@e7ad3393e1516b37edf60d368f78207ed9386873
 prometheus_client==0.25.0
 psutil==7.2.2
 psycopg2-binary==2.9.12
