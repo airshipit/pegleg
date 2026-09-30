@@ -140,6 +140,7 @@
       USE_ARMADA_GO: false
       DISTRO: ubuntu_noble
       DOCKER_REGISTRY: localhost:5000
+      zuul_treasuremap_relative_path: ../../airship/treasuremap
       gate_scripts_relative_path: ../../airship/treasuremap
       gate_scripts:
         - ./tools/deployment/airskiff/developer/000-clone-dependencies.sh
